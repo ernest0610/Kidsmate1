@@ -50,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="clicked_game_wordChain2"
-        android:text="game_wordChain" />
+        android:text="game_wordChain2" />
 
     <Button
         android:id="@+id/button_main"
