@@ -36,7 +36,7 @@ public class Game_todaysWord extends AppCompatActivity {
         int id = (int)(Math.random() * Integer.MAX_VALUE) % 3017 + 1; // 기왕이면 디비에서 전체 단어 갯수를 가지고 와서 나머지를 구하도록 하는게 좋지 않을까?
         String[] result = new String[]{"", ""};
 
-        DB = Database.getDB(); //Database를 이용
+        DB = Database2.getDB(); //Database를 이용
         cursor = DB.rawQuery("SELECT word, mean FROM dic WHERE id = " + id, null);
         cursor.moveToFirst();
         if (!cursor.isAfterLast()) {
