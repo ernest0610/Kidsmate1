@@ -5,10 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-/**
- * Created by User on 2017-04-15.
- */
-
 public class SelectContents extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

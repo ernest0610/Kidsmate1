@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/button_todaysWord"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_todaysWord"
+        android:text="todaysWord" />
+
+    <Button
+        android:id="@+id/button_dictionary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_dictionary"
+        android:text="dictionary" />
+
+    <Button
+        android:id="@+id/button_game_blank"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_game_blank"
+        android:text="game_blank" />
+
+    <Button
+        android:id="@+id/button_game_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_game_image"
+        android:text="game_image" />
+
+    <Button
+        android:id="@+id/button_game_wordChain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_game_wordChain"
+        android:text="game_wordChain" />
+
+    <Button
+        android:id="@+id/button_todaysWord2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_todaysWord2"
+        android:text="todaysword2" />
+
+    <Button
+        android:id="@+id/button_game_wordChain2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_game_wordChain2"
+        android:text="game_wordChain" />
+
+    <Button
+        android:id="@+id/button_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_main"
+        android:text="main" />
+</LinearLayout>
