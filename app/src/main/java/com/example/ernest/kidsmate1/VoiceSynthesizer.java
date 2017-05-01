@@ -14,11 +14,20 @@ public class VoiceSynthesizer{
     private static String clientSecret = "r38dkrGz8Z";//애플리케이션 클라이언트 시크릿값";
 
     private String arg;
+
+    /*
+    speaker : clara(여성) / matt(남성)
+    speed : -5, -4, ... 4, 5 (0.5배 빠른, 0.4배 빠른 .... 0.4배 느린, 0.5배 느린)
+    */
     private boolean speaker;
     private int speed;
+
     private Context context;
 
     public VoiceSynthesizer(Context context) {
+        /*
+        파일의 접근권한 획득을 위해서 각 액티비티는 반드시 보이스 신시사이저를 자신의 컨텍스트를 넣어 객체를 생성해야 합니다.
+        */
         this.context = context;
         this.arg = "";
         this.speaker = true;
@@ -26,6 +35,7 @@ public class VoiceSynthesizer{
     }
 
     /*
+    생성자 작업하다 만 것
     public VoiceSynthesizer(Context context, String arg, boolean speaker, int speed) {
         this.context = context;
         this.arg = "";
@@ -38,10 +48,12 @@ public class VoiceSynthesizer{
     */
 
     public void setString(String arg){
+        //음성합성을 시작하기 전에 이 클래스의 문자열 매개변수를 교체해주어야 합니다.
         this.arg = arg;
     }
 
     public void doSynthsize() {
+        // 이 메소드를 실행함으로써 음성합성이 시작됩니다.
         new Thread() {
             public void run () {
                 realSynthsizer(arg, speaker, speed);
@@ -50,6 +62,7 @@ public class VoiceSynthesizer{
     }
 
     private void realSynthsizer(String arg, boolean mSpeaker, int mSpeed) {
+        // 스레드에 넣어서 실행되는 음성합성 api입니다.
         String speaker;
         String speed;
         try {
@@ -62,10 +75,10 @@ public class VoiceSynthesizer{
             con.setRequestProperty("X-Naver-Client-Secret", clientSecret);
 
             // post request
-        /*
-        speaker : clara(여성) / matt(남성)
-        speed : -5, -4, ... 4, 5 (0.5배 빠른, 0.4배 빠른 .... 0.4배 느린, 0.5배 느린)
-        */
+            /*
+            speaker : clara(여성) / matt(남성)
+            speed : -5, -4, ... 4, 5 (0.5배 빠른, 0.4배 빠른 .... 0.4배 느린, 0.5배 느린)
+            */
             if (mSpeaker) {
                 speaker = URLEncoder.encode("clara", "UTF-8");
             } else {
