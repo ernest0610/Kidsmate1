@@ -31,12 +31,12 @@ public class Game_todaysWord extends AppCompatActivity {
     private Button button_next;
 
     private String[] getWord() {
+        String[] result = new String[]{"", ""};
+        /*
         SQLiteDatabase DB;
         Cursor cursor;
         int id = (int)(Math.random() * Integer.MAX_VALUE) % 3017 + 1; // 기왕이면 디비에서 전체 단어 갯수를 가지고 와서 나머지를 구하도록 하는게 좋지 않을까?
-        String[] result = new String[]{"", ""};
-
-        DB = Database2.getDB(); //Database를 이용
+        DB = Database.getDB(); //Database를 이용
         cursor = DB.rawQuery("SELECT word, mean FROM dic WHERE id = " + id, null);
         cursor.moveToFirst();
         if (!cursor.isAfterLast()) {
@@ -44,7 +44,7 @@ public class Game_todaysWord extends AppCompatActivity {
             result[1] = cursor.getString(1);
         }
         cursor.close();
-
+        */
         return result;
     }
 

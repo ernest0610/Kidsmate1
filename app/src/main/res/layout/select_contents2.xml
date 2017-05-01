@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="clicked_todaysWord2"
-        android:text="todaysword2" />
+        android:text="game_todaysword2" />
 
     <Button
         android:id="@+id/button_game_wordChain2"
