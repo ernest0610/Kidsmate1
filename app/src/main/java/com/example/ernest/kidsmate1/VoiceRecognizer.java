@@ -1,7 +1,6 @@
 package com.example.ernest.kidsmate1;
 
 import android.content.Context;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.WorkerThread;
@@ -22,8 +21,6 @@ class VoiceRecognizer {
     private static SpeechRecognizer mRecognizer; // 음성인식 클라이언트. (API)
 
     private static RecogListener mRecogListener; // inner class
-
-    //private static AudioWriterPCM writer;
 
     private static final String TAG = VoiceRecognizer.class.getSimpleName();
     private static final String CLIENT_ID = "4iZdE_YGdmxI9QVHDmDm";
@@ -93,8 +90,6 @@ class VoiceRecognizer {
         @WorkerThread
         public void onReady() {
             Log.d(TAG, "Event occurred : Ready");
-            //writer = new AudioWriterPCM(Environment.getExternalStorageDirectory().getAbsolutePath() + "/NaverSpeechTest");
-            //writer.open("Test");
             Message msg = Message.obtain(mHandler, R.id.clientReady);
             msg.sendToTarget();
         }
@@ -102,7 +97,6 @@ class VoiceRecognizer {
         @Override
         @WorkerThread
         public void onRecord(short[] speech) {
-            //writer.write(speech);
             Log.d(TAG, "Event occurred : Record");
             Message msg = Message.obtain(mHandler, R.id.audioRecording);
             msg.sendToTarget();
@@ -127,20 +121,6 @@ class VoiceRecognizer {
         @Override
         @WorkerThread
         public void onResult(SpeechRecognitionResult result) {
-            /*
-            5개의 스트링이 담긴 List<String>을 반환한다.
-            */
-            /*
-            List<String> results = result.getResults();
-            StringBuilder strBuf = new StringBuilder();
-            for(String resultz : results) {
-                strBuf.append(resultz);
-                strBuf.append("\n");
-            }
-            String mResult = strBuf.toString();
-            Log.d(TAG, "Final Result!! (" + result.getResults().get(0) + ")");
-            Message msg = Message.obtain(mHandler, R.id.finalResult, mResult);
-            */
             Message msg = Message.obtain(mHandler, R.id.finalResult, result);
             msg.sendToTarget();
         }
@@ -148,11 +128,6 @@ class VoiceRecognizer {
         @Override
         @WorkerThread
         public void onError(int errorCode) {
-            /*
-            if (writer != null) {
-                writer.close();
-            }
-            */
             Log.d(TAG, "Error!! (" + Integer.toString(errorCode) + ")");
             Message msg = Message.obtain(mHandler, R.id.recognitionError, errorCode);
             msg.sendToTarget();
@@ -169,11 +144,6 @@ class VoiceRecognizer {
         @Override
         @WorkerThread
         public void onInactive() {
-            /*
-            if (writer != null) {
-                writer.close();
-            }
-            */
             Log.d(TAG, "Event occurred : Inactive");
             Message msg = Message.obtain(mHandler, R.id.clientInactive);
             msg.sendToTarget();

@@ -29,6 +29,8 @@
         <activity android:name=".WordChain" />
         <activity android:name=".ResultDic" />
         <activity android:name=".Game_WordChain" />
+        <activity android:name=".Game_todaysWord" />
+        <activity android:name=".SelectContents2" />
     </application>
 
 </manifest>

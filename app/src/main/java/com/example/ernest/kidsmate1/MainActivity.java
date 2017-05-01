@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     }
 
     protected void mainStartClicked(View v) {               //메뉴 선택화면으로 이동
-        Intent intent = new Intent(MainActivity.this, SelectContents.class);
+        Intent intent = new Intent(MainActivity.this, SelectContents2.class);
         startActivity(intent);
         finish();
     }
@@ -45,12 +45,12 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     @Override
     protected void onStart() {              //Activity start 될 때
         super.onStart();
-        Database.naverRecognizerInitialize();
+        //Database.naverRecognizerInitialize();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)      //녹음, 저장 권한 확인 후 설정
                 == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getApplicationContext(), "음성 인식을 시작합니다.", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "음성 인식을 시작합니다.", Toast.LENGTH_SHORT).show();
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.RECORD_AUDIO) ||
                 ActivityCompat.shouldShowRequestPermissionRationale(this,

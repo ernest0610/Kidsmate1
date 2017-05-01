@@ -13,12 +13,12 @@ import com.naver.speech.clientapi.SpeechRecognitionResult;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class Game_WordChain extends AppCompatActivity {
+public class Feature_todaysWord extends AppCompatActivity {
     private VoiceRecognizer mVoiceRecognizer;
     private EventHandler mEventHandler;
 
-    private String givenWord;
-    private String givenWordMean;
+    private String correctAnswer;
+    private String correctAnsersMean;
     private boolean isRightAnswer;
 
     private TextView textView_word;
@@ -28,20 +28,17 @@ public class Game_WordChain extends AppCompatActivity {
     private Button button_start;
     private Button button_next;
 
-    private String[] getWord() {
-        String[] result = new String[]{"", ""};
-        result[0] = "apple";
-        result[1] = "사과";
-        return result;
+    private String[] getWordAndMean() {
+        return Database.getRandomWordMean();
     }
 
     private boolean makeQuiz(){
-        String[] targetWord = getWord();
-        givenWord = targetWord[0];
-        givenWordMean = targetWord[1];
+        String[] todayWord = getWordAndMean();
+        correctAnswer = todayWord[0];
+        correctAnsersMean = todayWord[1];
         isRightAnswer = false;
-        textView_word.setText(givenWord);
-        textView_mean.setText(givenWordMean);
+        textView_word.setText(correctAnswer);
+        textView_mean.setText(correctAnsersMean);
         return true;
     }
 
@@ -55,11 +52,9 @@ public class Game_WordChain extends AppCompatActivity {
             case R.id.partialResult:
                 String partialResult = (String) msg.obj;
                 textView_debug.append(partialResult+" ");
-                if(partialResult.length()>=2) {
-                    if (!isRightAnswer && partialResult.toLowerCase().charAt(0) == (givenWord.toLowerCase().lastIndexOf(0))) {
-                        isRightAnswer = true;
-                        textView_debug.append("정답입니다.\n");
-                    }
+                if(!isRightAnswer && partialResult.toLowerCase().equals(correctAnswer.toLowerCase())){
+                    isRightAnswer = true;
+                    textView_debug.append("정답입니다.\n");
                 }
                 textView_debug.append("\n");
                 break;
@@ -70,11 +65,9 @@ public class Game_WordChain extends AppCompatActivity {
                 for (String result: results) {
                     if (isRightAnswer) break;
                     textView_debug.append(result+" ");
-                    if(result.length()>=2) {
-                        if (result.toLowerCase().charAt(0) == (givenWord.toLowerCase().lastIndexOf(0))) {
-                            isRightAnswer = true;
-                            textView_debug.append("정답입니다.\n");
-                        }
+                    if(result.toLowerCase().equals(correctAnswer.toLowerCase())) {
+                        isRightAnswer = true;
+                        textView_debug.append("정답입니다.\n");
                     }
                 }
                 textView_debug.append("\n");
@@ -158,13 +151,13 @@ public class Game_WordChain extends AppCompatActivity {
     }
 
     public static class EventHandler extends Handler {
-        private final WeakReference<Game_WordChain> mActivity;
-        EventHandler(Game_WordChain activity) {
+        private final WeakReference<Feature_todaysWord> mActivity;
+        EventHandler(Feature_todaysWord activity) {
             mActivity = new WeakReference<>(activity);
         }
         @Override
         public void handleMessage(Message msg) {
-            Game_WordChain activity = mActivity.get();
+            Feature_todaysWord activity = mActivity.get();
             if (activity != null) {
                 activity.handleMessage(msg);
             }

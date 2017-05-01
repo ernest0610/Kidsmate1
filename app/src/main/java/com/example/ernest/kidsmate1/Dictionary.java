@@ -50,14 +50,14 @@ public class Dictionary extends AppCompatActivity {
         switch (msg.what) {                         //샘플 코드 복사 한 것입니다
             case R.id.endRecognize:
                 Log.v("dic", "endRecognize");
-                mResult = Database.getmmResult();
+                //mResult = Database.getmmResult();
                 dicInput.setText(mResult);
                 break;
         }
     }
 
     protected void onStartClicked(View v) {
-        Database.myRecognize(txtResult, btnStart, myHandler);
+        //Database.myRecognize(txtResult, btnStart, myHandler);
     }
 
     protected void searClicked(View v) {                    //단어 입력 후 검색 버튼 -> 결과화면으로
