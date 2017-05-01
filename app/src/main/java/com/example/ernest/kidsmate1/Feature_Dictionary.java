@@ -4,12 +4,24 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -35,9 +47,77 @@ public class Feature_Dictionary extends AppCompatActivity {
     private String question;
     private String questionMean;
 
+    // Http Request Parsing 용도
+    private String ResponseText;
+    private HttpClient client;
+    private HttpGet get;
+    private HttpResponse response;
+    private HttpEntity resEntity;
+    private Document doc;
+    private Elements elements1;
+    private Elements elements2;
+    private static final String addr = "http://m.endic.naver.com/search.nhn?searchOption=all&query=";
+    private String mean;
+    private Handler handler;
+
     //함수 시작
-    private String getWordMean(String word) {
-        return Database.getMean(word);
+    private void setWordMean(String word) {
+        final String tmpWord = word;
+        handler = new Handler() {
+            public void handleMessage(Message msg) {
+                Bundle bun = msg.getData();
+                mean = bun.getString("HTML_DATA");
+                if (mean.equals(""))
+                    mean = "'" + tmpWord + "'에 대한 결과가 없습니다";
+                textView_mean.setText(mean);
+            }
+        };
+        new Thread() {
+            public void run() {
+                String mean = "";
+                client = new DefaultHttpClient();
+                get = new HttpGet(addr + tmpWord.replaceAll(" ", "%20"));
+                try {
+                    response = client.execute(get);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                resEntity = response.getEntity();
+                if (resEntity != null) {
+                    try {
+                        ResponseText = EntityUtils.toString(resEntity, "UTF-8");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                doc = Jsoup.parse(ResponseText);
+                elements1 = doc.select("div.entry_search_word");
+                for (Element element1 : elements1) {
+                    elements2 = element1.select("strong");
+                    /*if(elements2.select("strong").size() == 2)
+                        elements2 = element1.select("strong strong");*/
+                    mean = mean + elements2.get(0).text() + "\n";
+                    elements2 = element1.select("li");
+                    for (Element element2 : elements2) {
+                        mean = mean + element2.text() + "\n";
+                    }
+                    elements2 = element1.select("p.example_stc");
+                    for (Element element2 : elements2) {
+                        mean = mean + "\nEx)" + element2.text() + "\n";
+                    }
+                    elements2 = element1.select("p.example_mean");
+                    for (Element element2 : elements2) {
+                        mean = mean + element2.text() + "\n";
+                    }
+                    mean = mean + "\n";
+                }
+                Bundle bun = new Bundle();
+                bun.putString("HTML_DATA", mean);
+                Message msg = handler.obtainMessage();
+                msg.setData(bun);
+                handler.sendMessage(msg);
+            }
+        }.start();
     }
 
     private boolean showWordMean(String word){
@@ -45,6 +125,8 @@ public class Feature_Dictionary extends AppCompatActivity {
         textView_word.setText(question);
         questionMean = getWordMean(question.toLowerCase());
         textView_mean.setText(questionMean);
+        textView_word.setText(word);
+        setWordMean(word);
         return true;
     }
 
@@ -70,6 +152,7 @@ public class Feature_Dictionary extends AppCompatActivity {
                 textView_debug.append("\n");
 
                 showWordMean(results.get(0));
+                editText_inputWord.setText(results.get(0));
                 break;
             case R.id.recognitionError:
                 MessageDialogFragment.newInstance("Error code : " + msg.obj.toString());
@@ -138,7 +221,7 @@ public class Feature_Dictionary extends AppCompatActivity {
         button_inputWordAccept.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                VoiceSynthesizer.Synthesize(question, true, 0);
+                showWordMean(editText_inputWord.getText().toString());
             }
         });
     }
