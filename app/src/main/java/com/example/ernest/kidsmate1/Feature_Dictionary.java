@@ -1,5 +1,6 @@
 package com.example.ernest.kidsmate1;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,6 +31,7 @@ public class Feature_Dictionary extends AppCompatActivity {
     // 모든 액티비티가 가지고 있어야 하는 요소.
     private VoiceRecognizer mVoiceRecognizer; // 싱글톤
     private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
+    private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
     // 액티비티들 공통 UI
     private TextView textView_word;
@@ -173,6 +175,8 @@ public class Feature_Dictionary extends AppCompatActivity {
         mEventHandler = new EventHandler(this);
         // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
+        // 음성합성 API를 사용하기 위한 객체 생성.
+        mVoiceSynthesizer = new VoiceSynthesizer(this);
 
         // UI 생성 (액티비티 공통)
         setContentView(R.layout.game_basic);
@@ -209,9 +213,12 @@ public class Feature_Dictionary extends AppCompatActivity {
             }
         });
 
+
         button_playSound.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                mVoiceSynthesizer.setString(question);
+                mVoiceSynthesizer.doSynthsize();
             }
         });
 

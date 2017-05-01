@@ -19,6 +19,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
     // 모든 액티비티가 가지고 있어야 하는 요소.
     private VoiceRecognizer mVoiceRecognizer; // 싱글톤
     private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
+    private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
     // 액티비티들 공통 UI
     private TextView textView_word;
@@ -124,6 +125,8 @@ public class Game_BlankGuessing extends AppCompatActivity {
         mEventHandler = new EventHandler(this);
         // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
+        // 음성합성 API를 사용하기 위한 객체 생성.
+        mVoiceSynthesizer = new VoiceSynthesizer(this);
 
         // UI 생성 (액티비티 공통)
         setContentView(R.layout.game_basic);
@@ -170,7 +173,8 @@ public class Game_BlankGuessing extends AppCompatActivity {
         button_playSound.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                VoiceSynthesizer.Synthesize(correctAnswer, true, 0);
+                mVoiceSynthesizer.setString(correctAnswer);
+                mVoiceSynthesizer.doSynthsize();
             }
         });
 
