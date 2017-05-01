@@ -4,44 +4,56 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Random;
 
 public class Game_WordChain extends AppCompatActivity {
-    private VoiceRecognizer mVoiceRecognizer;
-    private EventHandler mEventHandler;
+    // 모든 액티비티가 가지고 있어야 하는 요소.
+    private VoiceRecognizer mVoiceRecognizer; // 싱글톤
+    private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
 
-    private String givenWord;
-    private String givenWordMean;
-    private boolean isRightAnswer;
-
+    // 액티비티들 공통 UI
     private TextView textView_word;
     private TextView textView_mean;
     private TextView textView_debug;
 
+    private EditText editText_inputWord;
+    private Button button_inputWordAccept;
+
     private Button button_start;
     private Button button_next;
 
-    private String[] getWord() {
-        String[] result = new String[]{"", ""};
-        result[0] = "apple";
-        result[1] = "사과";
-        return result;
+    // 액티비티마다 다른 변수
+    private String givenWord;
+    private boolean isRightAnswer;
+    private String RightAnswerString;
+
+    //함수 시작
+    private static final String TAG = Game_WordChain.class.getSimpleName();
+
+    private String getWordStartWith(char ch){
+        return Database.getRandomWordStartWith(String.valueOf(ch));
     }
 
-    private boolean makeQuiz(){
-        String[] targetWord = getWord();
-        givenWord = targetWord[0];
-        givenWordMean = targetWord[1];
+    private boolean makeRandomQuiz(){
+        Random random = new Random();
+        String atoz = "abcdefghijklmnopqrstuvwxyz";
+        makeQuiz(atoz.charAt(random.nextInt(26)));
+        return true;
+    }
+    private boolean makeQuiz(char ch){
+        givenWord = getWordStartWith(ch);
         isRightAnswer = false;
         textView_word.setText(givenWord);
-        textView_mean.setText(givenWordMean);
         return true;
     }
 
@@ -56,8 +68,11 @@ public class Game_WordChain extends AppCompatActivity {
                 String partialResult = (String) msg.obj;
                 textView_debug.append(partialResult+" ");
                 if(partialResult.length()>=2) {
-                    if (!isRightAnswer && partialResult.toLowerCase().charAt(0) == (givenWord.toLowerCase().lastIndexOf(0))) {
+                    Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length()-1) +
+                            ", partialResult[0]:" + partialResult.toLowerCase().charAt(0));
+                    if (!isRightAnswer && (givenWord.toLowerCase().charAt(givenWord.length()-1)) == partialResult.toLowerCase().charAt(0)) {
                         isRightAnswer = true;
+                        RightAnswerString = new String(partialResult.toLowerCase());
                         textView_debug.append("정답입니다.\n");
                     }
                 }
@@ -71,15 +86,18 @@ public class Game_WordChain extends AppCompatActivity {
                     if (isRightAnswer) break;
                     textView_debug.append(result+" ");
                     if(result.length()>=2) {
-                        if (result.toLowerCase().charAt(0) == (givenWord.toLowerCase().lastIndexOf(0))) {
+                        Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length()-1) +
+                                ", result[0]:" + result.toLowerCase().charAt(0));
+                        if ((givenWord.toLowerCase().charAt(givenWord.length()-1)) == result.toLowerCase().charAt(0)) {
                             isRightAnswer = true;
+                            RightAnswerString = new String(result.toLowerCase());
                             textView_debug.append("정답입니다.\n");
                         }
                     }
                 }
                 textView_debug.append("\n");
                 if (isRightAnswer) {
-                    makeQuiz();
+                    makeQuiz(RightAnswerString.charAt(RightAnswerString.length()-1));
                 }else{
                     textView_debug.append("다시 발음 해 보세요.\n");
                 }
@@ -101,26 +119,36 @@ public class Game_WordChain extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 음성인식 API의 이벤트를 받을 핸들러 생성
         mEventHandler = new EventHandler(this);
-
-        setContentView(R.layout.game_basic);
-
+        // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
+
+        // UI 생성 (액티비티 공통)
+        setContentView(R.layout.game_basic);
 
         textView_word = (TextView) findViewById(R.id.textView_word);
         textView_mean = (TextView) findViewById(R.id.textView_mean);
+
+        button_start = (Button) findViewById(R.id.button_start);
+        button_next = (Button) findViewById(R.id.button_next);
+
+        editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
+        button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
+
         textView_debug = (TextView) findViewById(R.id.textView_debug);
 
-        button_next = (Button) findViewById(R.id.button_next);
-        button_start = (Button) findViewById(R.id.button_start);
-
+        // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
         button_start.setEnabled(true);
+        button_inputWordAccept.setEnabled(true);
 
+        // UI 리스너 구현
         button_next.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                makeQuiz();
+                makeRandomQuiz();
             }
         });
 
@@ -137,12 +165,31 @@ public class Game_WordChain extends AppCompatActivity {
             }
         });
 
-        makeQuiz();
+        button_inputWordAccept.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+
+                String inputWord = editText_inputWord.toString();
+                editText_inputWord.setText("");
+
+                if(inputWord.length()>=2 &&
+                        ((givenWord.toLowerCase().charAt(givenWord.length()-1)) == inputWord.toLowerCase().charAt(0))) {
+                    isRightAnswer = true;
+                    RightAnswerString = new String(inputWord.toLowerCase());
+                    textView_debug.append("정답입니다.\n");
+                    makeQuiz(RightAnswerString.charAt(RightAnswerString.length()-1));
+                }
+            }
+        });
+
+        // 퀴즈를 생성한다.
+        makeRandomQuiz();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        // 액티비티 시작시 반드시 음성인식 기능을 초기화 하여야 함.
         mVoiceRecognizer.initialize(mEventHandler);
     }
 
@@ -154,10 +201,12 @@ public class Game_WordChain extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        // 액티비티 종료시 반드시 음성인식 기능을 릴리즈 하여야 함.
         mVoiceRecognizer.release();
     }
 
     public static class EventHandler extends Handler {
+        // 이벤트 핸들러 이너 클래스
         private final WeakReference<Game_WordChain> mActivity;
         EventHandler(Game_WordChain activity) {
             mActivity = new WeakReference<>(activity);

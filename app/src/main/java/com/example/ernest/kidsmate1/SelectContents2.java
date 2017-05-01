@@ -16,37 +16,32 @@ public class SelectContents2 extends AppCompatActivity {
     public void onBackPressed() {
     }
 
-    protected void clicked_todaysWord(View v) {
-        Intent intent = new Intent(SelectContents2.this, TodayWord.class);
-        startActivity(intent);
-    }
-
     protected void clicked_dictionary(View v) {
         Intent intent = new Intent(SelectContents2.this, Dictionary.class);
         startActivity(intent);
     }
 
-    protected void clicked_game_blank(View v) {
-        Intent intent = new Intent(SelectContents2.this, Blank.class);
+    protected void clicked_Feature_Dictionary(View v) {
+        Intent intent = new Intent(SelectContents2.this, Feature_Dictionary.class);
         startActivity(intent);
     }
 
-    protected void clicked_game_image(View v) {
-        Intent intent = new Intent(SelectContents2.this, Image.class);
+    protected void clicked_Feature_TodaysWord(View v) {
+        Intent intent = new Intent(SelectContents2.this, Feature_TodaysWord.class);
         startActivity(intent);
     }
 
-    protected void clicked_game_wordChain(View v) {
-        Intent intent = new Intent(SelectContents2.this, WordChain.class);
+    protected void clicked_Game_BlankGuessing(View v) {
+        Intent intent = new Intent(SelectContents2.this, Game_BlankGuessing.class);
         startActivity(intent);
     }
 
-    protected void clicked_todaysWord2(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_todaysWord.class);
+    protected void clicked_Game_ImageGuessing(View v) {
+        Intent intent = new Intent(SelectContents2.this, Game_ImageGuessing.class);
         startActivity(intent);
     }
 
-    protected void clicked_game_wordChain2(View v) {
+    protected void clicked_Game_WordChain(View v) {
         Intent intent = new Intent(SelectContents2.this, Game_WordChain.class);
         startActivity(intent);
     }

@@ -10,15 +10,13 @@
         android:id="@+id/textView_word"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="TextView"
         android:textColor="@color/text"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/textView_mean"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:text="TextView" />
+        android:layout_height="200dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -37,6 +35,27 @@
             android:layout_height="wrap_content"
             android:text="다음" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/editText_inputWord"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="textPersonName" />
+
+        <Button
+            android:id="@+id/button_inputWordAccept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="입력" />
     </LinearLayout>
 
     <ScrollView

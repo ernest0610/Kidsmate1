@@ -4,13 +4,6 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/button_todaysWord"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_todaysWord"
-        android:text="todaysWord" />
-
-    <Button
         android:id="@+id/button_dictionary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,39 +11,39 @@
         android:text="dictionary" />
 
     <Button
-        android:id="@+id/button_game_blank"
+        android:id="@+id/button_dictionary2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="clicked_game_blank"
-        android:text="game_blank" />
+        android:onClick="clicked_Feature_Dictionary"
+        android:text="Feature_Dictionary" />
 
     <Button
-        android:id="@+id/button_game_image"
+        android:id="@+id/button_todaysWord"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="clicked_game_image"
-        android:text="game_image" />
+        android:onClick="clicked_Feature_TodaysWord"
+        android:text="Feature_TodaysWord" />
+
+    <Button
+        android:id="@+id/button_game_blankGuessing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_Game_BlankGuessing"
+        android:text="Game_BlankGuessing" />
+
+    <Button
+        android:id="@+id/button_game_imageGuessing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_Game_ImageGuessing"
+        android:text="Game_ImageGuessing" />
 
     <Button
         android:id="@+id/button_game_wordChain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="clicked_game_wordChain"
-        android:text="game_wordChain" />
-
-    <Button
-        android:id="@+id/button_todaysWord2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_todaysWord2"
-        android:text="game_todaysword2" />
-
-    <Button
-        android:id="@+id/button_game_wordChain2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_game_wordChain2"
-        android:text="game_wordChain2" />
+        android:onClick="clicked_Game_WordChain"
+        android:text="Game_WordChain" />
 
     <Button
         android:id="@+id/button_main"
