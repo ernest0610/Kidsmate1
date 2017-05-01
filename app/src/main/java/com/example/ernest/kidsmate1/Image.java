@@ -45,7 +45,7 @@ public class Image extends AppCompatActivity {
     }
 
     protected void onStartClicked_Img(View v) {
-        Database.myRecognize(txtResult, btnStart, myHandler);
+        //Database.myRecognize(txtResult, btnStart, myHandler);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Image extends AppCompatActivity {
         switch (msg.what) {                         //샘플 코드 복사 한 것입니다
             case R.id.endRecognize:
                 Log.v("dic", "endRecognize");
-                resultchk = Database.getResultCHK();
+                //resultchk = Database.getResultCHK();
                 test.setText("");
                 int i = 0;
                 for (String result: resultchk) {

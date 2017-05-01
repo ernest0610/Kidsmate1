@@ -35,6 +35,7 @@ public class Database extends Application {
     public static final String DBNAME = "testDB.db";
 
 
+    /*
     /////////////////////////////////////////////////////////////////////     API
     private static final String TAG = Database.class.getSimpleName();
     private static final String CLIENT_ID = "4iZdE_YGdmxI9QVHDmDm";
@@ -49,6 +50,7 @@ public class Database extends Application {
     private static String mmResult;
     private static String[] resultchk = new String[]{"", "", "", "", ""};
     /////////////////////////////////////////////////////////////////////////
+    */
 
     public static SQLiteDatabase getDB() {
         return DB;
@@ -59,15 +61,18 @@ public class Database extends Application {
             DB.close();
     }
 
+
     @Override
     public void onCreate() {
         super.onCreate();
         Database = this;
         Database.initializeInstance();
+        /*
         /////////////////////////////////////////////////////////        API
         handler = new RecognitionHandler(this);
         naverRecognizer = new NaverRecognizer(this, handler, CLIENT_ID);
         //////////////////////////////////////////////////////////////////
+        */
     }
 
     protected void initializeInstance() {
@@ -103,6 +108,7 @@ public class Database extends Application {
         }
     }
 
+    /*
     ////////////////////////////////////////////////////   API
     static class RecognitionHandler extends Handler {       //API용 핸들, 메시지를 받아와서 현재 Activity에 전달
         private final WeakReference<Database> mActivity;  //* Main으로 옮길 예정 or 클래스 분할
@@ -223,4 +229,5 @@ public class Database extends Application {
         return resultchk;
     }
     ///////////////////////////////////////////////////////////////////////
+    */
 }

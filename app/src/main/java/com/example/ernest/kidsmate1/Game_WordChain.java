@@ -1,12 +1,9 @@
 package com.example.ernest.kidsmate1;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,8 +17,8 @@ public class Game_WordChain extends AppCompatActivity {
     private VoiceRecognizer mVoiceRecognizer;
     private EventHandler mEventHandler;
 
-    private String correctAnswer;
-    private String correctAnsersMean;
+    private String givenWord;
+    private String givenWordMean;
     private boolean isRightAnswer;
 
     private TextView textView_word;
@@ -32,30 +29,19 @@ public class Game_WordChain extends AppCompatActivity {
     private Button button_next;
 
     private String[] getWord() {
-        SQLiteDatabase DB;
-        Cursor cursor;
-        int id = (int)(Math.random() * Integer.MAX_VALUE) % 3017 + 1; // 기왕이면 디비에서 전체 단어 갯수를 가지고 와서 나머지를 구하도록 하는게 좋지 않을까?
         String[] result = new String[]{"", ""};
-
-        DB = Database.getDB(); //Database를 이용
-        cursor = DB.rawQuery("SELECT word, mean FROM dic WHERE id = " + id, null);
-        cursor.moveToFirst();
-        if (!cursor.isAfterLast()) {
-            result[0] = cursor.getString(0);
-            result[1] = cursor.getString(1);
-        }
-        cursor.close();
-
+        result[0] = "apple";
+        result[1] = "사과";
         return result;
     }
 
     private boolean makeQuiz(){
-        String[] todayWord = getWord();
-        correctAnswer = todayWord[0];
-        correctAnsersMean = todayWord[1];
+        String[] targetWord = getWord();
+        givenWord = targetWord[0];
+        givenWordMean = targetWord[1];
         isRightAnswer = false;
-        textView_word.setText(correctAnswer);
-        textView_mean.setText(correctAnsersMean);
+        textView_word.setText(givenWord);
+        textView_mean.setText(givenWordMean);
         return true;
     }
 
@@ -69,9 +55,11 @@ public class Game_WordChain extends AppCompatActivity {
             case R.id.partialResult:
                 String partialResult = (String) msg.obj;
                 textView_debug.append(partialResult+" ");
-                if(!isRightAnswer && partialResult.toLowerCase().equals(correctAnswer.toLowerCase())){
-                    isRightAnswer = true;
-                    textView_debug.append("정답입니다.\n");
+                if(partialResult.length()>=2) {
+                    if (!isRightAnswer && partialResult.toLowerCase().charAt(0) == (givenWord.toLowerCase().lastIndexOf(0))) {
+                        isRightAnswer = true;
+                        textView_debug.append("정답입니다.\n");
+                    }
                 }
                 textView_debug.append("\n");
                 break;
@@ -82,9 +70,11 @@ public class Game_WordChain extends AppCompatActivity {
                 for (String result: results) {
                     if (isRightAnswer) break;
                     textView_debug.append(result+" ");
-                    if(result.toLowerCase().equals(correctAnswer.toLowerCase())) {
-                        isRightAnswer = true;
-                        textView_debug.append("정답입니다.\n");
+                    if(result.length()>=2) {
+                        if (result.toLowerCase().charAt(0) == (givenWord.toLowerCase().lastIndexOf(0))) {
+                            isRightAnswer = true;
+                            textView_debug.append("정답입니다.\n");
+                        }
                     }
                 }
                 textView_debug.append("\n");

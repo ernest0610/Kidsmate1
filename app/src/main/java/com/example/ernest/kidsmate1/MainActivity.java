@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     @Override
     protected void onStart() {              //Activity start 될 때
         super.onStart();
-        Database.naverRecognizerInitialize();
+        //Database.naverRecognizerInitialize();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)      //녹음, 저장 권한 확인 후 설정
                 == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
