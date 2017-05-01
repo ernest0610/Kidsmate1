@@ -51,13 +51,13 @@ public class TodayWord extends AppCompatActivity {
         test = (TextView) findViewById(R.id.textView4);
 
         myHandler = new MyHandler(this);
-        todayWord = getWord();
+        todayWord = Database.getRandomWordMean();//getWord();
         tw_word.setText(todayWord[0]);
         tw_mean.setText(todayWord[1]);
     }
 
     protected void onClicked_TW(View v) {
-        String[] todayWord = getWord();
+        String[] todayWord = Database.getRandomWordMean();//getWord();
         tw_word.setText(todayWord[0]);
         tw_mean.setText(todayWord[1]);
     }
@@ -102,7 +102,7 @@ public class TodayWord extends AppCompatActivity {
                     test.append("\"" + result + "\" - \"" + tw_word.getText() + "\"\n");
                     if(result.toLowerCase().equals(tw_word.getText().toString().toLowerCase())) {
                         test.append("잘했습니다");
-                        todayWord = getWord();
+                        todayWord = Database.getRandomWordMean();//getWord();
                         tw_word.setText(todayWord[0]);
                         tw_mean.setText(todayWord[1]);
                         break;
