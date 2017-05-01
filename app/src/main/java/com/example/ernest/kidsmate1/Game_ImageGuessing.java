@@ -29,6 +29,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
     private Button button_start;
     private Button button_next;
+    private Button button_playSound;
 
     // 액티비티마다 다른 변수
     private String correctAnswer;
@@ -116,6 +117,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
         button_start = (Button) findViewById(R.id.button_start);
         button_next = (Button) findViewById(R.id.button_next);
+        button_playSound = (Button) findViewById(R.id.button_playSound);
 
         editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
         button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
@@ -125,16 +127,10 @@ public class Game_ImageGuessing extends AppCompatActivity {
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
         button_start.setEnabled(true);
+        button_playSound.setEnabled(true);
         button_inputWordAccept.setEnabled(true);
 
         // UI 리스너 구현
-        button_next.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                makeQuiz();
-            }
-        });
-
         button_start.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -145,6 +141,20 @@ public class Game_ImageGuessing extends AppCompatActivity {
                     button_start.setEnabled(false);
                     mVoiceRecognizer.stop();
                 }
+            }
+        });
+
+        button_next.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                makeQuiz();
+            }
+        });
+
+        button_playSound.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                VoiceSynthesizer.Synthesize(correctAnswer, true, 0);
             }
         });
 
