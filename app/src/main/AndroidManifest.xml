@@ -21,16 +21,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SelectContents" />
-        <activity android:name=".TodayWord" />
         <activity android:name=".Dictionary" />
-        <activity android:name=".Blank" />
-        <activity android:name=".Image" />
-        <activity android:name=".WordChain" />
         <activity android:name=".ResultDic" />
-        <activity android:name=".Game_WordChain" />
-        <activity android:name=".Game_todaysWord" />
+
         <activity android:name=".SelectContents2" />
+        <activity android:name=".Feature_Dictionary" />
+        <activity android:name=".Feature_TodaysWord" />
+        <activity android:name=".Game_BlankGuessing" />
+        <activity android:name=".Game_ImageGuessing" />
+        <activity android:name=".Game_WordChain" />
     </application>
 
 </manifest>

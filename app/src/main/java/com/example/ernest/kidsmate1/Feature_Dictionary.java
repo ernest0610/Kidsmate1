@@ -6,6 +6,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
@@ -13,32 +14,34 @@ import com.naver.speech.clientapi.SpeechRecognitionResult;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class Game_imageGuessing extends AppCompatActivity {
-    private VoiceRecognizer mVoiceRecognizer;
-    private EventHandler mEventHandler;
+public class Feature_Dictionary extends AppCompatActivity {
+    // 모든 액티비티가 가지고 있어야 하는 요소.
+    private VoiceRecognizer mVoiceRecognizer; // 싱글톤
+    private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
 
-    private String correctAnswer;
-    private String correctAnsersMean;
-    private boolean isRightAnswer;
-
+    // 액티비티들 공통 UI
     private TextView textView_word;
     private TextView textView_mean;
     private TextView textView_debug;
 
+    private EditText editText_inputWord;
+    private Button button_inputWordAccept;
+
     private Button button_start;
     private Button button_next;
 
-    private String[] getWordAndMean() {
-        return Database.getRandomWordMean();
+    // 액티비티마다 다른 변수
+    private String question;
+    private String questionMean;
+
+    //함수 시작
+    private String getWordMean(String word) {
+        return Database.getMean(word);
     }
 
-    private boolean makeQuiz(){
-        String[] todayWord = getWordAndMean();
-        correctAnswer = todayWord[0];
-        correctAnsersMean = todayWord[1];
-        isRightAnswer = false;
-        //textView_word.setText(correctAnswer);
-        textView_mean.setText(correctAnsersMean);
+    private boolean showWordMean(String word){
+        textView_word.setText(word);
+        textView_mean.setText(getWordMean(word.toLowerCase()));
         return true;
     }
 
@@ -52,30 +55,18 @@ public class Game_imageGuessing extends AppCompatActivity {
             case R.id.partialResult:
                 String partialResult = (String) msg.obj;
                 textView_debug.append(partialResult+" ");
-                if(!isRightAnswer && partialResult.toLowerCase().equals(correctAnswer.toLowerCase())){
-                    isRightAnswer = true;
-                    textView_debug.append("정답입니다.\n");
-                }
-                textView_debug.append("\n");
                 break;
             case R.id.endPointDetected:
                 break;
             case R.id.finalResult:
                 List<String> results = ((SpeechRecognitionResult)(msg.obj)).getResults();
+
                 for (String result: results) {
-                    if (isRightAnswer) break;
                     textView_debug.append(result+" ");
-                    if(result.toLowerCase().equals(correctAnswer.toLowerCase())) {
-                        isRightAnswer = true;
-                        textView_debug.append("정답입니다.\n");
-                    }
                 }
                 textView_debug.append("\n");
-                if (isRightAnswer) {
-                    makeQuiz();
-                }else{
-                    textView_debug.append("다시 발음 해 보세요.\n");
-                }
+
+                showWordMean(results.get(0));
                 break;
             case R.id.recognitionError:
                 MessageDialogFragment.newInstance("Error code : " + msg.obj.toString());
@@ -94,29 +85,32 @@ public class Game_imageGuessing extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 음성인식 API의 이벤트를 받을 핸들러 생성
         mEventHandler = new EventHandler(this);
-
-        setContentView(R.layout.game_basic);
-
+        // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
+
+        // UI 생성 (액티비티 공통)
+        setContentView(R.layout.game_basic);
 
         textView_word = (TextView) findViewById(R.id.textView_word);
         textView_mean = (TextView) findViewById(R.id.textView_mean);
+
+        button_start = (Button) findViewById(R.id.button_start);
+        button_next = (Button) findViewById(R.id.button_next);
+
+        editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
+        button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
+
         textView_debug = (TextView) findViewById(R.id.textView_debug);
 
-        button_next = (Button) findViewById(R.id.button_next);
-        button_start = (Button) findViewById(R.id.button_start);
-
-        button_next.setEnabled(true);
+        // UI 환경 설정 (액티비티마다 다름)
         button_start.setEnabled(true);
+        button_next.setEnabled(false);
+        button_inputWordAccept.setEnabled(true);
 
-        button_next.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                makeQuiz();
-            }
-        });
-
+        // UI 리스너 구현
         button_start.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -130,12 +124,18 @@ public class Game_imageGuessing extends AppCompatActivity {
             }
         });
 
-        makeQuiz();
+        button_inputWordAccept.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                showWordMean(editText_inputWord.getText().toString());
+            }
+        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        // 액티비티 시작시 반드시 음성인식 기능을 초기화 하여야 함.
         mVoiceRecognizer.initialize(mEventHandler);
     }
 
@@ -147,17 +147,19 @@ public class Game_imageGuessing extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        // 액티비티 종료시 반드시 음성인식 기능을 릴리즈 하여야 함.
         mVoiceRecognizer.release();
     }
 
     public static class EventHandler extends Handler {
-        private final WeakReference<Game_imageGuessing> mActivity;
-        EventHandler(Game_imageGuessing activity) {
+        // 이벤트 핸들러 이너 클래스
+        private final WeakReference<Feature_Dictionary> mActivity;
+        EventHandler(Feature_Dictionary activity) {
             mActivity = new WeakReference<>(activity);
         }
         @Override
         public void handleMessage(Message msg) {
-            Game_imageGuessing activity = mActivity.get();
+            Feature_Dictionary activity = mActivity.get();
             if (activity != null) {
                 activity.handleMessage(msg);
             }

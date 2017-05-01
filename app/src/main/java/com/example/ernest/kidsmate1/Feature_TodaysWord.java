@@ -6,6 +6,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
@@ -13,21 +14,28 @@ import com.naver.speech.clientapi.SpeechRecognitionResult;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class Feature_todaysWord extends AppCompatActivity {
-    private VoiceRecognizer mVoiceRecognizer;
-    private EventHandler mEventHandler;
+public class Feature_TodaysWord extends AppCompatActivity {
+    // 모든 액티비티가 가지고 있어야 하는 요소.
+    private VoiceRecognizer mVoiceRecognizer; // 싱글톤
+    private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
 
-    private String correctAnswer;
-    private String correctAnsersMean;
-    private boolean isRightAnswer;
-
+    // 액티비티들 공통 UI
     private TextView textView_word;
     private TextView textView_mean;
     private TextView textView_debug;
 
+    private EditText editText_inputWord;
+    private Button button_inputWordAccept;
+
     private Button button_start;
     private Button button_next;
 
+    // 액티비티마다 다른 변수
+    private String correctAnswer;
+    private String correctAnsersMean;
+    private boolean isRightAnswer;
+
+    // 함수 시작
     private String[] getWordAndMean() {
         return Database.getRandomWordMean();
     }
@@ -94,22 +102,32 @@ public class Feature_todaysWord extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 음성인식 API의 이벤트를 받을 핸들러 생성
         mEventHandler = new EventHandler(this);
-
-        setContentView(R.layout.game_basic);
-
+        // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
+
+        // UI 생성 (액티비티 공통)
+        setContentView(R.layout.game_basic);
 
         textView_word = (TextView) findViewById(R.id.textView_word);
         textView_mean = (TextView) findViewById(R.id.textView_mean);
+
+        button_start = (Button) findViewById(R.id.button_start);
+        button_next = (Button) findViewById(R.id.button_next);
+
+        editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
+        button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
+
         textView_debug = (TextView) findViewById(R.id.textView_debug);
 
-        button_next = (Button) findViewById(R.id.button_next);
-        button_start = (Button) findViewById(R.id.button_start);
-
+        // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
         button_start.setEnabled(true);
+        button_inputWordAccept.setEnabled(false);
 
+        // UI 리스너 구현
         button_next.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -130,12 +148,14 @@ public class Feature_todaysWord extends AppCompatActivity {
             }
         });
 
+        // 퀴즈를 만든다.
         makeQuiz();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        // 액티비티 시작시 반드시 음성인식 기능을 초기화 하여야 함.
         mVoiceRecognizer.initialize(mEventHandler);
     }
 
@@ -147,17 +167,19 @@ public class Feature_todaysWord extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        // 액티비티 종료시 반드시 음성인식 기능을 릴리즈 하여야 함.
         mVoiceRecognizer.release();
     }
 
     public static class EventHandler extends Handler {
-        private final WeakReference<Feature_todaysWord> mActivity;
-        EventHandler(Feature_todaysWord activity) {
+        // 이벤트 핸들러 이너 클래스
+        private final WeakReference<Feature_TodaysWord> mActivity;
+        EventHandler(Feature_TodaysWord activity) {
             mActivity = new WeakReference<>(activity);
         }
         @Override
         public void handleMessage(Message msg) {
-            Feature_todaysWord activity = mActivity.get();
+            Feature_TodaysWord activity = mActivity.get();
             if (activity != null) {
                 activity.handleMessage(msg);
             }
