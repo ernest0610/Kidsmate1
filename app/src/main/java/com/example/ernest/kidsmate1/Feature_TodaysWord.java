@@ -1,7 +1,5 @@
 package com.example.ernest.kidsmate1;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,7 +13,7 @@ import com.naver.speech.clientapi.SpeechRecognitionResult;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class Game_todaysWord extends AppCompatActivity {
+public class Feature_todaysWord extends AppCompatActivity {
     private VoiceRecognizer mVoiceRecognizer;
     private EventHandler mEventHandler;
 
@@ -30,26 +28,12 @@ public class Game_todaysWord extends AppCompatActivity {
     private Button button_start;
     private Button button_next;
 
-    private String[] getWord() {
-        SQLiteDatabase DB;
-        Cursor cursor;
-        int id = (int)(Math.random() * Integer.MAX_VALUE) % 3017 + 1; // 기왕이면 디비에서 전체 단어 갯수를 가지고 와서 나머지를 구하도록 하는게 좋지 않을까?
-        String[] result = new String[]{"", ""};
-
-        DB = Database.getDB(); //Database를 이용
-        cursor = DB.rawQuery("SELECT word, mean FROM dic WHERE id = " + id, null);
-        cursor.moveToFirst();
-        if (!cursor.isAfterLast()) {
-            result[0] = cursor.getString(0);
-            result[1] = cursor.getString(1);
-        }
-        cursor.close();
-
-        return result;
+    private String[] getWordAndMean() {
+        return Database.getRandomWordMean();
     }
 
     private boolean makeQuiz(){
-        String[] todayWord = getWord();
+        String[] todayWord = getWordAndMean();
         correctAnswer = todayWord[0];
         correctAnsersMean = todayWord[1];
         isRightAnswer = false;
@@ -167,13 +151,13 @@ public class Game_todaysWord extends AppCompatActivity {
     }
 
     public static class EventHandler extends Handler {
-        private final WeakReference<Game_todaysWord> mActivity;
-        EventHandler(Game_todaysWord activity) {
+        private final WeakReference<Feature_todaysWord> mActivity;
+        EventHandler(Feature_todaysWord activity) {
             mActivity = new WeakReference<>(activity);
         }
         @Override
         public void handleMessage(Message msg) {
-            Game_todaysWord activity = mActivity.get();
+            Feature_todaysWord activity = mActivity.get();
             if (activity != null) {
                 activity.handleMessage(msg);
             }
