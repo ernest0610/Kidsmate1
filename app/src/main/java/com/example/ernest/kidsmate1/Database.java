@@ -66,7 +66,8 @@ public class Database extends Application {
         String word = "";
         Cursor cursor = DB.rawQuery("SELECT word FROM dic WHERE id = " + id, null);
         cursor.moveToFirst();
-        word = cursor.getString(0);
+        if(!cursor.isAfterLast())
+            word = cursor.getString(0);
         cursor.close();
         return word;
     }
@@ -76,8 +77,10 @@ public class Database extends Application {
         String[] word = new String[]{"", ""};
         Cursor cursor = DB.rawQuery("SELECT word, mean FROM dic WHERE id = " + id, null);
         cursor.moveToFirst();
-        word[0] = cursor.getString(0);
-        word[1] = cursor.getString(1);
+        if(!cursor.isAfterLast()) {
+            word[0] = cursor.getString(0);
+            word[1] = cursor.getString(1);
+        }
         cursor.close();
         return word;
     }
@@ -87,7 +90,8 @@ public class Database extends Application {
         Cursor cursor = DB.rawQuery("SELECT word FROM dic WHERE word LIKE '" + start + "%' COLLATE NOCASE", null);
         int id = (int)(Math.random() * Integer.MAX_VALUE) % cursor.getCount();
         cursor.move(id);
-        word = cursor.getString(0);
+        if(!cursor.isAfterLast())
+            word = cursor.getString(0);
         cursor.close();
         return word;
     }
@@ -97,8 +101,10 @@ public class Database extends Application {
         Cursor cursor = DB.rawQuery("SELECT word, mean FROM dic WHERE word LIKE '" + start + "%' COLLATE NOCASE", null);
         int id = (int)(Math.random() * Integer.MAX_VALUE) % cursor.getCount();
         cursor.move(id);
-        word[0] = cursor.getString(0);
-        word[1] = cursor.getString(1);
+        if(!cursor.isAfterLast()) {
+            word[0] = cursor.getString(0);
+            word[1] = cursor.getString(1);
+        }
         cursor.close();
         return word;
     }
@@ -106,9 +112,20 @@ public class Database extends Application {
     public static String getMean(String word) {
         Cursor cursor = DB.rawQuery("SELECT mean FROM dic WHERE word = '" + word + "' COLLATE NOCASE", null);
         cursor.moveToFirst();
-        String mean = cursor.getString(0);
+        String mean = "";
+        if(!cursor.isAfterLast())
+            mean = cursor.getString(0);
         cursor.close();
         return mean;
+    }
+    public static String getWord(String mean) {
+        Cursor cursor = DB.rawQuery("SELECT word FROM dic WHERE mean = '" + mean + "' ", null);
+        cursor.moveToFirst();
+        String word = "";
+        if(!cursor.isAfterLast())
+            cursor.getString(0);
+        cursor.close();
+        return word;
     }
 
     @Override
