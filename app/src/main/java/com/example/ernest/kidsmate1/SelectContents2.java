@@ -16,11 +16,6 @@ public class SelectContents2 extends AppCompatActivity {
     public void onBackPressed() {
     }
 
-    protected void clicked_dictionary(View v) {
-        Intent intent = new Intent(SelectContents2.this, Dictionary.class);
-        startActivity(intent);
-    }
-
     protected void clicked_Feature_Dictionary(View v) {
         Intent intent = new Intent(SelectContents2.this, Feature_Dictionary.class);
         startActivity(intent);

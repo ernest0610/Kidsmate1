@@ -4,13 +4,6 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/button_dictionary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_dictionary"
-        android:text="dictionary" />
-
-    <Button
         android:id="@+id/button_dictionary2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
