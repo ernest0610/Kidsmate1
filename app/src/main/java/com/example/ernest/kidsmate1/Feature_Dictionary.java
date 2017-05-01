@@ -122,9 +122,6 @@ public class Feature_Dictionary extends AppCompatActivity {
 
     private boolean showWordMean(String word){
         question = word;
-        textView_word.setText(question);
-        questionMean = getWordMean(question.toLowerCase());
-        textView_mean.setText(questionMean);
         textView_word.setText(word);
         setWordMean(word);
         return true;
