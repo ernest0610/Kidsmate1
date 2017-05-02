@@ -41,6 +41,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
     // 모든 액티비티가 가지고 있어야 하는 요소.
     private VoiceRecognizer mVoiceRecognizer; // 싱글톤
     private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
+    private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
     // 액티비티들 공통 UI
     private TextView textView_word;
@@ -52,6 +53,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
     private Button button_start;
     private Button button_next;
+    private Button button_playSound;
 
     private ScrollView scrollView_game;
 
@@ -212,6 +214,8 @@ public class Game_ImageGuessing extends AppCompatActivity {
         mEventHandler = new EventHandler(this);
         // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
+        // 음성합성 API를 사용하기 위한 객체 생성.
+        mVoiceSynthesizer = new VoiceSynthesizer(this);
 
         // UI 생성 (액티비티 공통)
         setContentView(R.layout.game_basic);
@@ -221,6 +225,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
         button_start = (Button) findViewById(R.id.button_start);
         button_next = (Button) findViewById(R.id.button_next);
+        button_playSound = (Button) findViewById(R.id.button_playSound);
 
         editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
         button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
@@ -231,6 +236,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
         button_start.setEnabled(true);
+        button_playSound.setEnabled(true);
         button_inputWordAccept.setEnabled(true);
         scrollView_game = (ScrollView) findViewById(R.id.scrollView_game);
         myProgress = new MyProgress(this);
@@ -238,13 +244,6 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
 
         // UI 리스너 구현
-        button_next.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                makeQuiz();
-            }
-        });
-
         button_start.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -255,6 +254,21 @@ public class Game_ImageGuessing extends AppCompatActivity {
                     button_start.setEnabled(false);
                     mVoiceRecognizer.stop();
                 }
+            }
+        });
+
+        button_next.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                makeQuiz();
+            }
+        });
+
+        button_playSound.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                mVoiceSynthesizer.setString(correctAnswer);
+                mVoiceSynthesizer.doSynthsize();
             }
         });
 

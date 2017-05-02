@@ -54,6 +54,12 @@
             android:layout_height="wrap_content"
             android:text="다음" />
 
+        <Button
+            android:id="@+id/button_playSound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="재생" />
+
     </LinearLayout>
 
     <LinearLayout
