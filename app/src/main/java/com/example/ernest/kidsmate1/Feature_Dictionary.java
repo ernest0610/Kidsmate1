@@ -59,6 +59,9 @@ public class Feature_Dictionary extends AppCompatActivity {
     private String mean;
     private Handler handler;
 
+    // progress bar 변수
+    private MyProgress myProgress;
+
     //함수 시작
     private void setWordMean(String word) {
         final String tmpWord = word;
@@ -69,6 +72,7 @@ public class Feature_Dictionary extends AppCompatActivity {
                 if (mean.equals(""))
                     mean = "'" + tmpWord + "'에 대한 결과가 없습니다";
                 textView_mean.setText(mean);
+                myProgress.dismiss();
             }
         };
         new Thread() {
@@ -120,6 +124,7 @@ public class Feature_Dictionary extends AppCompatActivity {
     }
 
     private boolean showWordMean(String word){
+        myProgress.show();
         textView_word.setText(word);
         setWordMean(word);
         return true;
@@ -190,6 +195,8 @@ public class Feature_Dictionary extends AppCompatActivity {
         button_start.setEnabled(true);
         button_next.setEnabled(false);
         button_inputWordAccept.setEnabled(true);
+        myProgress = new MyProgress(this);
+        myProgress.setCancelable(false);
 
         // UI 리스너 구현
         button_start.setOnClickListener(new View.OnClickListener(){
