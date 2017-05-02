@@ -1,18 +1,41 @@
 package com.example.ernest.kidsmate1;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 
 public class Game_ImageGuessing extends AppCompatActivity {
     // 모든 액티비티가 가지고 있어야 하는 요소.
@@ -32,10 +55,29 @@ public class Game_ImageGuessing extends AppCompatActivity {
     private Button button_next;
     private Button button_playSound;
 
+    private ScrollView scrollView_game;
+
     // 액티비티마다 다른 변수
     private String correctAnswer;
     private String correctAnsersMean;
     private boolean isRightAnswer;
+
+    // 이미지 추출용 변수
+    private Handler handler;
+    private String imageURL;
+    private URL url;
+    private Bitmap bitmap;
+    private static final String addr = "https://www.google.com/search?newwindow=1&prmd=ivmn&source=lnms&tbm=isch&sa=X&biw=360&bih=517&dpr=2&q=";
+    private HttpsURLConnection conn = null;
+    private BufferedInputStream bis = null;
+    private BufferedReader reader = null;
+    private StringBuffer st = null;
+    private Document doc;
+    private Elements elements;
+    private Drawable drawable = null;
+
+    // progress bar 변수
+    private MyProgress myProgress;
 
     //함수 시작
     private String[] getWordAndMean() {
@@ -43,12 +85,75 @@ public class Game_ImageGuessing extends AppCompatActivity {
     }
 
     private boolean makeQuiz(){
+        imageURL = "";
+        myProgress.show();
         String[] todayWord = getWordAndMean();
         correctAnswer = todayWord[0];
         correctAnsersMean = todayWord[1];
         isRightAnswer = false;
         //textView_word.setText(correctAnswer);
-        textView_mean.setText(correctAnsersMean);
+        handler = new Handler() {
+            public void handleMessage(Message msg) {
+                Bundle bun = msg.getData();
+                imageURL = bun.getString("IMAGE_URL");
+                //if (imageURL.equals(""));
+                scrollView_game.setBackground(drawable);
+                myProgress.dismiss();
+            }
+        };
+        new Thread() {
+            public void run() {
+                String imageURL = "";
+                try{
+                    url = new URL(addr + correctAnswer.replaceAll(" ", "%20") + "#imgrc=6C2Fpt3z7jtfQM:");
+                    conn = (HttpsURLConnection) url.openConnection();
+                    conn.setRequestProperty("user-agent",
+                            "Mozilla/5.0 (Linux; Android 4.3; Nexus 10 Build/JSS15Q) "
+                                    + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2307.2 Mobile Safari/537.36"
+                    );
+                    conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                    SSLContext context = SSLContext.getInstance("TLS");
+                    context.init(null, null, null);
+                    conn.setSSLSocketFactory(context.getSocketFactory());
+                    conn.connect();
+                    conn.setInstanceFollowRedirects(true);
+
+
+                    bis = new BufferedInputStream(conn.getInputStream());
+                    reader = new BufferedReader(new InputStreamReader(bis));
+                    st = new StringBuffer();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        st.append(line + "\n");
+                    }
+                }catch (Exception e) { e.printStackTrace();}
+                //doc = Jsoup.parse(ResponseText);
+                doc = Jsoup.parse(st.toString());
+
+                elements = doc.select("div.rg_meta");
+                for(Element element : elements) {
+                    imageURL = imageURL + element.text();
+                    imageURL = imageURL.substring(imageURL.indexOf("\"ou\"") + 6, imageURL.indexOf("\"ow\"") - 2);
+                    break;
+                }
+                try {
+                    url = new URL(imageURL);
+                } catch (Exception e) { e.printStackTrace();}
+                try {
+                    bitmap = BitmapFactory.decodeStream(url.openStream());
+                } catch (Exception e) {e.printStackTrace();}
+                try {
+                    drawable = new BitmapDrawable(bitmap);
+                } catch (Exception e) { e.printStackTrace();}
+
+                Bundle bun = new Bundle();
+                bun.putString("IMAGE_URL", imageURL);
+                Message msg = handler.obtainMessage();
+                msg.setData(bun);
+                handler.sendMessage(msg);
+            }
+        }.start();
+        textView_word.setText(correctAnswer);
         return true;
     }
 
@@ -127,11 +232,16 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
         textView_debug = (TextView) findViewById(R.id.textView_debug);
 
+
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
         button_start.setEnabled(true);
         button_playSound.setEnabled(true);
         button_inputWordAccept.setEnabled(true);
+        scrollView_game = (ScrollView) findViewById(R.id.scrollView_game);
+        myProgress = new MyProgress(this);
+        myProgress.setCancelable(false);
+
 
         // UI 리스너 구현
         button_start.setOnClickListener(new View.OnClickListener(){
