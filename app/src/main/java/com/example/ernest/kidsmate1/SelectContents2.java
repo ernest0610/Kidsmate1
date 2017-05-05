@@ -41,8 +41,13 @@ public class SelectContents2 extends AppCompatActivity {
         startActivity(intent);
     }
 
+    protected void clicked_Test_WordChain(View v) {
+        Intent intent = new Intent(SelectContents2.this, Test_WordChain.class);
+        startActivity(intent);
+    }
+
     protected void clicked_main(View v) {
-        Intent intent = new Intent(SelectContents2.this, MainActivity.class);
+        Intent intent = new Intent(SelectContents2.this, Login_test.class);
         startActivity(intent);
         finish();
     }

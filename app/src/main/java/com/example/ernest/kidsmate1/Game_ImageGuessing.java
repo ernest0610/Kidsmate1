@@ -158,7 +158,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
         return true;
     }
 
-    private void handleMessage(Message msg) {
+    public void handleMessage(Message msg) {
         switch (msg.what) {
             case R.id.clientReady:
                 button_start.setText("연결됨");
@@ -307,20 +307,5 @@ public class Game_ImageGuessing extends AppCompatActivity {
         super.onStop();
         // 액티비티 종료시 반드시 음성인식 기능을 릴리즈 하여야 함.
         mVoiceRecognizer.release();
-    }
-
-    public static class EventHandler extends Handler {
-        // 이벤트 핸들러 이너 클래스
-        private final WeakReference<Game_ImageGuessing> mActivity;
-        EventHandler(Game_ImageGuessing activity) {
-            mActivity = new WeakReference<>(activity);
-        }
-        @Override
-        public void handleMessage(Message msg) {
-            Game_ImageGuessing activity = mActivity.get();
-            if (activity != null) {
-                activity.handleMessage(msg);
-            }
-        }
     }
 }
