@@ -132,19 +132,20 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
                 elements = doc.select("div.rg_meta");
                 for(Element element : elements) {
-                    imageURL = imageURL + element.text();
+                    imageURL = element.text();
                     imageURL = imageURL.substring(imageURL.indexOf("\"ou\"") + 6, imageURL.indexOf("\"ow\"") - 2);
-                    break;
+                    try {
+                        url = new URL(imageURL);
+                    } catch (Exception e) { e.printStackTrace();}
+                    try {
+                        bitmap = BitmapFactory.decodeStream(url.openStream());
+                    } catch (Exception e) {e.printStackTrace();}
+                    try {
+                        drawable = new BitmapDrawable(bitmap);
+                    } catch (Exception e) { e.printStackTrace();}
+                    if(bitmap != null)
+                        break;
                 }
-                try {
-                    url = new URL(imageURL);
-                } catch (Exception e) { e.printStackTrace();}
-                try {
-                    bitmap = BitmapFactory.decodeStream(url.openStream());
-                } catch (Exception e) {e.printStackTrace();}
-                try {
-                    drawable = new BitmapDrawable(bitmap);
-                } catch (Exception e) { e.printStackTrace();}
 
                 Bundle bun = new Bundle();
                 bun.putString("IMAGE_URL", imageURL);
