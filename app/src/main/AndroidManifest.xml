@@ -28,6 +28,9 @@
         <activity android:name=".Game_BlankGuessing" />
         <activity android:name=".Game_ImageGuessing" />
         <activity android:name=".Game_WordChain" />
+        <activity android:name=".Test_WordChain"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Login_test" />
     </application>
 
 </manifest>
