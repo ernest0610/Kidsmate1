@@ -155,16 +155,14 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:text="다음" />
+                    android:layout_weight="1" />
 
                 <Button
                     android:id="@+id/button_playSound"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:text="재생" />
+                    android:layout_weight="1" />
 
             </LinearLayout>
 
@@ -179,8 +177,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:text="시작" />
+                    android:layout_weight="1"/>
             </LinearLayout>
 
         </LinearLayout>
