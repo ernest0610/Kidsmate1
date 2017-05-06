@@ -119,6 +119,18 @@ public class Database extends Application {
         DB.execSQL("DELETE FROM user WHERE uname = '" + uname + "'");
     }
 
+    public static void delCharacterAll(String uname) {
+        DB.execSQL("DELETE FROM character WHERE uname = '" + uname + "'");
+    }
+
+    public static void delPetAll(String uname) {
+        DB.execSQL("DELETE FROM pet WHERE uname = '" + uname + "'");
+    }
+
+    public static void delTrophyAll(String uname) {
+        DB.execSQL("DELETE FROM trophy WHERE uname = '" + uname + "'");
+    }
+
     public static int getUserInfo(String attr, String uname) {
         Cursor cursor = DB.rawQuery("SELECT " + attr + " FROM user WHERE uname = '" + uname + "'", null);
         cursor.moveToFirst();
@@ -151,20 +163,20 @@ public class Database extends Application {
         DB.execSQL("UPDATE character SET job = " + job + " WHERE uname = '" + uname + "', cname = '" + cname + "'");
     }
 
-    public static void addCharacter(String uname, String cname, int date) {
-        DB.execSQL("INSERT INTO character (uname, cname, date) VALUES ('" + uname + "', '" + cname + "', " + date + ")");
+    public static void addCharacter(String uname, String cname, String date) {
+        DB.execSQL("INSERT INTO character (uname, cname, date) VALUES ('" + uname + "', '" + cname + "', '" + date + "')");
     }
 
-    public static void addPet(int pid, String uname, int type) {
-        DB.execSQL("INSERT INTO pet (pid, uname, type) VALUES (" + pid + ", '" + uname + "', " + type + ")");
+    public static void addPet(String pid, String uname, int type) {
+        DB.execSQL("INSERT INTO pet (pid, uname, type) VALUES ('" + pid + "', '" + uname + "', " + type + ")");
     }
 
-    public static void addTrophy(int tid, String uname, int type) {
-        DB.execSQL("INSERT INTO trophy (tid, uname, type) VALUES (" + tid + ", '" + uname + "', " + type + ")");
+    public static void addTrophy(String tid, String uname, int type) {
+        DB.execSQL("INSERT INTO trophy (tid, uname, type) VALUES ('" + tid + "', '" + uname + "', " + type + ")");
     }
 
-    public static ArrayList<Integer> getPetArray(String uname) {
-        Cursor cursor = DB.rawQuery("SELECT type FROM pet WHERE uname = '" + uname + "' ORDERBY pid", null);
+    public static ArrayList<Integer> getPetList(String uname) {
+        Cursor cursor = DB.rawQuery("SELECT type FROM pet WHERE uname = '" + uname + "' ORDER BY pid", null);
         cursor.moveToFirst();
         ArrayList<Integer> result = new ArrayList<Integer>();
         while(!cursor.isAfterLast()) {
@@ -175,12 +187,24 @@ public class Database extends Application {
         return result;
     }
 
-    public static ArrayList<Integer> getTrophyArray(String uname) {
-        Cursor cursor = DB.rawQuery("SELECT type FROM trophy WHERE uname = '" + uname + "' ORDERBY tid", null);
+    public static ArrayList<Integer> getTrophyList(String uname) {
+        Cursor cursor = DB.rawQuery("SELECT type FROM trophy WHERE uname = '" + uname + "' ORDER BY tid", null);
         cursor.moveToFirst();
         ArrayList<Integer> result = new ArrayList<Integer>();
         while(!cursor.isAfterLast()) {
             result.add(cursor.getInt(0));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return result;
+    }
+
+    public static ArrayList<String> getCharacterList(String uname) {
+        Cursor cursor = DB.rawQuery("SELECT cname FROM character WHERE uname = '" + uname + "' ORDER BY date", null);
+        cursor.moveToFirst();
+        ArrayList<String> result = new ArrayList<>();
+        while(!cursor.isAfterLast()) {
+            result.add(cursor.getString(0));
             cursor.moveToNext();
         }
         cursor.close();
