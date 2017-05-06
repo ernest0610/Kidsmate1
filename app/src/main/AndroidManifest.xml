@@ -33,6 +33,9 @@
         <activity android:name=".Login_test" />
 
         <activity android:name=".Character_Info" />
+        <activity android:name=".Character_Pet" />
+        <activity android:name=".Character_Alphabet" />
+        <activity android:name=".Character_Trophy" />
     </application>
 
 </manifest>

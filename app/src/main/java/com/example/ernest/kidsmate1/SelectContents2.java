@@ -12,8 +12,10 @@ public class SelectContents2 extends AppCompatActivity {
         setContentView(R.layout.select_contents2);
     }
 
+
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
     }
 
     protected void clicked_Feature_Dictionary(View v) {

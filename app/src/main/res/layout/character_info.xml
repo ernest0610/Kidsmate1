@@ -86,6 +86,7 @@
                     android:layout_height="0dp"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
+                    android:onClick="clicked_button_pet"
                     android:text="pet" />
 
                 <Button
@@ -94,6 +95,7 @@
                     android:layout_height="0dp"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
+                    android:onClick="clicked_button_alphabet"
                     android:text="alphabet" />
 
                 <Button
@@ -102,6 +104,7 @@
                     android:layout_height="0dp"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
+                    android:onClick="clicked_button_trophy"
                     android:text="trophy" />
 
             </LinearLayout>

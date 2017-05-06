@@ -151,7 +151,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
 
-        mDatabaseTestStub = new DatabaseTestStub();
+        mDatabaseTestStub = DatabaseTestStub.getInstance();
 
         // UI 생성 (액티비티 공통)
         setContentView(R.layout.game_basic2);
