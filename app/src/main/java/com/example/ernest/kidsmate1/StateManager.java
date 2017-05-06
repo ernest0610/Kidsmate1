@@ -22,7 +22,7 @@ public class StateManager {
     private StateManager() {
     }
 
-    public static StateManager getInstance() { // constructor
+    public static StateManager getInstance() { /// constructor
         if(mStateManager == null) {
             synchronized (StateManager.class) {
                 if(mStateManager == null) {
