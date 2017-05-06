@@ -31,6 +31,8 @@
         <activity android:name=".Test_WordChain"
             android:screenOrientation="sensorLandscape"/>
         <activity android:name=".Login_test" />
+
+        <activity android:name=".Character_Info" />
     </application>
 
 </manifest>

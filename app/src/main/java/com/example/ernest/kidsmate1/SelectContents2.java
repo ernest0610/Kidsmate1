@@ -46,9 +46,8 @@ public class SelectContents2 extends AppCompatActivity {
         startActivity(intent);
     }
 
-    protected void clicked_main(View v) {
-        Intent intent = new Intent(SelectContents2.this, Login_test.class);
+    protected void clicked_Character_Info(View v) {
+        Intent intent = new Intent(SelectContents2.this, Character_Info.class);
         startActivity(intent);
-        finish();
     }
 }
