@@ -32,8 +32,6 @@ public class Test_WordChain extends AppCompatActivity {
     private LinearLayout linearLayout;
     private TextView textView_word;
     private TextView textView_mean;
-    private TextView textView_debug;
-    private ScrollView scrollView_debug;
 
     private EditText editText_inputWord;
     private Button button_inputWordAccept;
@@ -42,8 +40,8 @@ public class Test_WordChain extends AppCompatActivity {
     private Button button_next;
     private Button button_playSound;
 
-    private ProgressBar progressBar;
-    private Thread thread;
+    //private ProgressBar progressBar;
+    //private Thread thread;
 
     // 액티비티마다 다른 변수
     private String givenWord;
@@ -60,15 +58,31 @@ public class Test_WordChain extends AppCompatActivity {
     private boolean makeRandomQuiz(){
         Random random = new Random();
         String atoz = "abcdefghijklmnopqrstuvwxyz";
-        makeQuiz(atoz.charAt(random.nextInt(26)));
+        char ch = atoz.charAt(random.nextInt(26));
+        while(Database.getRandomWordStartWith(String.valueOf(ch)).equals("")) {
+            ch = atoz.charAt(random.nextInt(26));
+        }
+        makeQuiz(ch);
         return true;
     }
     private boolean makeQuiz(char ch){
-        progressBar.setProgress(100);
+        //progressBar.setProgress(100);
         givenWord = getWordStartWith(ch);
         isRightAnswer = false;
         textView_word.setText(givenWord);
         return true;
+    }
+
+    private void checkAnswer(String word){
+        if(word.length()>=2) {
+            Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length()-1) +
+                    ", partialResult[0]:" + word.toLowerCase().charAt(0));
+            if (!isRightAnswer && (givenWord.toLowerCase().charAt(givenWord.length()-1)) == word.toLowerCase().charAt(0)) {
+                isRightAnswer = true;
+                RightAnswerString = new String(word.toLowerCase());
+                Log.d(TAG, "정답입니다.");
+            }
+        }
     }
 
     public void handleMessage(Message msg) {
@@ -80,47 +94,23 @@ public class Test_WordChain extends AppCompatActivity {
                 break;
             case R.id.partialResult:
                 String partialResult = (String) msg.obj;
-                textView_debug.append(partialResult+" ");
-                scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
-                if(partialResult.length()>=2) {
-                    Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length()-1) +
-                            ", partialResult[0]:" + partialResult.toLowerCase().charAt(0));
-                    if (!isRightAnswer && (givenWord.toLowerCase().charAt(givenWord.length()-1)) == partialResult.toLowerCase().charAt(0)) {
-                        isRightAnswer = true;
-                        RightAnswerString = new String(partialResult.toLowerCase());
-                        textView_debug.append("정답입니다.\n");
-                        scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
-                    }
-                }
-                textView_debug.append("\n");
-                scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
+                Log.d(TAG, "partialResult: " + partialResult);
+
+                checkAnswer(partialResult);
                 break;
             case R.id.endPointDetected:
                 break;
             case R.id.finalResult:
                 List<String> results = ((SpeechRecognitionResult)(msg.obj)).getResults();
                 for (String result: results) {
-                    if (isRightAnswer) break;
-                    textView_debug.append(result+" ");
-                    scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
-                    if(result.length()>=2) {
-                        Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length()-1) +
-                                ", result[0]:" + result.toLowerCase().charAt(0));
-                        if ((givenWord.toLowerCase().charAt(givenWord.length()-1)) == result.toLowerCase().charAt(0)) {
-                            isRightAnswer = true;
-                            RightAnswerString = new String(result.toLowerCase());
-                            textView_debug.append("정답입니다.\n");
-                            scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
-                        }
-                    }
+                    Log.d(TAG, "results: " + result);
+                    checkAnswer(result);
+                    if(isRightAnswer) break;
                 }
-                textView_debug.append("\n");
-                scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
                 if (isRightAnswer) {
                     makeQuiz(RightAnswerString.charAt(RightAnswerString.length()-1));
                 }else{
-                    textView_debug.append("다시 발음 해 보세요.\n");
-                    scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
+                    Log.d(TAG, "다시 발음 해 보세요.");
                 }
                 break;
             case R.id.recognitionError:
@@ -134,8 +124,9 @@ public class Test_WordChain extends AppCompatActivity {
                 button_start.setText("시작");
                 button_start.setEnabled(true);
                 break;
-            case R.id.progressbarClock:
+            /*case R.id.progressbarClock:
                 progressBar.incrementProgressBy(-5);
+                break;*/
         }
     }
 
@@ -151,7 +142,7 @@ public class Test_WordChain extends AppCompatActivity {
         mVoiceSynthesizer = new VoiceSynthesizer(this);
 
         // UI 생성 (액티비티 공통)
-        setContentView(R.layout.test_wordchain);
+        setContentView(R.layout.game_basic2_test);
 
         textView_word = (TextView) findViewById(R.id.textView_word_test);
         textView_mean = (TextView) findViewById(R.id.textView_mean_test);
@@ -163,13 +154,10 @@ public class Test_WordChain extends AppCompatActivity {
         editText_inputWord = (EditText) findViewById(R.id.editText_inputWord_test);
         button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept_test);
 
-        textView_debug = (TextView) findViewById(R.id.textView_debug_test);
-        scrollView_debug = (ScrollView) findViewById(R.id.scrollView_debug_test);
-
-        linearLayout = (LinearLayout) findViewById(R.id.linearLayout_test);
+        linearLayout = (LinearLayout) findViewById(R.id.LinearLayout_root_test);
         linearLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.testwordchain));
 
-        progressBar = (ProgressBar) findViewById(R.id.progressBar_test);
+        //progressBar = (ProgressBar) findViewById(R.id.progressBar_test);
 
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
@@ -210,23 +198,21 @@ public class Test_WordChain extends AppCompatActivity {
             @Override
             public void onClick(View v){
 
-                String inputWord = editText_inputWord.toString();
+                String inputWord = editText_inputWord.getText().toString();
                 editText_inputWord.setText("");
 
-                if(inputWord.length()>=2 &&
-                        ((givenWord.toLowerCase().charAt(givenWord.length()-1)) == inputWord.toLowerCase().charAt(0))) {
-                    isRightAnswer = true;
-                    RightAnswerString = new String(inputWord.toLowerCase());
-                    textView_debug.append("정답입니다.\n");
-                    scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
+                checkAnswer(inputWord);
+                if (isRightAnswer) {
                     makeQuiz(RightAnswerString.charAt(RightAnswerString.length()-1));
+                }else{
+                    Log.d(TAG, "다시 발음 해 보세요.");
                 }
             }
         });
 
         // 퀴즈를 생성한다.
         makeRandomQuiz();
-        new Thread() {
+        /*new Thread() {
             @Override
             public void run() {
                 try {
@@ -240,7 +226,7 @@ public class Test_WordChain extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-        }.start();
+        }.start();*/
     }
 
     @Override

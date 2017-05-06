@@ -19,14 +19,14 @@ public class StateManager {
     private String currentUname = "";
     private String currentCname = "";
 
-    private StateManager(Context context) {
+    private StateManager() {
     }
 
-    public static StateManager getInstance(Context context) { // constructor
+    public static StateManager getInstance() { // constructor
         if(mStateManager == null) {
             synchronized (StateManager.class) {
                 if(mStateManager == null) {
-                    mStateManager = new StateManager(context);
+                    mStateManager = new StateManager();
                 }
             }
         }
@@ -207,27 +207,30 @@ public int getCharacterLevel() {
     public void addCharacter(String cname) {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        int date = Integer.parseInt(simpleDateFormat.format(cal.getTime()));
-        Database.addCharacter(currentUname, currentCname, date);
+        String date = simpleDateFormat.format(cal.getTime());
+        Database.addCharacter(currentUname, cname, date);
     }
     public void addPet(int type) {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        int pid = Integer.parseInt(simpleDateFormat.format(cal.getTime()));
+        String pid = simpleDateFormat.format(cal.getTime());
         Database.addPet(pid, currentUname, type);
     }
     public void addTrophy(int type) {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        int tid = Integer.parseInt(simpleDateFormat.format(cal.getTime()));
+        String tid = simpleDateFormat.format(cal.getTime());
         Database.addPet(tid, currentUname, type);
     }
-    ////////////////////////////////////////////////////////////////////////////////// get pet, trophy array
-    public ArrayList<Integer> getPetArray() {
-        return Database.getPetArray(currentUname);
+    ////////////////////////////////////////////////////////////////////////////////// get pet, trophy list
+    public ArrayList<Integer> getPetList() {
+        return Database.getPetList(currentUname);
     }
-    public ArrayList<Integer> getTrophyArray() {
-        return Database.getTrophyArray(currentUname);
+    public ArrayList<Integer> getTrophyList() {
+        return Database.getTrophyList(currentUname);
     }
-    ////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////// get char list
+    public ArrayList<String> getCharacterList() {
+        return Database.getCharacterList(currentUname);
+    }
 }
