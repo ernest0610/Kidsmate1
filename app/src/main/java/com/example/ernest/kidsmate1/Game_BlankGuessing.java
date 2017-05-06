@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,10 +22,14 @@ public class Game_BlankGuessing extends AppCompatActivity {
     private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
     private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
+    //test stub
+    private DatabaseTestStub mDatabaseTestStub;
+    private static final String TAG = Game_BlankGuessing.class.getSimpleName();
+
     // 액티비티들 공통 UI
     private TextView textView_word;
     private TextView textView_mean;
-    private TextView textView_debug;
+    //private TextView textView_debug;
 
     private EditText editText_inputWord;
     private Button button_inputWordAccept;
@@ -38,6 +43,11 @@ public class Game_BlankGuessing extends AppCompatActivity {
     private String correctAnsersMean;
     private boolean isRightAnswer;
     private int[] blankIndex = {0};
+
+    // session var.
+    private int maxRound;
+    private int thisRound; // 0~(maxround-1)
+    //private int ;
 
     // 함수 시작
     private String[] getWordAndMean() {
@@ -62,6 +72,14 @@ public class Game_BlankGuessing extends AppCompatActivity {
         return true;
     }
 
+    private void checkAnswer(String word){
+        if(word.length()==1 && !isRightAnswer && word.toLowerCase().charAt(0) == correctAnswer.charAt(blankIndex[0])) {
+            isRightAnswer = true;
+            Log.d(TAG, "정답입니다.");
+            mDatabaseTestStub.addCharacterExp(1);
+        }
+    }
+
     public void handleMessage(Message msg) {
         switch (msg.what) {
             case R.id.clientReady:
@@ -71,36 +89,41 @@ public class Game_BlankGuessing extends AppCompatActivity {
                 break;
             case R.id.partialResult:
                 String partialResult = (String) msg.obj;
-                textView_debug.append(partialResult+" ");
+                Log.d(TAG, "partialResult: " + partialResult);
+                /*
                 if(partialResult.length()==1) {
                     if (!isRightAnswer && partialResult.toLowerCase().charAt(0)
                             == correctAnswer.charAt(blankIndex[0])) {
                         isRightAnswer = true;
-                        textView_debug.append("정답입니다.\n");
+                        Log.d(TAG, "정답입니다.");
                     }
                 }
-                textView_debug.append("\n");
+                */
+                checkAnswer(partialResult);
                 break;
             case R.id.endPointDetected:
                 break;
             case R.id.finalResult:
                 List<String> results = ((SpeechRecognitionResult)(msg.obj)).getResults();
                 for (String result: results) {
+                    Log.d(TAG, "results: " + result);
+                    checkAnswer(result);
                     if (isRightAnswer) break;
-                    textView_debug.append(result+" ");
+                    //textView_debug.append(result+" ");
+                    /*
                     if(result.length()==1) {
                         if (!isRightAnswer && result.toLowerCase().charAt(0)
                                 == correctAnswer.charAt(blankIndex[0])) {
                             isRightAnswer = true;
-                            textView_debug.append("정답입니다.\n");
+                            Log.d(TAG, "정답입니다.");
                         }
                     }
+                    */
                 }
-                textView_debug.append("\n");
                 if (isRightAnswer) {
                     makeQuiz();
                 }else{
-                    textView_debug.append("다시 발음 해 보세요.\n");
+                    Log.d(TAG, "다시 발음 해 보세요.");
                 }
                 break;
             case R.id.recognitionError:
@@ -128,8 +151,10 @@ public class Game_BlankGuessing extends AppCompatActivity {
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
 
+        mDatabaseTestStub = new DatabaseTestStub();
+
         // UI 생성 (액티비티 공통)
-        setContentView(R.layout.game_basic);
+        setContentView(R.layout.game_basic2);
 
         textView_word = (TextView) findViewById(R.id.textView_word);
         textView_mean = (TextView) findViewById(R.id.textView_mean);
@@ -141,7 +166,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
         button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
 
-        textView_debug = (TextView) findViewById(R.id.textView_debug);
+        //textView_debug = (TextView) findViewById(R.id.textView_debug);
 
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
@@ -183,13 +208,24 @@ public class Game_BlankGuessing extends AppCompatActivity {
             public void onClick(View v){
                 String inputWord = editText_inputWord.toString();
                 editText_inputWord.setText("");
+                /*
                 if(inputWord.length()==1 && inputWord.charAt(0) == correctAnswer.charAt(blankIndex[0])) {
                     isRightAnswer = true;
-                    textView_debug.append("정답입니다.\n");
+                    Log.d(TAG, "정답입니다.");
                     makeQuiz();
+                }
+                */
+                checkAnswer(inputWord);
+                if (isRightAnswer) {
+                    makeQuiz();
+                }else{
+                    Log.d(TAG, "다시 해 보세요.");
                 }
             }
         });
+
+        // setup
+
 
         // 퀴즈를 만든다.
         makeQuiz();
