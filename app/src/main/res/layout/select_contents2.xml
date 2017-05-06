@@ -38,10 +38,10 @@
         android:onClick="clicked_Game_WordChain"
         android:text="Game_WordChain" />
 
-    <Button
+    <!--Button
         android:id="@+id/button_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="clicked_main"
-        android:text="main" />
+        android:text="main" /-->
 </LinearLayout>

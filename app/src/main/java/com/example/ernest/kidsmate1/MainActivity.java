@@ -1,20 +1,12 @@
 package com.example.ernest.kidsmate1;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity implements MessageDialogFragment.Listener {
 
@@ -24,7 +16,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main2);
     }
 
     @Override
@@ -45,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     @Override
     protected void onStart() {              //Activity start 될 때
         super.onStart();
-        //Database.naverRecognizerInitialize();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)      //녹음, 저장 권한 확인 후 설정
                 == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
