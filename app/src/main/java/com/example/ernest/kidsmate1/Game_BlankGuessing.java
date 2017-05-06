@@ -44,20 +44,26 @@ public class Game_BlankGuessing extends AppCompatActivity {
     private boolean isRightAnswer;
     private int[] blankIndex = {0};
 
-    // session var.
-    private int maxRound;
-    private int thisRound; // 0~(maxround-1)
-    //private int ;
+    private boolean hintMean;
+    private boolean hintSynthesizer;
+
+    private Session_Admin session_admin; // session variant
+
+    private int opportunity;
 
     // 함수 시작
     private String[] getWordAndMean() {
         return Database.getRandomWordMean();
     }
 
-    private boolean makeQuiz(){
+    private boolean roundInit(){
         String[] todayWord = getWordAndMean();
         correctAnswer = todayWord[0].toLowerCase();
         correctAnsersMean = todayWord[1];
+
+        hintMean = false;
+        hintSynthesizer = false;
+        textView_mean.setText("");
 
         //빈칸이 들어갈 위치 정하기.
         Random randomIndex = new Random();
@@ -69,6 +75,12 @@ public class Game_BlankGuessing extends AppCompatActivity {
         StringBuffer mStringBuffer = new StringBuffer(correctAnswer);
         mStringBuffer.setCharAt(blankIndex[0], '_');
         textView_word.setText(mStringBuffer.toString());
+
+        this.opportunity = 5;
+
+        button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
+        button_next.setText("현재 라운드: " + Integer.toString(session_admin.getCurrentRound())+ "\n패스(패배)");
+        button_playSound.setText("발음 힌트");
         return true;
     }
 
@@ -76,29 +88,46 @@ public class Game_BlankGuessing extends AppCompatActivity {
         if(word.length()==1 && !isRightAnswer && word.toLowerCase().charAt(0) == correctAnswer.charAt(blankIndex[0])) {
             isRightAnswer = true;
             Log.d(TAG, "정답입니다.");
-            mDatabaseTestStub.addCharacterExp(1);
+        }
+    }
+
+    private void applyResult(Session_Admin.resultCode result){
+        session_admin.reportGameResult(result);
+        if(session_admin.getCurrentRound() <= session_admin.getMaxRound()){
+            roundInit();
+        }else{
+            if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
+                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+            }else{
+                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+            }
+            mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
+
+            button_next.setEnabled(false);
+            button_start.setEnabled(true);
+            button_playSound.setEnabled(false);
+            button_inputWordAccept.setEnabled(false);
+
+            button_start.setText("메인화면으로.");
+            button_start.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    onBackPressed2();
+                }
+            });
         }
     }
 
     public void handleMessage(Message msg) {
         switch (msg.what) {
-            case R.id.clientReady:
-                button_start.setText("연결됨");
+            case R.id.clientReady: //// TODO: 2017-05-06 준비 메시지가 늦게 도착하는 경우 메인화면으로 텍스트보다 나중에 갱신되어 이 메시지가 뜨는 경우가 있음. 
+                button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n발음하세요.");
                 break;
             case R.id.audioRecording:
                 break;
             case R.id.partialResult:
                 String partialResult = (String) msg.obj;
                 Log.d(TAG, "partialResult: " + partialResult);
-                /*
-                if(partialResult.length()==1) {
-                    if (!isRightAnswer && partialResult.toLowerCase().charAt(0)
-                            == correctAnswer.charAt(blankIndex[0])) {
-                        isRightAnswer = true;
-                        Log.d(TAG, "정답입니다.");
-                    }
-                }
-                */
                 checkAnswer(partialResult);
                 break;
             case R.id.endPointDetected:
@@ -109,32 +138,28 @@ public class Game_BlankGuessing extends AppCompatActivity {
                     Log.d(TAG, "results: " + result);
                     checkAnswer(result);
                     if (isRightAnswer) break;
-                    //textView_debug.append(result+" ");
-                    /*
-                    if(result.length()==1) {
-                        if (!isRightAnswer && result.toLowerCase().charAt(0)
-                                == correctAnswer.charAt(blankIndex[0])) {
-                            isRightAnswer = true;
-                            Log.d(TAG, "정답입니다.");
-                        }
-                    }
-                    */
                 }
                 if (isRightAnswer) {
-                    makeQuiz();
+                    applyResult(Session_Admin.resultCode.CORRECT);
                 }else{
-                    Log.d(TAG, "다시 발음 해 보세요.");
+                    if(opportunity>0){
+                        opportunity--;
+                        Log.d(TAG, "다시 발음 해 보세요.");
+                    }else {
+                        applyResult(Session_Admin.resultCode.WRONG);
+                    }
                 }
                 break;
             case R.id.recognitionError:
-                MessageDialogFragment.newInstance("Error code : " + msg.obj.toString());
-                button_start.setText("시작");
+                //MessageDialogFragment.newInstance("Error code : " + msg.obj.toString());
+                Log.d(TAG, "Error code : " + msg.obj.toString());
+                button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
                 button_start.setEnabled(true);
                 break;
             case R.id.endPointDetectTypeSelected:
                 break;
             case R.id.clientInactive:
-                button_start.setText("시작");
+                button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
                 button_start.setEnabled(true);
                 break;
         }
@@ -174,12 +199,15 @@ public class Game_BlankGuessing extends AppCompatActivity {
         button_playSound.setEnabled(true);
         button_inputWordAccept.setEnabled(true);
 
+
+
+
         // UI 리스너 구현
         button_start.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 if(!mVoiceRecognizer.isRunning()) {
-                    button_start.setText("연결중");
+                    button_start.setText("남은 기회는 " + Integer.toString(opportunity)+ "회.\n기다리세요.");
                     mVoiceRecognizer.recognize();
                 } else {
                     button_start.setEnabled(false);
@@ -191,7 +219,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         button_next.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                makeQuiz();
+                applyResult(Session_Admin.resultCode.PASSED);
             }
         });
 
@@ -200,6 +228,16 @@ public class Game_BlankGuessing extends AppCompatActivity {
             public void onClick(View v){
                 mVoiceSynthesizer.setString(correctAnswer);
                 mVoiceSynthesizer.doSynthsize();
+                if(hintMean == false) {
+                    if (hintSynthesizer == false) {
+                        hintSynthesizer = true;
+                        button_playSound.setText("의미 힌트");
+                    } else {
+                        textView_mean.setText(correctAnsersMean);
+                        hintMean = true;
+                        button_playSound.setText("발음 힌트");
+                    }
+                }
             }
         });
 
@@ -208,27 +246,25 @@ public class Game_BlankGuessing extends AppCompatActivity {
             public void onClick(View v){
                 String inputWord = editText_inputWord.toString();
                 editText_inputWord.setText("");
-                /*
-                if(inputWord.length()==1 && inputWord.charAt(0) == correctAnswer.charAt(blankIndex[0])) {
-                    isRightAnswer = true;
-                    Log.d(TAG, "정답입니다.");
-                    makeQuiz();
-                }
-                */
                 checkAnswer(inputWord);
+                Log.d(TAG, "input: " + inputWord);
+
                 if (isRightAnswer) {
-                    makeQuiz();
+                    applyResult(Session_Admin.resultCode.CORRECT);
                 }else{
-                    Log.d(TAG, "다시 해 보세요.");
+                    if(opportunity>0){
+                        opportunity--;
+                        Log.d(TAG, "다시 입력 해 보세요.");
+                    }else {
+                        applyResult(Session_Admin.resultCode.WRONG);
+                    }
                 }
             }
         });
 
-        // setup
-
-
-        // 퀴즈를 만든다.
-        makeQuiz();
+        // 세션 초기화
+        session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        roundInit();
     }
 
     @Override
@@ -239,14 +275,13 @@ public class Game_BlankGuessing extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         // 액티비티 종료시 반드시 음성인식 기능을 릴리즈 하여야 함.
         mVoiceRecognizer.release();
+    }
+
+    protected void onBackPressed2(){
+        super.onBackPressed();
     }
 }

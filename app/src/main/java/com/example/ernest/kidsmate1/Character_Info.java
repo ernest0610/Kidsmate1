@@ -36,15 +36,20 @@ public class Character_Info extends AppCompatActivity {
         button_pet.setEnabled(true);
         button_alphabet.setEnabled(true);
         button_trophy.setEnabled(true);
-
-        textView_characterName.setText(mDatabaseTestStub.getCharacterCname());
-        textView_status.setText("STATUS : Bla Bla");
     }
 
     @Override
     protected void onStart(){
         super.onStart();
         button_pet.setText("pet : " + Integer.toString(mDatabaseTestStub.getCurrentPet()));
+        textView_characterName.setText(mDatabaseTestStub.getCharacterCname());
+        textView_status.setText("level:" + mDatabaseTestStub.getLevel() +
+                "\nCurrentExp: " + mDatabaseTestStub.getCurrentExp() +
+                "\nLevelUpExp: " + mDatabaseTestStub.getLevelUpExp() +
+                "\nGame_BlankGuessing Stat: " + mDatabaseTestStub.getStatBlankGuessing() +
+                "\nGame_ImageGuessing Stat: " + mDatabaseTestStub.getStatImageGuessing() +
+                "\nGame_WordChain Stat: " + mDatabaseTestStub.getStatWordChain() +
+                "\n");
     }
 
     protected void clicked_button_pet(View v) {

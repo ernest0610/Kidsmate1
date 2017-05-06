@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class Character_Pet extends AppCompatActivity {
 
     DatabaseTestStub mDatabaseTestStub;
@@ -18,9 +20,12 @@ public class Character_Pet extends AppCompatActivity {
 
     LinearLayout linearLayout_buttonScroll;
 
-    int num;
+    int petButtonListSize;
 
-    int selectedButtonNumber;
+    int selectedButtonIndex;
+
+    ArrayList<Button> petButtonList;
+    ArrayList<Integer> petList;
 
     Button buttonAdd;
     Button buttonConfirm;
@@ -28,15 +33,20 @@ public class Character_Pet extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mDatabaseTestStub = DatabaseTestStub.getInstance();
-        context = this;
-        num = 0;
-        selectedButtonNumber = mDatabaseTestStub.getCurrentPet();
-
         setContentView(R.layout.dynamic_button_scroll_view);
 
+        mDatabaseTestStub = DatabaseTestStub.getInstance();
+
+        context = this;
+
         linearLayout_buttonScroll = (LinearLayout) findViewById(R.id.linearLayout_buttonScroll);
+
+        petButtonListSize = 0;
+
+        selectedButtonIndex = mDatabaseTestStub.getCurrentPet();
+
+        petButtonList = new ArrayList(6);
+
 
         buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonConfirm = (Button) findViewById(R.id.buttonConfirm);
@@ -44,31 +54,60 @@ public class Character_Pet extends AppCompatActivity {
         buttonAdd.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                num++;
+                petButtonListSize++;
                 final Button button = new Button(context);
-                button.setText(Integer.toString(num));
-                button.setOnClickListener(new View.OnClickListener(){
-                    int buttonNum = num;
+                button.setText(Integer.toString(petButtonListSize));
+                petButtonList.add(button);
+                button.setOnClickListener(new View.OnClickListener() {
                     Button mButton = button;
+                    int index = petButtonListSize-1;
                     @Override
-                    public void onClick(View v){
-                        selectedButtonNumber = buttonNum;
+                    public void onClick(View v) {
+                        petButtonList.get(selectedButtonIndex).setEnabled(true);
                         mButton.setEnabled(false);
+                        selectedButtonIndex = index;
                     }
                 });
                 linearLayout_buttonScroll.addView(button);
+                mDatabaseTestStub.addPet(petButtonListSize);
             }
         });
 
         buttonConfirm.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-
+                mDatabaseTestStub.setCurrentPet(selectedButtonIndex+1);
+                onBackPressed(v);
             }
         });
 
         buttonAdd.setEnabled(true);
         buttonConfirm.setEnabled(true);
+
+        petList = mDatabaseTestStub.getPetList();
+        if(petList.size() != 0) {
+            for (int petcode : petList) {
+                petButtonListSize++;
+                final Button button = new Button(this);
+                button.setText(Integer.toString(petcode));
+                petButtonList.add(button);
+                button.setOnClickListener(new View.OnClickListener() {
+                    Button mButton = button;
+                    int index = petButtonListSize-1;
+                    @Override
+                    public void onClick(View v) {
+                        petButtonList.get(selectedButtonIndex).setEnabled(true);
+                        mButton.setEnabled(false);
+                        selectedButtonIndex = index;
+                    }
+                });
+                linearLayout_buttonScroll.addView(button);
+            }
+        }
+    }
+    @Override
+    protected void onStart(){
+        super.onStart();
     }
 
     protected void onBackPressed(View v){
