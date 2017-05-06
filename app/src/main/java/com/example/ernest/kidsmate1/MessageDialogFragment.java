@@ -7,10 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 
-/**
- * Created by User on 2017-04-28.
- */
-
 public class MessageDialogFragment extends AppCompatDialogFragment {
     public interface Listener {
         void onMessageDialogDismissed();

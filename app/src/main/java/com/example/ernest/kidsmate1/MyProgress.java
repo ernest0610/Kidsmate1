@@ -7,9 +7,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.Window;
 import android.widget.TextView;
 
-/**
- * Created by User on 2017-05-02.
- */
 // 커스텀 progress bar
 public class MyProgress extends Dialog {
     public MyProgress(Context context)

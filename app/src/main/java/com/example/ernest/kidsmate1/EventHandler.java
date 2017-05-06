@@ -6,10 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.lang.ref.WeakReference;
 
-/**
- * Created by User on 2017-05-05.
- */
-
 public class EventHandler extends Handler {
     // 이벤트 핸들러 이너 클래스
     private final WeakReference<AppCompatActivity> mActivity;
