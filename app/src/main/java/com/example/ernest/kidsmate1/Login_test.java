@@ -1,16 +1,17 @@
 package com.example.ernest.kidsmate1;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
 
@@ -26,24 +27,116 @@ public class Login_test extends AppCompatActivity implements AdapterView.OnItemC
     private ArrayList<String> unames = null;
     private EditText editText;
     private boolean isExist;
+    private StateManager stateManager;
+    private ArrayList<String> cnames = null;
+    private static final String TAG = Login_test.class.getSimpleName();
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(getApplicationContext(), unames.get(position) + "님 환영합니다", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(Login_test.this, SelectContents2.class);
-        startActivity(intent);
-        finish();
+        String uname = unames.get(position);
+        Toast.makeText(getApplicationContext(), uname + "님 환영합니다", Toast.LENGTH_SHORT).show();
+        stateManager = StateManager.getInstance();
+        stateManager.switchUser(uname);
+        cnames = stateManager.getCharacterList();
+        if(cnames.size() == 0) {
+            ShowDialog_addCharacter();
+        }
+        else {
+            Toast.makeText(getApplicationContext(), cnames.get(0) + "님 환영합니다", Toast.LENGTH_SHORT).show();
+            stateManager.switchCharacter(cnames.get(0));
+            Intent intent = new Intent(Login_test.this, SelectContents2.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    private void ShowDialog_addCharacter()
+    {
+        LayoutInflater dialog = LayoutInflater.from(this);
+        final View dialogLayout = dialog.inflate(R.layout.my_dialog_addchar_test, null);
+        final Dialog myDialog = new Dialog(this);
+
+        myDialog.setTitle("캐릭터를 생성합니다");
+        myDialog.setContentView(dialogLayout);
+        myDialog.show();
+
+        Button btn_ok = (Button)dialogLayout.findViewById(R.id.button_ok_mydialog_addchar_test);
+        Button btn_cancel = (Button)dialogLayout.findViewById(R.id.button_cancel_mydialog_addchar_test);
+        final EditText editText = (EditText)dialogLayout.findViewById(R.id.editText_mydialog_addchar_test);
+
+        btn_ok.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String cname = editText.getText().toString();
+                if(cname.equals("")) {
+                    Toast.makeText(getApplicationContext(), "캐릭터 이름을 입력하세요", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), cname + "님 환영합니다", Toast.LENGTH_SHORT).show();
+                    stateManager.addCharacter(cname);
+                    stateManager.switchCharacter(cname);
+                    Intent intent = new Intent(Login_test.this, SelectContents2.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                myDialog.cancel();
+            }
+        });
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(getApplicationContext(), unames.get(position) + "님이 삭제 되었습니다", Toast.LENGTH_SHORT).show();
-        Database.delUser(unames.get(position));
-        myAdapter.removeItem(position);
-        unames.remove(position);
-        listView.setAdapter(myAdapter);
-        listView.setSelection(myAdapter.getCount() - 1);
+        ShowDialog_delUser(position);
         return false;
+    }
+
+    private void ShowDialog_delUser(final int position)
+    {
+        LayoutInflater dialog = LayoutInflater.from(this);
+        final View dialogLayout = dialog.inflate(R.layout.my_dialog_deluser_test, null);
+        final Dialog myDialog = new Dialog(this);
+
+        myDialog.setTitle("사용자 '" + unames.get(position) + "' 를 삭제합니다");
+        myDialog.setContentView(dialogLayout);
+        myDialog.show();
+
+        Button btn_ok = (Button)dialogLayout.findViewById(R.id.button_ok_mydialog_deluser_test);
+        Button btn_cancel = (Button)dialogLayout.findViewById(R.id.button_cancel_mydialog_deluser_test);
+
+        btn_ok.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Toast.makeText(getApplicationContext(), unames.get(position) + "님이 삭제 되었습니다", Toast.LENGTH_SHORT).show();
+                Database.delCharacterAll(unames.get(position));
+                Database.delPetAll(unames.get(position));
+                Database.delTrophyAll(unames.get(position));
+                Database.delUser(unames.get(position));
+                myAdapter.removeItem(position);
+                unames.remove(position);
+                listView.setAdapter(myAdapter);
+                listView.setSelection(myAdapter.getCount() - 1);
+                myDialog.cancel();
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                myDialog.cancel();
+            }
+        });
     }
 
     @Override

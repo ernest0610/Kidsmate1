@@ -13,6 +13,5 @@
 
     <item name="endPointDetectTypeSelected" type="id"/>
     <item name="endRecognize" type="id"/>
-
-    <item name="progressbarClock" type="id"/>
+    <item name="progressbarClock" type="id" />
 </resources>
