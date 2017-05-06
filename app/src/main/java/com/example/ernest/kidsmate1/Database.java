@@ -96,7 +96,7 @@ public class Database extends Application {
         cursor.moveToFirst();
         String word = "";
         if(!cursor.isAfterLast())
-            cursor.getString(0);
+            word = cursor.getString(0);
         cursor.close();
         return word;
     }
@@ -118,6 +118,74 @@ public class Database extends Application {
 
     public static void delUser(String uname) {
         DB.execSQL("DELETE FROM user WHERE uname = '" + uname + "'");
+    }
+
+    public static int getUserInfo(String attr, String uname) {
+        Cursor cursor = DB.rawQuery("SELECT " + attr + " FROM user WHERE uname = '" + uname + "'", null);
+        cursor.moveToFirst();
+        int result = 0;
+        if(!cursor.isAfterLast())
+            result = cursor.getInt(0);
+        cursor.close();
+        return result;
+    }
+
+    public static void setUserInfo(String attr, String uname, int value) {
+        DB.execSQL("UPDATE user SET " + attr + " = " + value + " WHERE uname = '" + uname + "'");
+    }
+
+    public static int getCharacterInfo(String attr, String uname, String cname) {
+        Cursor cursor = DB.rawQuery("SELECT " + attr + " FROM character WHERE uname = '" + uname + "', cname = '" + cname + "'", null);
+        cursor.moveToFirst();
+        int result = 0;
+        if(!cursor.isAfterLast())
+            result = cursor.getInt(0);
+        cursor.close();
+        return result;
+    }
+
+    public static void setCharacterInfo(String attr, String uname, String cname, int value) {
+        DB.execSQL("UPDATE character SET " + attr + " = " + value + " WHERE uname = '" + uname + "', cname = '" + cname + "'");
+    }
+
+    public static void setCharacterJob(String uname, String cname, String job) {
+        DB.execSQL("UPDATE character SET job = " + job + " WHERE uname = '" + uname + "', cname = '" + cname + "'");
+    }
+
+    public static void addCharacter(String uname, String cname, int date) {
+        DB.execSQL("INSERT INTO character (uname, cname, date) VALUES ('" + uname + "', '" + cname + "', " + date + ")");
+    }
+
+    public static void addPet(int pid, String uname, int type) {
+        DB.execSQL("INSERT INTO pet (pid, uname, type) VALUES (" + pid + ", '" + uname + "', " + type + ")");
+    }
+
+    public static void addTrophy(int tid, String uname, int type) {
+        DB.execSQL("INSERT INTO trophy (tid, uname, type) VALUES (" + tid + ", '" + uname + "', " + type + ")");
+    }
+
+    public static ArrayList<Integer> getPetArray(String uname) {
+        Cursor cursor = DB.rawQuery("SELECT type FROM pet WHERE uname = '" + uname + "' ORDERBY pid", null);
+        cursor.moveToFirst();
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        while(!cursor.isAfterLast()) {
+            result.add(cursor.getInt(0));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return result;
+    }
+
+    public static ArrayList<Integer> getTrophyArray(String uname) {
+        Cursor cursor = DB.rawQuery("SELECT type FROM trophy WHERE uname = '" + uname + "' ORDERBY tid", null);
+        cursor.moveToFirst();
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        while(!cursor.isAfterLast()) {
+            result.add(cursor.getInt(0));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return result;
     }
 
     @Override
