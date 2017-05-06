@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 public class Database extends Application {
     private static Database Database;
@@ -56,10 +57,13 @@ public class Database extends Application {
     public static String getRandomWordStartWith(String start) {
         String word = "";
         Cursor cursor = DB.rawQuery("SELECT word FROM dic WHERE word LIKE '" + start + "%' COLLATE NOCASE", null);
-        int id = (int)(Math.random() * Integer.MAX_VALUE) % cursor.getCount();
-        cursor.move(id);
-        if(!cursor.isAfterLast())
+        cursor.moveToFirst();
+        int id = 0;
+        if(!cursor.isAfterLast()) {
+            id = (int) (Math.random() * Integer.MAX_VALUE) % cursor.getCount();
+            cursor.move(id);
             word = cursor.getString(0);
+        }
         cursor.close();
         return word;
     }
@@ -94,6 +98,25 @@ public class Database extends Application {
             cursor.getString(0);
         cursor.close();
         return word;
+    }
+
+    public static ArrayList<String> getUser() {
+        Cursor cursor = DB.rawQuery("SELECT uname FROM user", null);
+        cursor.moveToFirst();
+        ArrayList<String> unames = new ArrayList<String>();
+        while(!cursor.isAfterLast()) {
+            unames.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
+        return unames;
+    }
+
+    public static void addUser(String uname) {
+        DB.execSQL("INSERT INTO user (uname) VALUES ('" + uname + "')");
+    }
+
+    public static void delUser(String uname) {
+        DB.execSQL("DELETE FROM user WHERE uname = '" + uname + "'");
     }
 
     @Override

@@ -1,31 +1,39 @@
 package com.example.ernest.kidsmate1;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Random;
 
-public class Game_WordChain extends AppCompatActivity {
+/**
+ * Created by User on 2017-05-05.
+ */
+
+public class Test_WordChain extends AppCompatActivity {
     // 모든 액티비티가 가지고 있어야 하는 요소.
     private VoiceRecognizer mVoiceRecognizer; // 싱글톤
     private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
     private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
     // 액티비티들 공통 UI
+    private LinearLayout linearLayout;
     private TextView textView_word;
     private TextView textView_mean;
     private TextView textView_debug;
+    private ScrollView scrollView_debug;
 
     private EditText editText_inputWord;
     private Button button_inputWordAccept;
@@ -34,13 +42,16 @@ public class Game_WordChain extends AppCompatActivity {
     private Button button_next;
     private Button button_playSound;
 
+    private ProgressBar progressBar;
+    private Thread thread;
+
     // 액티비티마다 다른 변수
     private String givenWord;
     private boolean isRightAnswer;
     private String RightAnswerString;
 
     //함수 시작
-    private static final String TAG = Game_WordChain.class.getSimpleName();
+    private static final String TAG = Test_WordChain.class.getSimpleName();
 
     private String getWordStartWith(char ch){
         return Database.getRandomWordStartWith(String.valueOf(ch));
@@ -53,6 +64,7 @@ public class Game_WordChain extends AppCompatActivity {
         return true;
     }
     private boolean makeQuiz(char ch){
+        progressBar.setProgress(100);
         givenWord = getWordStartWith(ch);
         isRightAnswer = false;
         textView_word.setText(givenWord);
@@ -69,6 +81,7 @@ public class Game_WordChain extends AppCompatActivity {
             case R.id.partialResult:
                 String partialResult = (String) msg.obj;
                 textView_debug.append(partialResult+" ");
+                scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
                 if(partialResult.length()>=2) {
                     Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length()-1) +
                             ", partialResult[0]:" + partialResult.toLowerCase().charAt(0));
@@ -76,9 +89,11 @@ public class Game_WordChain extends AppCompatActivity {
                         isRightAnswer = true;
                         RightAnswerString = new String(partialResult.toLowerCase());
                         textView_debug.append("정답입니다.\n");
+                        scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
                     }
                 }
                 textView_debug.append("\n");
+                scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
                 break;
             case R.id.endPointDetected:
                 break;
@@ -87,6 +102,7 @@ public class Game_WordChain extends AppCompatActivity {
                 for (String result: results) {
                     if (isRightAnswer) break;
                     textView_debug.append(result+" ");
+                    scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
                     if(result.length()>=2) {
                         Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length()-1) +
                                 ", result[0]:" + result.toLowerCase().charAt(0));
@@ -94,14 +110,17 @@ public class Game_WordChain extends AppCompatActivity {
                             isRightAnswer = true;
                             RightAnswerString = new String(result.toLowerCase());
                             textView_debug.append("정답입니다.\n");
+                            scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
                         }
                     }
                 }
                 textView_debug.append("\n");
+                scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
                 if (isRightAnswer) {
                     makeQuiz(RightAnswerString.charAt(RightAnswerString.length()-1));
                 }else{
                     textView_debug.append("다시 발음 해 보세요.\n");
+                    scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
                 }
                 break;
             case R.id.recognitionError:
@@ -115,6 +134,8 @@ public class Game_WordChain extends AppCompatActivity {
                 button_start.setText("시작");
                 button_start.setEnabled(true);
                 break;
+            case R.id.progressbarClock:
+                progressBar.incrementProgressBy(-5);
         }
     }
 
@@ -130,19 +151,25 @@ public class Game_WordChain extends AppCompatActivity {
         mVoiceSynthesizer = new VoiceSynthesizer(this);
 
         // UI 생성 (액티비티 공통)
-        setContentView(R.layout.game_basic);
+        setContentView(R.layout.test_wordchain);
 
-        textView_word = (TextView) findViewById(R.id.textView_word);
-        textView_mean = (TextView) findViewById(R.id.textView_mean);
+        textView_word = (TextView) findViewById(R.id.textView_word_test);
+        textView_mean = (TextView) findViewById(R.id.textView_mean_test);
 
-        button_start = (Button) findViewById(R.id.button_start);
-        button_next = (Button) findViewById(R.id.button_next);
-        button_playSound = (Button) findViewById(R.id.button_playSound);
+        button_start = (Button) findViewById(R.id.button_start_test);
+        button_next = (Button) findViewById(R.id.button_next_test);
+        button_playSound = (Button) findViewById(R.id.button_playSound_test);
 
-        editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
-        button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
+        editText_inputWord = (EditText) findViewById(R.id.editText_inputWord_test);
+        button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept_test);
 
-        textView_debug = (TextView) findViewById(R.id.textView_debug);
+        textView_debug = (TextView) findViewById(R.id.textView_debug_test);
+        scrollView_debug = (ScrollView) findViewById(R.id.scrollView_debug_test);
+
+        linearLayout = (LinearLayout) findViewById(R.id.linearLayout_test);
+        linearLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.testwordchain));
+
+        progressBar = (ProgressBar) findViewById(R.id.progressBar_test);
 
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
@@ -191,6 +218,7 @@ public class Game_WordChain extends AppCompatActivity {
                     isRightAnswer = true;
                     RightAnswerString = new String(inputWord.toLowerCase());
                     textView_debug.append("정답입니다.\n");
+                    scrollView_debug.fullScroll(ScrollView.FOCUS_DOWN);
                     makeQuiz(RightAnswerString.charAt(RightAnswerString.length()-1));
                 }
             }
@@ -198,6 +226,21 @@ public class Game_WordChain extends AppCompatActivity {
 
         // 퀴즈를 생성한다.
         makeRandomQuiz();
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    //for(int i=0; i<20; i++){
+                    for(;;){
+                        sleep(1000);
+                        Message msg = Message.obtain(mEventHandler, R.id.progressbarClock);
+                        msg.sendToTarget();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     @Override

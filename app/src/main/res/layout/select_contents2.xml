@@ -38,6 +38,14 @@
         android:onClick="clicked_Game_WordChain"
         android:text="Game_WordChain" />
 
+
+    <Button
+        android:id="@+id/button_test_wordChain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_Test_WordChain"
+        android:text="Test_WordChain" />
+
     <!--Button
         android:id="@+id/button_main"
         android:layout_width="match_parent"
