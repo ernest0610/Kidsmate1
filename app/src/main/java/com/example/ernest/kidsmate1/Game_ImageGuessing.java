@@ -224,18 +224,18 @@ public class Game_ImageGuessing extends AppCompatActivity {
         모든 라운드가 끝나고 세션의 결과를 표시
          */
         Game_Result game_result = new Game_Result(this);
-        game_result.setGameResultText(
-                "CurrentRound: "+session_admin.getCurrentRound()+
-                        "\nCorrectRound: "+session_admin.getCorrectRound()+
-                        "\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
-                        "\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
-        );
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
                 Game_ImageGuessing.this.finish();
             }
         });
+        game_result.setGameResultText(
+                "CurrentRound: "+session_admin.getCurrentRound()+
+                        "\nCorrectRound: "+session_admin.getCorrectRound()+
+                        "\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
+                        "\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
+        );
         game_result.show();
     }
 
