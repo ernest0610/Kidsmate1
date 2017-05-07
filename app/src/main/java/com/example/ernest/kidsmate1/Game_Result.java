@@ -13,7 +13,6 @@ import android.widget.TextView;
 class Game_Result extends Dialog {
     private LinearLayout linearLayout_root;
     private TextView textView_gameResult;
-    //private String gameResultText;
 
     public Game_Result(Context context) {
         super(context);
