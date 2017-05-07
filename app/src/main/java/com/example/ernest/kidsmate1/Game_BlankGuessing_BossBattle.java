@@ -2,6 +2,7 @@ package com.example.ernest.kidsmate1;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -27,6 +28,7 @@ public class Game_BlankGuessing_BossBattle extends Game_BlankGuessing {
         }
         //mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
         mStateManager.addCharacterLuck(session_admin.getCorrectRound());
+        Log.d(TAG, "session_admin.getCorrectRound(): "+Integer.toString(session_admin.getCorrectRound()));
     }
 
     @Override
@@ -42,7 +44,7 @@ public class Game_BlankGuessing_BossBattle extends Game_BlankGuessing {
             }
         });
         game_result.setGameResultText(
-                "CurrentRound: "+session_admin.getCurrentRound()+
+                "CurrentRound: "+(session_admin.getCurrentRound()-1)+
                         "\nCorrectRound: "+session_admin.getCorrectRound()+
                         //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
                         //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
@@ -82,7 +84,7 @@ public class Game_BlankGuessing_BossBattle extends Game_BlankGuessing {
             }
         }
         int selectedIndex = random.nextInt(indexOfString.size());
-        char selectedChar = target.charAt(selectedIndex);
+        selectedChar = target.charAt(selectedIndex);
         finalState.setCharAt(selectedIndex, selectedChar);
 
         mDatabaseTestStub.setUserAlpha_pyramid(finalState.toString());

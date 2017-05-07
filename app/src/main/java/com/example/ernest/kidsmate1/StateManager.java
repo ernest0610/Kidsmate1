@@ -16,6 +16,8 @@ import java.util.Calendar;
  */
 
 public class StateManager {
+    protected static final String TAG = StateManager.class.getSimpleName();
+
     private static StateManager mStateManager = null;
     private String currentUname = "";
     private String currentCname = "";
@@ -130,7 +132,7 @@ public class StateManager {
     }
 ////////////////////////////////////////////////////////////////////////////////////// user info get
     public String getUserAlphpa_kerberos() {
-        return Database.getUserAlpha("alpha_kerberos", currentUname);
+       return Database.getUserAlpha("alpha_kerberos", currentUname);
     }
 
     public String getUserAlpha_griffin() {
@@ -184,6 +186,7 @@ public class StateManager {
             addCharacterLevel(1);
             LevelUpChck = true;
         }
+
         Database.setCharacterInfo("exp", currentUname, currentCname, origin);
         return LevelUpChck;
     }
