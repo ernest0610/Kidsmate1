@@ -168,10 +168,17 @@ public class StateManager {
         Database.setCharacterInfo("level", currentUname, currentUname, origin);
     }
 
-    public void addCharacterExp(int increment) {
+    public boolean addCharacterExp(int increment) {
+        boolean LevelUpChck = false;
         int origin = Database.getCharacterInfo("exp", currentUname, currentCname);
         origin += increment;
+        while(origin >= this.getLevelUpExp()) {
+            origin -= this.getLevelUpExp();
+            addCharacterLevel(1);
+            LevelUpChck = true;
+        }
         Database.setCharacterInfo("exp", currentUname, currentUname, origin);
+        return LevelUpChck;
     }
 
     public void addCharacterPower(int increment) {
