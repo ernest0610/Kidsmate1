@@ -13,6 +13,7 @@ public class DatabaseTestStub {
     private String Cname;
     private int currentPet;
     private ArrayList<Integer> petArrayList;
+    private ArrayList<Character> alphabetArrayList;
 
     private int statBlankGuessing;
     private int statImageGuessing;
@@ -22,10 +23,15 @@ public class DatabaseTestStub {
 
     private int levelUpExp;
 
+    private String pyramid;
+    private String kerberos;
+    private String griffin;
+
     private DatabaseTestStub(){
         currentExp = 0;
         Cname = "Ernest";
         petArrayList = new ArrayList(6);
+        alphabetArrayList = new ArrayList(20);
         petArrayList.add(1);
         currentPet = 1;
 
@@ -36,6 +42,10 @@ public class DatabaseTestStub {
         level = 1;
 
         levelUpExp = getLevelUpExp(level);
+
+        pyramid = "_______";
+        kerberos = "________";
+        griffin = "_______";
     }
 
     public static DatabaseTestStub getInstance(){
@@ -97,33 +107,32 @@ public class DatabaseTestStub {
         }
     }
 
+
     public int getCurrentPet(){
         /*
         현재 펫의 정보를 얻는다. (객체, 문자열)
          */
         return currentPet;
     }
-
     public void setCurrentPet(int code){
         /*
         펫을 교체한다.
          */
         currentPet = code;
     }
-
     public ArrayList<Integer> getPetList(){
         /*
         펫의 리스트를 얻는다.
          */
         return petArrayList;
     }
-
     public void addPet(int petcode){
         /*
         펫을 추가한다.
          */
         petArrayList.add(petcode);
     }
+
 
     public void addStatBlankGuessing(int point){
         /*
@@ -144,35 +153,48 @@ public class DatabaseTestStub {
         statWordChain += point;
     }
 
-    // 총 스탯을 얻어온다.
     public int getStatBlankGuessing(){
+        /*
+        빈칸맞추기로 얻는 스탯을 얻어온다.
+         */
         return statBlankGuessing;
     }
     public int getStatImageGuessing(){
+        /*
+        그림맞추기로 얻는 스탯을 얻어온다.
+         */
         return statImageGuessing;
     }
     public int getStatWordChain(){
+        /*
+        끝말잇기로 얻는 스탯을 얻어온다.
+         */
         return statWordChain;
     }
 
-    // 현재 레벨을 구한다.
     public int getLevel(){
+        // 현재 레벨을 구한다.
         return level;
     }
 
-    // 다음 레벨업에 필요한 경험치를 구한다.
     public int getLevelUpExp(){
+        /*
+        다음 레벨업에 필요한 경험치를 구한다.
+         */
         return this.levelUpExp;
     }
 
-
-    // 한 세션(게임)의 최대 라운드를 구한다. (기본 10판이나 나중에 변경할수도 있으니)
     public int getMaxRound(){
+        /*
+        한 세션(게임)의 최대 라운드를 구한다. (기본 10판이나 나중에 변경할수도 있으니)
+         */
         return 10;
     }
 
-    // 경험치를 더 얻기 위해 이겨야 하는 라운드의 수를 구한다.
     public int getGoalRound(){
+        /*
+        보너스 경험치를 얻기 위해 이겨야 하는 라운드의 수를 구한다.
+         */
         if(level <= 10){
             return 4;
         }else if(level <= 20){
@@ -188,13 +210,69 @@ public class DatabaseTestStub {
         }
     }
 
-    // 이겼을때 경험치를 얼마나 얻는가
     public int getEarnedExpWhenSuccess(){
+        /*
+        이겼을때 경험치를 얼마나 얻는가
+         */
         return 10;
     }
 
-    // 졌을때 경험치를 얼마나 얻는가
     public int getEarnedExpWhenFailure(){
+        /*
+        졌을때 경험치를 얼마나 얻는가
+         */
         return 5;
     }
+
+    //////////////////////////////////////////////// 새로 작성한 코드는 여기서부터
+    public ArrayList<Character> getAlphabetList(){
+        /*
+        알파벳의 리스트를 얻는다.
+         */
+        return alphabetArrayList;
+    }
+    public void addAlphabet(char ch){
+        alphabetArrayList.add(ch);
+    }
+
+    public boolean isBlankGuessingBossBattleAvailable(){
+        return true;
+    }
+    public boolean isImageGuessingBossBattleAvailable(){
+        return true;
+    }
+    public boolean isWordChainBossBattleAvailable(){
+        return true;
+    }
+
+    public void setUserAlpha_pyramid(String str){
+        pyramid = str;
+    }
+    public void setUserAlpha_kerberos(String str){
+        kerberos = str;
+    }
+    public void setUserAlpha_griffin(String str){
+        griffin = str;
+    }
+
+    public String getUserAlpha_pyramid(){
+        return pyramid;
+    }
+    public String getUserAlpha_kerberos(){
+        return kerberos;
+    }
+    public String getUserAlpha_griffin(){
+        return griffin;
+    }
+
+    public String getUserAlpha_pyramid_fullString(){
+        return "PYRAMID";
+    }
+    public String getUserAlpha_kerberos_fullString(){
+        return "KERBEROS";
+    }
+    public String getUserAlpha_griffin_fullString(){
+        return "GRIFFIN";
+    }
+
 }

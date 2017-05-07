@@ -160,7 +160,7 @@ public class Database extends Application {
     }
 
     public static int getCharacterInfo(String attr, String uname, String cname) {
-        Cursor cursor = DB.rawQuery("SELECT " + attr + " FROM character WHERE uname = '" + uname + "', cname = '" + cname + "'", null);
+        Cursor cursor = DB.rawQuery("SELECT " + attr + " FROM character WHERE uname = '" + uname + "'AND cname = '" + cname + "'", null);
         cursor.moveToFirst();
         int result = -1;
         if(!cursor.isAfterLast())
@@ -170,11 +170,11 @@ public class Database extends Application {
     }
 
     public static void setCharacterInfo(String attr, String uname, String cname, int value) {
-        DB.execSQL("UPDATE character SET " + attr + " = " + value + " WHERE uname = '" + uname + "', cname = '" + cname + "'");
+        DB.execSQL("UPDATE character SET " + attr + " = " + value + " WHERE uname = '" + uname + "'AND cname = '" + cname + "'");
     }
 
     public static void setCharacterJob(String uname, String cname, String job) {
-        DB.execSQL("UPDATE character SET job = " + job + " WHERE uname = '" + uname + "', cname = '" + cname + "'");
+        DB.execSQL("UPDATE character SET job = " + job + " WHERE uname = '" + uname + "'AND cname = '" + cname + "'");
     }
 
     public static void addCharacter(String uname, String cname, String date) {
@@ -226,7 +226,7 @@ public class Database extends Application {
     }
 
     public static int getCurrentPet(String uname, String cname) {
-        Cursor cursor = DB.rawQuery("SELECT type FROM pet WHERE uname = '" + uname + "', cname = '" + cname + "'", null);
+        Cursor cursor = DB.rawQuery("SELECT type FROM pet WHERE uname = '" + uname + "'AND cname = '" + cname + "'", null);
         cursor.moveToFirst();
         int result = -1;
         if(!cursor.isAfterLast()) {
@@ -237,13 +237,13 @@ public class Database extends Application {
     }
 
     public static void setCurrentPet(String uname, String cname, String pid) {
-        Cursor cursor = DB.rawQuery("SELECT pid FROM pet WHERE uname = '" + uname + "', cname = '" + cname + "'", null);
+        Cursor cursor = DB.rawQuery("SELECT pid FROM pet WHERE uname = '" + uname + "'AND cname = '" + cname + "'", null);
         cursor.moveToFirst();
         if(!cursor.isAfterLast()) {
             DB.execSQL("UPDATE pet SET cname = '' WHERE pid = '" + cursor.getString(0) + "'");cursor.getInt(0);
         }
         cursor.close();
-        DB.execSQL("UPDATE pet SET cname = '" + cname + "' WHERE pid = '" + pid + "', uname = '" + uname + "'");
+        DB.execSQL("UPDATE pet SET cname = '" + cname + "' WHERE pid = '" + pid + "'AND uname = '" + uname + "'");
     }
 
     @Override

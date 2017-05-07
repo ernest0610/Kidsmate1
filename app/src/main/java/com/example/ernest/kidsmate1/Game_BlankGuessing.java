@@ -2,6 +2,7 @@ package com.example.ernest.kidsmate1;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,45 +13,49 @@ import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Random;
 
 public class Game_BlankGuessing extends AppCompatActivity {
-    // 모든 액티비티가 가지고 있어야 하는 요소.
-    private VoiceRecognizer mVoiceRecognizer; // 싱글톤
-    private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
-    private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
-
-    // test stub
-    private DatabaseTestStub mDatabaseTestStub;
-
     // 디버깅 메시지
-    private static final String TAG = Game_BlankGuessing.class.getSimpleName();
+    protected static final String TAG = Game_BlankGuessing.class.getSimpleName();
+
+    // 모든 액티비티가 가지고 있어야 하는 요소.
+    protected VoiceRecognizer mVoiceRecognizer; // 싱글톤
+    protected InnerEventHandler mInnerEventHandler; // 각 액티비티 고유의 이벤트 핸들러
+    protected VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
+
+    // 데이터베이스 테스트 stub
+    protected DatabaseTestStub mDatabaseTestStub = DatabaseTestStub.getInstance();
+
+    // 데이터베이스 상태 매니저
+    protected StateManager mStateManager;
 
     // 액티비티들 공통 UI
-    private TextView textView_word;
-    private TextView textView_mean;
+    protected TextView textView_word;
+    protected TextView textView_mean;
 
-    private EditText editText_inputWord;
-    private Button button_inputWordAccept;
+    protected EditText editText_inputWord;
+    protected Button button_inputWordAccept;
 
-    private Button button_start;
-    private Button button_next;
-    private Button button_playSound;
+    protected Button button_start;
+    protected Button button_next;
+    protected Button button_playSound;
 
     // 퀴즈를 진행하기 위한 변수
-    private String correctAnswer; // 정답을 기록하는 변수
-    private String correctAnsersMean; // 정답의 의미를 기록하는 변수
-    private boolean isRightAnswer; // 정답을 맞췄는지 기록하는 변수
-    private Session_Admin session_admin; // 세션을 관리하는 변수
-    private int opportunity; // 발음할 수 있는 횟수를 제한하는 변수.
+    protected String correctAnswer; // 정답을 기록하는 변수
+    protected String correctAnsersMean; // 정답의 의미를 기록하는 변수
+    protected boolean isRightAnswer; // 정답을 맞췄는지 기록하는 변수
+    protected Session_Admin session_admin; // 세션을 관리하는 변수
+    protected int opportunity; // 발음할 수 있는 횟수를 제한하는 변수.
 
-    private int[] blankIndex = {0}; // 빈칸을 체크하는 변수
-    private boolean hintMean; // 힌트를 주었는지 체크하는 변수
-    private boolean hintSynthesizer;
+    protected int[] blankIndex = {0}; // 빈칸을 체크하는 변수
+    protected boolean hintMean; // 힌트를 주었는지 체크하는 변수
+    protected boolean hintSynthesizer;
 
     // 함수 시작
-    private boolean roundInit(){
+    protected boolean roundInit(){
         /*
         세션이 처음 시작될때 딱 한번 onCreate에서 호출되고, 그 이후에는 반드시 applyResult에서만 호출되어야 하는 함수.
          */
@@ -82,7 +87,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         return true;
     }
 
-    private void checkAnswer(String word){
+    protected void checkAnswer(String word){
         /*
         정답을 체크하고, isRightAnswer의 값을 변경하는 함수. (결과를 데이터베이스에 반영하지는 않음)
         isRightAnswer의 값에 따라 이후 처리가 달라진다.
@@ -93,7 +98,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         }
     }
 
-    private void applyResult(Session_Admin.resultCode result){
+    protected void applyResult(Session_Admin.resultCode result){
         /*
         정답을 데이터베이스에 반영하고, 다음 문제를 출제하거나, 세션을 종료하는 함수.
          */
@@ -101,47 +106,60 @@ public class Game_BlankGuessing extends AppCompatActivity {
         if(session_admin.getCurrentRound() <= session_admin.getMaxRound()){
             roundInit();
         }else{
-            if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
-            }else{
-                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
-            }
-            mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
-
-            button_next.setEnabled(false);
-            button_start.setEnabled(true);
-            button_playSound.setEnabled(false);
-            button_inputWordAccept.setEnabled(false);
-
-            button_start.setText("메인화면으로.");
-            button_start.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    onBackPressed2();
-                }
-            });
-
-            // 결과창 표시 변수
-            Game_Result game_result = new Game_Result(this);
-            game_result.setGameResultText(
-                    "CurrentRound: "+session_admin.getCurrentRound()+
-                    "\nCorrectRound: "+session_admin.getCorrectRound()+
-                    "\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
-                    "\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
-            );
-            game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
-                @Override
-                public void onCancel(DialogInterface dialog){
-                    Game_BlankGuessing.this.finish();
-                }
-            });
-            game_result.show();
+            endingSession();
         }
+    }
+
+    protected void endingSession(){
+        button_next.setEnabled(false);
+        button_start.setEnabled(true);
+        button_playSound.setEnabled(false);
+        button_inputWordAccept.setEnabled(false);
+
+        sendResultToDatabase();
+        showTotalResult();
+    }
+
+    protected void sendResultToDatabase(){
+        /*
+        데이터베이스에 결과를 전송
+         */
+        if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
+            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenSuccess());
+        }else{
+            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenFailure());
+        }
+        //mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
+        mStateManager.addCharacterLuck(session_admin.getCorrectRound());
+    }
+
+    protected void showTotalResult(){
+        /*
+        모든 라운드가 끝나고 세션의 결과를 표시
+         */
+        Game_Result game_result = new Game_Result(this);
+        game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
+            @Override
+            public void onCancel(DialogInterface dialog){
+                Game_BlankGuessing.this.finish();
+            }
+        });
+        game_result.setGameResultText(
+                "CurrentRound: "+session_admin.getCurrentRound()+
+                        "\nCorrectRound: "+session_admin.getCorrectRound()+
+                        //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
+                        //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
+                        "\nCurrentExp: "+mStateManager.getCharacterExp()+
+                        "\nLevelUpExp: "+mStateManager.getLevelUpExp()
+        );
+        game_result.show();
     }
 
     public void handleMessage(Message msg) {
         switch (msg.what) {
-            case R.id.clientReady: //// TODO: 2017-05-06 준비 메시지가 늦게 도착하는 경우 메인화면으로 텍스트보다 나중에 갱신되어 이 메시지가 뜨는 경우가 있음. 
+            case R.id.clientReady:
                 button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n발음하세요.");
                 break;
             case R.id.audioRecording:
@@ -178,7 +196,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
                 break;
             case R.id.endPointDetectTypeSelected:
                 break;
-            case R.id.clientInactive: //// TODO: 2017-05-06 준비 메시지가 늦게 도착하는 경우 메인화면으로 텍스트보다 나중에 갱신되어 이 메시지가 뜨는 경우가 있음.
+            case R.id.clientInactive:
                 button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
                 button_start.setEnabled(true);
                 break;
@@ -190,13 +208,13 @@ public class Game_BlankGuessing extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // 음성인식 API의 이벤트를 받을 핸들러 생성
-        mEventHandler = new EventHandler(this);
+        mInnerEventHandler = new InnerEventHandler(this);
         // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
-
-        mDatabaseTestStub = DatabaseTestStub.getInstance();
+        // 데이터베이스를 다루기 위한 객체
+        mStateManager = StateManager.getInstance();
 
         // UI 생성 (액티비티 공통)
         setContentView(R.layout.game_basic2);
@@ -278,7 +296,8 @@ public class Game_BlankGuessing extends AppCompatActivity {
         });
 
         // 세션 초기화, 퀴즈 생성
-        session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        //session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
         roundInit();
     }
 
@@ -286,7 +305,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // 액티비티 시작시 반드시 음성인식 기능을 초기화 하여야 함.
-        mVoiceRecognizer.initialize(mEventHandler);
+        mVoiceRecognizer.initialize(mInnerEventHandler);
     }
 
     @Override
@@ -298,5 +317,20 @@ public class Game_BlankGuessing extends AppCompatActivity {
 
     protected void onBackPressed2(){
         super.onBackPressed();
+    }
+
+    protected static class InnerEventHandler extends Handler {
+        // 이벤트 핸들러 이너 클래스
+        private final WeakReference<Game_BlankGuessing> mActivity;
+        InnerEventHandler(Game_BlankGuessing activity) {
+            mActivity = new WeakReference(activity);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            Game_BlankGuessing activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
+            }
+        }
     }
 }

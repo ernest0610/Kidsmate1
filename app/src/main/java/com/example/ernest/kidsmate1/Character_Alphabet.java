@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Character_Alphabet extends AppCompatActivity {
 
@@ -17,12 +18,12 @@ public class Character_Alphabet extends AppCompatActivity {
 
     LinearLayout linearLayout_buttonScroll;
 
-    int petButtonListSize;
+    int mListSize; // 수정!
 
     int selectedButtonIndex;
 
-    ArrayList<Button> petButtonList;
-    ArrayList<Integer> petList;
+    ArrayList<Button> buttonList; // 수정!
+    ArrayList<Character> mList; // 수정!
 
     Button buttonAdd;
     Button buttonConfirm;
@@ -38,11 +39,11 @@ public class Character_Alphabet extends AppCompatActivity {
 
         linearLayout_buttonScroll = (LinearLayout) findViewById(R.id.linearLayout_buttonScroll);
 
-        petButtonListSize = 0;
+        mListSize = 0;
 
-        selectedButtonIndex = mDatabaseTestStub.getCurrentPet();
+        //selectedButtonIndex = mDatabaseTestStub.getCurrentPet(); // 수정!
 
-        petButtonList = new ArrayList(6);
+        buttonList = new ArrayList(6);
 
 
         buttonAdd = (Button) findViewById(R.id.buttonAdd);
@@ -51,29 +52,35 @@ public class Character_Alphabet extends AppCompatActivity {
         buttonAdd.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                petButtonListSize++;
+
+                Random random = new Random();
+                String atoz = "abcdefghijklmnopqrstuvwxyz";
+                Character randomCh = atoz.charAt(random.nextInt(atoz.length()));
+
+                mDatabaseTestStub.addAlphabet(randomCh); // 수정!
+
+                mListSize++;
                 final Button button = new Button(context);
-                button.setText(Integer.toString(petButtonListSize));
-                petButtonList.add(button);
+                button.setText(randomCh);
+                buttonList.add(button);
                 button.setOnClickListener(new View.OnClickListener() {
                     Button mButton = button;
-                    int index = petButtonListSize-1;
+                    int index = mListSize-1;
                     @Override
                     public void onClick(View v) {
-                        petButtonList.get(selectedButtonIndex).setEnabled(true);
+                        buttonList.get(selectedButtonIndex).setEnabled(true);
                         mButton.setEnabled(false);
                         selectedButtonIndex = index;
                     }
                 });
                 linearLayout_buttonScroll.addView(button);
-                mDatabaseTestStub.addPet(petButtonListSize);
             }
         });
 
         buttonConfirm.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                mDatabaseTestStub.setCurrentPet(selectedButtonIndex+1);
+                //mDatabaseTestStub.setCurrentPet(selectedButtonIndex+1); // 수정!
                 onBackPressed(v);
             }
         });
@@ -81,19 +88,19 @@ public class Character_Alphabet extends AppCompatActivity {
         buttonAdd.setEnabled(true);
         buttonConfirm.setEnabled(true);
 
-        petList = mDatabaseTestStub.getPetList();
-        if(petList.size() != 0) {
-            for (int petcode : petList) {
-                petButtonListSize++;
+        mList = mDatabaseTestStub.getAlphabetList(); // 수정!
+        if(mList.size() != 0) {
+            for (char ch : mList) {
+                mListSize++;
                 final Button button = new Button(this);
-                button.setText(Integer.toString(petcode));
-                petButtonList.add(button);
+                button.setText(ch);
+                buttonList.add(button);
                 button.setOnClickListener(new View.OnClickListener() {
                     Button mButton = button;
-                    int index = petButtonListSize-1;
+                    int index = mListSize-1;
                     @Override
                     public void onClick(View v) {
-                        petButtonList.get(selectedButtonIndex).setEnabled(true);
+                        buttonList.get(selectedButtonIndex).setEnabled(true);
                         mButton.setEnabled(false);
                         selectedButtonIndex = index;
                     }
