@@ -27,7 +27,8 @@ public class Game_BlankGuessing extends AppCompatActivity {
     protected VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
     // test stub
-    protected DatabaseTestStub mDatabaseTestStub;
+    //protected DatabaseTestStub mDatabaseTestStub;
+    protected StateManager mStateManager;
 
     // 액티비티들 공통 UI
     protected TextView textView_word;
@@ -206,7 +207,8 @@ public class Game_BlankGuessing extends AppCompatActivity {
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
 
-        mDatabaseTestStub = DatabaseTestStub.getInstance();
+        //mDatabaseTestStub = DatabaseTestStub.getInstance();
+        mStateManager = StateManager.getInstance();
 
         // UI 생성 (액티비티 공통)
         setContentView(R.layout.game_basic2);
@@ -289,6 +291,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
 
         // 세션 초기화, 퀴즈 생성
         session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
         roundInit();
     }
 
