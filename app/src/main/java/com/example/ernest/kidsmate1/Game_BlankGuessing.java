@@ -1,5 +1,6 @@
 package com.example.ernest.kidsmate1;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -47,9 +48,6 @@ public class Game_BlankGuessing extends AppCompatActivity {
     private int[] blankIndex = {0}; // 빈칸을 체크하는 변수
     private boolean hintMean; // 힌트를 주었는지 체크하는 변수
     private boolean hintSynthesizer;
-
-    // 결과창 표시 변수
-    private Game_Result game_result;
 
     // 함수 시작
     private boolean roundInit(){
@@ -123,8 +121,21 @@ public class Game_BlankGuessing extends AppCompatActivity {
                 }
             });
 
-            //game_result.show();
-            //game_result.set
+            // 결과창 표시 변수
+            Game_Result game_result = new Game_Result(this);
+            game_result.setGameResultText(
+                    "CurrentRound: "+session_admin.getCurrentRound()+
+                    "\nCorrectRound: "+session_admin.getCorrectRound()+
+                    "\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
+                    "\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
+            );
+            game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
+                @Override
+                public void onCancel(DialogInterface dialog){
+                    Game_BlankGuessing.this.finish();
+                }
+            });
+            game_result.show();
         }
     }
 

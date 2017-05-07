@@ -86,6 +86,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
         /*
         세션이 처음 시작될때 딱 한번 onCreate에서 호출되고, 그 이후에는 반드시 applyResult에서만 호출되어야 하는 함수.
          */
+        // 로딩 메시지를 띄움
         imageURL = "";
         myProgress.show();
 
@@ -112,7 +113,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
                 imageURL = bun.getString("IMAGE_URL");
                 //if (imageURL.equals(""));
                 scrollView_game.setBackground(drawable);
-                myProgress.dismiss();
+                myProgress.dismiss(); // 로딩 메시지를 닫음.
             }
         };
         new Thread() {
