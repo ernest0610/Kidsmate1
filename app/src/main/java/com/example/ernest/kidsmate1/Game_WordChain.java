@@ -1,7 +1,6 @@
 package com.example.ernest.kidsmate1;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Random;
 
@@ -22,10 +20,15 @@ public class Game_WordChain extends AppCompatActivity {
     private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
     private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
+    // test stub
+    private DatabaseTestStub mDatabaseTestStub;
+
+    // 디버깅 메시지
+    private static final String TAG = Game_WordChain.class.getSimpleName();
+
     // 액티비티들 공통 UI
     private TextView textView_word;
     private TextView textView_mean;
-    private TextView textView_debug;
 
     private EditText editText_inputWord;
     private Button button_inputWordAccept;
@@ -34,85 +37,138 @@ public class Game_WordChain extends AppCompatActivity {
     private Button button_next;
     private Button button_playSound;
 
-    // 액티비티마다 다른 변수
-    private String givenWord;
-    private boolean isRightAnswer;
-    private String RightAnswerString;
+    // 퀴즈를 진행하기 위한 변수
+    private String givenWord; // 컴퓨터가 제시한 단어를 기록하는 변수.
+    private boolean isRightAnswer; // 적절한 단어를 말했는지 기록하는 변수.
+    private String RightAnswer; // 답한 단어를 기록하는 변수.
+    private Session_Admin session_admin; // 세션을 관리하는 변수
+    private int opportunity; // 발음할 수 있는 횟수를 제한하는 변수.
 
     //함수 시작
-    private static final String TAG = Game_WordChain.class.getSimpleName();
-
-    private String getWordStartWith(char ch){
-        return Database.getRandomWordStartWith(String.valueOf(ch));
-    }
-
-    private boolean makeRandomQuiz(){
+    private boolean roundInit() {
+        /*
+        세션이 처음 시작될때 딱 한번 onCreate에서 호출되는 함수.
+         */
+        // 문제를 얻어온다.
         Random random = new Random();
         String atoz = "abcdefghijklmnopqrstuvwxyz";
-        makeQuiz(atoz.charAt(random.nextInt(26)));
+        roundInit(atoz.charAt(random.nextInt(26)));
         return true;
     }
-    private boolean makeQuiz(char ch){
-        givenWord = getWordStartWith(ch);
-        isRightAnswer = false;
+    private boolean roundInit(char ch) {
+        /*
+        applyResult에서만 호출되어야 하는 함수.
+         */
+        // 문제를 얻어온다.
+        givenWord = Database.getRandomWordStartWith(String.valueOf(ch));
         textView_word.setText(givenWord);
+
+        // 라운드 초기화.
+        isRightAnswer = false;
+        textView_mean.setText("");
+        opportunity = 5;
+
+        // 버튼 텍스트 초기화.
+        button_start.setText("남은 기회는 " + Integer.toString(opportunity)+ "회.\n도전!");
+        button_next.setText("현재 라운드: " + Integer.toString(session_admin.getCurrentRound())+ "\n패스(패배)");
+        //button_playSound.setText("발음 힌트"); // 필요한가?
         return true;
+    }
+
+    private void checkAnswer(String word){
+        /*
+        정답을 체크하고, isRightAnswer의 값을 변경하는 함수. (결과를 데이터베이스에 반영하지는 않음)
+        isRightAnswer의 값에 따라 이후 처리가 달라진다.
+         */
+        if(word.length()>=2) {
+            Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length() - 1) +
+                    ", result[0]:" + word.toLowerCase().charAt(0));
+            if ((givenWord.toLowerCase().charAt(givenWord.length() - 1)) == word.toLowerCase().charAt(0)) {
+                isRightAnswer = true;
+                RightAnswer = new String(word.toLowerCase());
+                Log.d(TAG, "정답입니다.");
+            }
+        }
+    }
+
+    private void applyResult(Session_Admin.resultCode result){
+        /*
+        정답을 데이터베이스에 반영하고, 다음 문제를 출제하거나, 세션을 종료하는 함수.
+         */
+        session_admin.reportGameResult(result);
+        if(session_admin.getCurrentRound() <= session_admin.getMaxRound()
+                && result == Session_Admin.resultCode.CORRECT){
+            roundInit(RightAnswer.toLowerCase().charAt(RightAnswer.length() - 1));
+        }else{
+            if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
+                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+            }else{
+                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+            }
+            mDatabaseTestStub.addStatWordChain(session_admin.getCorrectRound());
+
+            button_next.setEnabled(false);
+            button_start.setEnabled(true);
+            button_playSound.setEnabled(false);
+            button_inputWordAccept.setEnabled(false);
+
+            button_start.setText("메인화면으로.");
+            button_start.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    onBackPressed2();
+                }
+            });
+        }
     }
 
     public void handleMessage(Message msg) {
         switch (msg.what) {
-            case R.id.clientReady:
+            case R.id.clientReady: //// TODO: 2017-05-06 준비 메시지가 늦게 도착하는 경우 메인화면으로 텍스트보다 나중에 갱신되어 이 메시지가 뜨는 경우가 있음.
                 button_start.setText("연결됨");
                 break;
             case R.id.audioRecording:
                 break;
             case R.id.partialResult:
                 String partialResult = (String) msg.obj;
-                textView_debug.append(partialResult+" ");
-                if(partialResult.length()>=2) {
-                    Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length()-1) +
-                            ", partialResult[0]:" + partialResult.toLowerCase().charAt(0));
-                    if (!isRightAnswer && (givenWord.toLowerCase().charAt(givenWord.length()-1)) == partialResult.toLowerCase().charAt(0)) {
-                        isRightAnswer = true;
-                        RightAnswerString = new String(partialResult.toLowerCase());
-                        textView_debug.append("정답입니다.\n");
-                    }
-                }
-                textView_debug.append("\n");
+                Log.d(TAG, "partialResult: " + partialResult);
+                checkAnswer(partialResult);
+
                 break;
             case R.id.endPointDetected:
                 break;
             case R.id.finalResult:
                 List<String> results = ((SpeechRecognitionResult)(msg.obj)).getResults();
-                for (String result: results) {
-                    if (isRightAnswer) break;
-                    textView_debug.append(result+" ");
-                    if(result.length()>=2) {
-                        Log.d(TAG, "givenWord[n]:" + givenWord.toLowerCase().charAt(givenWord.length()-1) +
-                                ", result[0]:" + result.toLowerCase().charAt(0));
-                        if ((givenWord.toLowerCase().charAt(givenWord.length()-1)) == result.toLowerCase().charAt(0)) {
-                            isRightAnswer = true;
-                            RightAnswerString = new String(result.toLowerCase());
-                            textView_debug.append("정답입니다.\n");
-                        }
-                    }
+                for (int index = results.size()-1; index>=0; index--) {
+                    /*
+                    다른 퀴즈들과는 다르게 여기서는 순서를 거꾸로 하여 체크해야한다.
+                    checkAnswer은 적합한 답을 발견하면 변수의 값을 교체하는데,
+                    부정확한 답부터 순서대로 체크하여야, 가장 마지막에 가장 정확한 값이 남기 때문이다.
+                     */
+                    Log.d(TAG, "results: " + results.get(index));
+                    checkAnswer(results.get(index));
+
                 }
-                textView_debug.append("\n");
                 if (isRightAnswer) {
-                    makeQuiz(RightAnswerString.charAt(RightAnswerString.length()-1));
+                    applyResult(Session_Admin.resultCode.CORRECT);
                 }else{
-                    textView_debug.append("다시 발음 해 보세요.\n");
+                    if(opportunity>0){
+                        opportunity--;
+                        Log.d(TAG, "다시 발음 해 보세요.");
+                    }else {
+                        applyResult(Session_Admin.resultCode.WRONG);
+                    }
                 }
                 break;
             case R.id.recognitionError:
-                MessageDialogFragment.newInstance("Error code : " + msg.obj.toString());
-                button_start.setText("시작");
+                Log.d(TAG, "Error code : " + msg.obj.toString());
+                button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
                 button_start.setEnabled(true);
                 break;
             case R.id.endPointDetectTypeSelected:
                 break;
             case R.id.clientInactive:
-                button_start.setText("시작");
+                button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
                 button_start.setEnabled(true);
                 break;
         }
@@ -129,8 +185,10 @@ public class Game_WordChain extends AppCompatActivity {
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
 
+        mDatabaseTestStub = DatabaseTestStub.getInstance();
+
         // UI 생성 (액티비티 공통)
-        setContentView(R.layout.game_basic);
+        setContentView(R.layout.game_basic2);
 
         textView_word = (TextView) findViewById(R.id.textView_word);
         textView_mean = (TextView) findViewById(R.id.textView_mean);
@@ -141,8 +199,6 @@ public class Game_WordChain extends AppCompatActivity {
 
         editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
         button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
-
-        textView_debug = (TextView) findViewById(R.id.textView_debug);
 
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
@@ -155,7 +211,7 @@ public class Game_WordChain extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 if(!mVoiceRecognizer.isRunning()) {
-                    button_start.setText("연결중");
+                    button_start.setText("남은 기회는 " + Integer.toString(opportunity)+ "회.\n기다리세요.");
                     mVoiceRecognizer.recognize();
                 } else {
                     button_start.setEnabled(false);
@@ -167,7 +223,7 @@ public class Game_WordChain extends AppCompatActivity {
         button_next.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                makeRandomQuiz();
+                applyResult(Session_Admin.resultCode.PASSED);
             }
         });
 
@@ -182,22 +238,29 @@ public class Game_WordChain extends AppCompatActivity {
         button_inputWordAccept.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-
                 String inputWord = editText_inputWord.toString();
                 editText_inputWord.setText("");
+                checkAnswer(inputWord);
+                Log.d(TAG, "input: " + inputWord);
 
-                if(inputWord.length()>=2 &&
-                        ((givenWord.toLowerCase().charAt(givenWord.length()-1)) == inputWord.toLowerCase().charAt(0))) {
-                    isRightAnswer = true;
-                    RightAnswerString = new String(inputWord.toLowerCase());
-                    textView_debug.append("정답입니다.\n");
-                    makeQuiz(RightAnswerString.charAt(RightAnswerString.length()-1));
+                if (isRightAnswer) {
+                    applyResult(Session_Admin.resultCode.CORRECT);
+                }else{
+                    if(opportunity>0){
+                        opportunity--;
+                        Log.d(TAG, "다시 입력 해 보세요.");
+                    }else {
+                        applyResult(Session_Admin.resultCode.WRONG);
+                    }
                 }
+
+
             }
         });
 
-        // 퀴즈를 생성한다.
-        makeRandomQuiz();
+        // 세션 초기화, 퀴즈 생성
+        session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        roundInit();
     }
 
     @Override
@@ -208,14 +271,13 @@ public class Game_WordChain extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         // 액티비티 종료시 반드시 음성인식 기능을 릴리즈 하여야 함.
         mVoiceRecognizer.release();
+    }
+
+    protected void onBackPressed2(){
+        super.onBackPressed();
     }
 }
