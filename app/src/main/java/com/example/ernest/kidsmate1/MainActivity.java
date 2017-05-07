@@ -19,19 +19,10 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
         setContentView(R.layout.activity_main2);
     }
 
-    @Override
-    public void onBackPressed() {       //뒤로가기 버튼 작동 중지
-    }
-
     protected void mainStartClicked(View v) {               //메뉴 선택화면으로 이동
         Intent intent = new Intent(MainActivity.this, Login_test.class);
         startActivity(intent);
         finish();
-    }
-
-    protected void mainOffClicked(View v) {             //종료 버튼
-        finish();
-        System.exit(0);
     }
 
     @Override

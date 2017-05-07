@@ -3,55 +3,87 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/button_dictionary2"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_Feature_Dictionary"
-        android:text="Feature_Dictionary" />
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/button_todaysWord"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_Feature_TodaysWord"
-        android:text="Feature_TodaysWord" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/button_game_blankGuessing"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_Game_BlankGuessing"
-        android:text="Game_BlankGuessing" />
+            <Button
+                android:id="@+id/button_dictionary2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Feature_Dictionary"
+                android:text="Feature_Dictionary" />
 
-    <Button
-        android:id="@+id/button_game_imageGuessing"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_Game_ImageGuessing"
-        android:text="Game_ImageGuessing" />
+            <Button
+                android:id="@+id/button_todaysWord"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Feature_TodaysWord"
+                android:text="Feature_TodaysWord" />
 
-    <Button
-        android:id="@+id/button_game_wordChain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_Game_WordChain"
-        android:text="Game_WordChain" />
+            <Button
+                android:id="@+id/button_game_blankGuessing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Game_BlankGuessing"
+                android:text="Game_BlankGuessing" />
 
+            <Button
+                android:id="@+id/button_game_imageGuessing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Game_ImageGuessing"
+                android:text="Game_ImageGuessing" />
 
-    <Button
-        android:id="@+id/button_test_wordChain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_Test_WordChain"
-        android:text="Test_WordChain" />
+            <Button
+                android:id="@+id/button_game_wordChain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Game_WordChain"
+                android:text="Game_WordChain" />
 
-    <Button
-        android:id="@+id/button_character_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_Character_Info"
-        android:text="Character_Info" />
+            <Button
+                android:id="@+id/button_test_wordChain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Test_WordChain"
+                android:text="Test_WordChain" />
+
+            <Button
+                android:id="@+id/button_character_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Character_Info"
+                android:text="Character_Info" />
+
+            <Button
+                android:id="@+id/button_game_wordChain_bossBattle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Game_BlankGuessing_BossBattle"
+                android:text="Game_BlankGuessing_BossBattle" />
+
+            <Button
+                android:id="@+id/button_game_imageGuessing_bossBattle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Game_ImageGuessing_BossBattle"
+                android:text="Game_ImageGuessing_BossBattle" />
+
+            <Button
+                android:id="@+id/button_Game_wordChain_bossBattle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Game_WordChain_BossBattle"
+                android:text="Game_WordChain_BossBattle" />
+        </LinearLayout>
+    </ScrollView>
+
 
     <Button
         android:id="@+id/button"

@@ -1,12 +1,9 @@
 package com.example.ernest.kidsmate1;
 
-import android.app.Dialog;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,7 +11,6 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -38,67 +34,91 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
 public class Game_ImageGuessing extends AppCompatActivity {
+    // 디버깅 메시지
+    protected static final String TAG = Game_ImageGuessing.class.getSimpleName();
+
     // 모든 액티비티가 가지고 있어야 하는 요소.
-    private VoiceRecognizer mVoiceRecognizer; // 싱글톤
-    private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
-    private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
+    protected VoiceRecognizer mVoiceRecognizer; // 싱글톤
+    protected InnerEventHandler mInnerEventHandler; // 각 액티비티 고유의 이벤트 핸들러
+    protected VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
+
+    // 데이터베이스 테스트 stub
+    protected DatabaseTestStub mDatabaseTestStub = DatabaseTestStub.getInstance();
+
+    // 데이터베이스 상태 매니저
+    protected StateManager mStateManager;
 
     // 액티비티들 공통 UI
-    private TextView textView_word;
-    private TextView textView_mean;
-    private TextView textView_debug;
+    protected TextView textView_word;
+    protected TextView textView_mean;
 
-    private EditText editText_inputWord;
-    private Button button_inputWordAccept;
+    protected EditText editText_inputWord;
+    protected Button button_inputWordAccept;
 
-    private Button button_start;
-    private Button button_next;
-    private Button button_playSound;
+    protected Button button_start;
+    protected Button button_next;
+    protected Button button_playSound;
 
-    private ScrollView scrollView_game;
+    // 퀴즈를 진행하기 위한 변수
+    protected String correctAnswer; // 정답을 기록하는 변수
+    protected String correctAnsersMean; // 정답의 의미를 기록하는 변수
+    protected boolean isRightAnswer; // 정답을 맞췄는지 기록하는 변수
+    protected Session_Admin session_admin; // 세션을 관리하는 변수
+    protected int opportunity; // 발음할 수 있는 횟수를 제한하는 변수.
 
-    // 액티비티마다 다른 변수
-    private String correctAnswer;
-    private String correctAnsersMean;
-    private boolean isRightAnswer;
+    // 그림 맞추기 전용 변수
+    protected ScrollView scrollView_game;
 
     // 이미지 추출용 변수
-    private Handler handler;
-    private String imageURL;
-    private URL url;
-    private Bitmap bitmap;
-    private static final String addr = "https://www.google.com/search?newwindow=1&prmd=ivmn&source=lnms&tbm=isch&sa=X&biw=360&bih=517&dpr=2&q=";
-    private HttpsURLConnection conn = null;
-    private BufferedInputStream bis = null;
-    private BufferedReader reader = null;
-    private StringBuffer st = null;
-    private Document doc;
-    private Elements elements;
-    private Drawable drawable = null;
+    protected Handler handler;
+    protected String imageURL;
+    protected URL url;
+    protected Bitmap bitmap;
+    protected static final String addr = "https://www.google.com/search?newwindow=1&prmd=ivmn&source=lnms&tbm=isch&sa=X&biw=360&bih=517&dpr=2&q=";
+    protected HttpsURLConnection conn = null;
+    protected BufferedInputStream bis = null;
+    protected BufferedReader reader = null;
+    protected StringBuffer st = null;
+    protected Document doc;
+    protected Elements elements;
+    protected Drawable drawable = null;
 
     // progress bar 변수
-    private MyProgress myProgress;
+    protected MyProgress myProgress;
 
-    //함수 시작
-    private String[] getWordAndMean() {
-        return Database.getRandomWordMean();
-    }
-
-    private boolean makeQuiz(){
+    // 함수 시작
+    protected boolean roundInit(){
+        /*
+        세션이 처음 시작될때 딱 한번 onCreate에서 호출되고, 그 이후에는 반드시 applyResult에서만 호출되어야 하는 함수.
+         */
+        // 로딩 메시지를 띄움
         imageURL = "";
         myProgress.show();
-        String[] todayWord = getWordAndMean();
+
+        // 문제를 얻어온다.
+        String[] todayWord = Database.getRandomWordMean();
         correctAnswer = todayWord[0];
         correctAnsersMean = todayWord[1];
+
+        //라운드 초기화.
         isRightAnswer = false;
-        //textView_word.setText(correctAnswer);
+        //textView_mean.setText("");
+        //hintMean = false;
+        //hintSynthesizer = false;
+        opportunity = 5;
+
+        // 버튼 텍스트 초기화.
+        button_start.setText("남은 기회는 " + Integer.toString(opportunity)+ "회.\n도전!");
+        button_next.setText("현재 라운드: " + Integer.toString(session_admin.getCurrentRound())+ "\n패스(패배)");
+        button_playSound.setText("발음 힌트");
+
         handler = new Handler() {
             public void handleMessage(Message msg) {
                 Bundle bun = msg.getData();
                 imageURL = bun.getString("IMAGE_URL");
                 //if (imageURL.equals(""));
                 scrollView_game.setBackground(drawable);
-                myProgress.dismiss();
+                myProgress.dismiss(); // 로딩 메시지를 닫음.
             }
         };
         new Thread() {
@@ -158,50 +178,117 @@ public class Game_ImageGuessing extends AppCompatActivity {
         return true;
     }
 
+    protected void checkAnswer(String word){
+        /*
+        정답을 체크하고, isRightAnswer의 값을 변경하는 함수. (결과를 데이터베이스에 반영하지는 않음)
+        isRightAnswer의 값에 따라 이후 처리가 달라진다.
+         */
+        if(word.toLowerCase().equals(correctAnswer.toLowerCase())){
+            isRightAnswer = true;
+            Log.d(TAG, "정답입니다.");
+        }
+    }
+
+    protected void applyResult(Session_Admin.resultCode result){
+        /*
+        정답을 데이터베이스에 반영하고, 다음 문제를 출제하거나, 세션을 종료하는 함수.
+         */
+        session_admin.reportGameResult(result);
+        if(session_admin.getCurrentRound() <= session_admin.getMaxRound()){
+            roundInit();
+        }else{
+            endingSession();
+        }
+    }
+
+    protected void endingSession(){
+        button_next.setEnabled(false);
+        button_start.setEnabled(true);
+        button_playSound.setEnabled(false);
+        button_inputWordAccept.setEnabled(false);
+
+        sendResultToDatabase();
+        showTotalResult();
+    }
+
+    protected void sendResultToDatabase(){
+        /*
+        데이터베이스에 결과를 전송
+         */
+        if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
+            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenSuccess());
+        }else{
+            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenFailure());
+        }
+        //mDatabaseTestStub.addStatImageGuessing(session_admin.getCorrectRound());
+        mStateManager.addCharacterPower(session_admin.getCorrectRound());
+    }
+
+    protected void showTotalResult(){
+        /*
+        모든 라운드가 끝나고 세션의 결과를 표시
+         */
+        Game_Result game_result = new Game_Result(this);
+        game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
+            @Override
+            public void onCancel(DialogInterface dialog){
+                Game_ImageGuessing.this.finish();
+            }
+        });
+        game_result.setGameResultText(
+                "CurrentRound: "+session_admin.getCurrentRound()+
+                        "\nCorrectRound: "+session_admin.getCorrectRound()+
+                        //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
+                        //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
+                        "\nCurrentExp: "+mStateManager.getCharacterExp()+
+                        "\nLevelUpExp: "+mStateManager.getLevelUpExp()
+        );
+        game_result.show();
+    }
+
     public void handleMessage(Message msg) {
         switch (msg.what) {
             case R.id.clientReady:
-                button_start.setText("연결됨");
+                button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n발음하세요.");
                 break;
             case R.id.audioRecording:
                 break;
             case R.id.partialResult:
                 String partialResult = (String) msg.obj;
-                textView_debug.append(partialResult+" ");
-                if(!isRightAnswer && partialResult.toLowerCase().equals(correctAnswer.toLowerCase())){
-                    isRightAnswer = true;
-                    textView_debug.append("정답입니다.\n");
-                }
-                textView_debug.append("\n");
+                Log.d(TAG, "partialResult: " + partialResult);
+                checkAnswer(partialResult);
                 break;
             case R.id.endPointDetected:
                 break;
             case R.id.finalResult:
                 List<String> results = ((SpeechRecognitionResult)(msg.obj)).getResults();
                 for (String result: results) {
+                    Log.d(TAG, "results: " + result);
+                    checkAnswer(result);
                     if (isRightAnswer) break;
-                    textView_debug.append(result+" ");
-                    if(result.toLowerCase().equals(correctAnswer.toLowerCase())) {
-                        isRightAnswer = true;
-                        textView_debug.append("정답입니다.\n");
-                    }
                 }
-                textView_debug.append("\n");
                 if (isRightAnswer) {
-                    makeQuiz();
+                    applyResult(Session_Admin.resultCode.CORRECT);
                 }else{
-                    textView_debug.append("다시 발음 해 보세요.\n");
+                    if(opportunity>0){
+                        opportunity--;
+                        Log.d(TAG, "다시 발음 해 보세요.");
+                    }else {
+                        applyResult(Session_Admin.resultCode.WRONG);
+                    }
                 }
                 break;
             case R.id.recognitionError:
-                MessageDialogFragment.newInstance("Error code : " + msg.obj.toString());
-                button_start.setText("시작");
+                Log.d(TAG, "Error code : " + msg.obj.toString());
+                button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
                 button_start.setEnabled(true);
                 break;
             case R.id.endPointDetectTypeSelected:
                 break;
             case R.id.clientInactive:
-                button_start.setText("시작");
+                button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
                 button_start.setEnabled(true);
                 break;
         }
@@ -212,14 +299,16 @@ public class Game_ImageGuessing extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // 음성인식 API의 이벤트를 받을 핸들러 생성
-        mEventHandler = new EventHandler(this);
+        mInnerEventHandler = new InnerEventHandler(this);
         // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
+        // 데이터베이스를 다루기 위한 객체
+        mStateManager = StateManager.getInstance();
 
         // UI 생성 (액티비티 공통)
-        setContentView(R.layout.game_basic);
+        setContentView(R.layout.game_basic2);
 
         textView_word = (TextView) findViewById(R.id.textView_word);
         textView_mean = (TextView) findViewById(R.id.textView_mean);
@@ -231,25 +320,23 @@ public class Game_ImageGuessing extends AppCompatActivity {
         editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
         button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
 
-        textView_debug = (TextView) findViewById(R.id.textView_debug);
-
-
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
         button_start.setEnabled(true);
         button_playSound.setEnabled(true);
         button_inputWordAccept.setEnabled(true);
+
+        // imageGuessing 이미지 로딩 구현
         scrollView_game = (ScrollView) findViewById(R.id.scrollView_game);
         myProgress = new MyProgress(this);
         myProgress.setCancelable(false);
-
 
         // UI 리스너 구현
         button_start.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 if(!mVoiceRecognizer.isRunning()) {
-                    button_start.setText("연결중");
+                    button_start.setText("남은 기회는 " + Integer.toString(opportunity)+ "회.\n기다리세요.");
                     mVoiceRecognizer.recognize();
                 } else {
                     button_start.setEnabled(false);
@@ -261,7 +348,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
         button_next.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                makeQuiz();
+                applyResult(Session_Admin.resultCode.PASSED);
             }
         });
 
@@ -278,28 +365,33 @@ public class Game_ImageGuessing extends AppCompatActivity {
             public void onClick(View v){
                 String inputWord = editText_inputWord.toString();
                 editText_inputWord.setText("");
-                if(inputWord.toLowerCase().equals(correctAnswer.toLowerCase())){
-                    isRightAnswer = true;
-                    textView_debug.append("정답입니다.\n");
-                    makeQuiz();
+                checkAnswer(inputWord);
+                Log.d(TAG, "input: " + inputWord);
+
+                if (isRightAnswer) {
+                    applyResult(Session_Admin.resultCode.CORRECT);
+                }else{
+                    if(opportunity>0){
+                        opportunity--;
+                        Log.d(TAG, "다시 입력 해 보세요.");
+                    }else {
+                        applyResult(Session_Admin.resultCode.WRONG);
+                    }
                 }
             }
         });
 
-        // 퀴즈를 생성한다.
-        makeQuiz();
+        // 세션 초기화, 퀴즈 생성
+        //session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
+        roundInit();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         // 액티비티 시작시 반드시 음성인식 기능을 초기화 하여야 함.
-        mVoiceRecognizer.initialize(mEventHandler);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+        mVoiceRecognizer.initialize(mInnerEventHandler);
     }
 
     @Override
@@ -307,5 +399,24 @@ public class Game_ImageGuessing extends AppCompatActivity {
         super.onStop();
         // 액티비티 종료시 반드시 음성인식 기능을 릴리즈 하여야 함.
         mVoiceRecognizer.release();
+    }
+
+    protected void onBackPressed2(){
+        super.onBackPressed();
+    }
+
+    protected static class InnerEventHandler extends Handler {
+        // 이벤트 핸들러 이너 클래스
+        private final WeakReference<Game_ImageGuessing> mActivity;
+        InnerEventHandler(Game_ImageGuessing activity) {
+            mActivity = new WeakReference(activity);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            Game_ImageGuessing activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
+            }
+        }
     }
 }

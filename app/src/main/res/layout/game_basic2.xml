@@ -51,26 +51,8 @@
                 android:id="@+id/imageView_player"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="4"
+                android:layout_weight="6"
                 app:srcCompat="@drawable/progress" />
-
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textView_debug"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                </LinearLayout>
-            </ScrollView>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -82,7 +64,7 @@
                     android:id="@+id/editText_inputWord"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="7"
+                    android:layout_weight="5"
                     android:inputType="textPersonName" />
 
                 <Button

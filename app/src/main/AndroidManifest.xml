@@ -50,6 +50,10 @@
             android:screenOrientation="sensorLandscape"/>
         <activity android:name=".Layout_Test"
             android:screenOrientation="sensorLandscape"/>
+
+        <activity android:name=".Game_BlankGuessing_BossBattle" />
+        <activity android:name=".Game_ImageGuessing_BossBattle" />
+        <activity android:name=".Game_WordChain_BossBattle" />
     </application>
 
 </manifest>
