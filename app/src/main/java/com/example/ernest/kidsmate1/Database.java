@@ -134,7 +134,7 @@ public class Database extends Application {
     public static int getUserInfo(String attr, String uname) {
         Cursor cursor = DB.rawQuery("SELECT " + attr + " FROM user WHERE uname = '" + uname + "'", null);
         cursor.moveToFirst();
-        int result = 0;
+        int result = -1;
         if(!cursor.isAfterLast())
             result = cursor.getInt(0);
         cursor.close();
@@ -148,7 +148,7 @@ public class Database extends Application {
     public static int getCharacterInfo(String attr, String uname, String cname) {
         Cursor cursor = DB.rawQuery("SELECT " + attr + " FROM character WHERE uname = '" + uname + "', cname = '" + cname + "'", null);
         cursor.moveToFirst();
-        int result = 0;
+        int result = -1;
         if(!cursor.isAfterLast())
             result = cursor.getInt(0);
         cursor.close();
@@ -175,12 +175,12 @@ public class Database extends Application {
         DB.execSQL("INSERT INTO trophy (tid, uname, type) VALUES ('" + tid + "', '" + uname + "', " + type + ")");
     }
 
-    public static ArrayList<Integer> getPetList(String uname) {
-        Cursor cursor = DB.rawQuery("SELECT type FROM pet WHERE uname = '" + uname + "' ORDER BY pid", null);
+    public static ArrayList<Pet> getPetList(String uname) {
+        Cursor cursor = DB.rawQuery("SELECT type, uname, pid, cname FROM pet WHERE uname = '" + uname + "' ORDER BY pid", null);
         cursor.moveToFirst();
-        ArrayList<Integer> result = new ArrayList<Integer>();
+        ArrayList<Pet> result = new ArrayList<>();
         while(!cursor.isAfterLast()) {
-            result.add(cursor.getInt(0));
+            result.add(new Pet(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3)));
             cursor.moveToNext();
         }
         cursor.close();
@@ -209,6 +209,27 @@ public class Database extends Application {
         }
         cursor.close();
         return result;
+    }
+
+    public static int getCurrentPet(String uname, String cname) {
+        Cursor cursor = DB.rawQuery("SELECT type FROM pet WHERE uname = '" + uname + "', cname = '" + cname + "'", null);
+        cursor.moveToFirst();
+        int result = -1;
+        if(!cursor.isAfterLast()) {
+            result = cursor.getInt(0);
+        }
+        cursor.close();
+        return result;
+    }
+
+    public static void setCurrentPet(String uname, String cname, String pid) {
+        Cursor cursor = DB.rawQuery("SELECT pid FROM pet WHERE uname = '" + uname + "', cname = '" + cname + "'", null);
+        cursor.moveToFirst();
+        if(!cursor.isAfterLast()) {
+            DB.execSQL("UPDATE pet SET cname = '' WHERE pid = '" + cursor.getString(0) + "'");cursor.getInt(0);
+        }
+        cursor.close();
+        DB.execSQL("UPDATE pet SET cname = '" + cname + "' WHERE pid = '" + pid + "', uname = '" + uname + "'");
     }
 
     @Override

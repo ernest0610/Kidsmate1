@@ -271,7 +271,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         button_inputWordAccept.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                String inputWord = editText_inputWord.toString();
+                String inputWord = editText_inputWord.getText().toString();
                 editText_inputWord.setText("");
                 checkAnswer(inputWord);
                 Log.d(TAG, "input: " + inputWord);
