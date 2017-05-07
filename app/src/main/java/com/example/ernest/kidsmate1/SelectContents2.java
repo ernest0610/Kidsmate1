@@ -52,4 +52,9 @@ public class SelectContents2 extends AppCompatActivity {
         Intent intent = new Intent(SelectContents2.this, Character_Info.class);
         startActivity(intent);
     }
+
+    protected void clicked_Layout_Test(View v) {
+        Intent intent = new Intent(SelectContents2.this, Layout_Test.class);
+        startActivity(intent);
+    }
 }

@@ -53,4 +53,11 @@
         android:onClick="clicked_Character_Info"
         android:text="Character_Info" />
 
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="clicked_Layout_Test"
+        android:text="LAYOUT_TEST" />
+
 </LinearLayout>

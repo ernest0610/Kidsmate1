@@ -48,6 +48,8 @@
             android:screenOrientation="sensorLandscape"/>
         <activity android:name=".Character_Trophy"
             android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Layout_Test"
+            android:screenOrientation="sensorLandscape"/>
     </application>
 
 </manifest>
