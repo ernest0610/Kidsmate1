@@ -8,7 +8,8 @@ import android.widget.*;
 
 public class Character_Info extends AppCompatActivity {
 
-    DatabaseTestStub mDatabaseTestStub;
+    //DatabaseTestStub mDatabaseTestStub;
+    StateManager mStateManager;
 
     ImageView imageView_characterPic;
     TextView textView_characterName;
@@ -22,7 +23,9 @@ public class Character_Info extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mDatabaseTestStub = DatabaseTestStub.getInstance();
+        //mDatabaseTestStub = DatabaseTestStub.getInstance();
+        mStateManager = StateManager.getInstance();
+
         setContentView(R.layout.character_info);
 
         imageView_characterPic = (ImageView) findViewById(R.id.imageView_characterPic);
@@ -39,8 +42,9 @@ public class Character_Info extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart(){
-        super.onStart();
+    protected void onResume(){
+        super.onResume();
+        /*
         button_pet.setText("pet : " + Integer.toString(mDatabaseTestStub.getCurrentPet()));
         textView_characterName.setText(mDatabaseTestStub.getCharacterCname());
         textView_status.setText("level:" + mDatabaseTestStub.getLevel() +
@@ -49,6 +53,17 @@ public class Character_Info extends AppCompatActivity {
                 "\nGame_BlankGuessing Stat: " + mDatabaseTestStub.getStatBlankGuessing() +
                 "\nGame_ImageGuessing Stat: " + mDatabaseTestStub.getStatImageGuessing() +
                 "\nGame_WordChain Stat: " + mDatabaseTestStub.getStatWordChain() +
+                "\n");
+        */
+
+        button_pet.setText("pet : " + Integer.toString(mStateManager.getCurrentPet()));
+        textView_characterName.setText(mStateManager.getCurrentCname());
+        textView_status.setText("level:" + mStateManager.getCharacterLevel() +
+                "\nCurrentExp: " + mStateManager.getCharacterExp() +
+                "\nLevelUpExp: " + mStateManager.getLevelUpExp() +
+                "\nGame_BlankGuessing Stat: " + mStateManager.getCharacterLuck() +
+                "\nGame_ImageGuessing Stat: " + mStateManager.getCharacterPower() +
+                "\nGame_WordChain Stat: " + mStateManager.getCharacterSmart() +
                 "\n");
     }
 
