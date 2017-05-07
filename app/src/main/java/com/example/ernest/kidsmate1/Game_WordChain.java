@@ -15,37 +15,37 @@ import java.util.List;
 import java.util.Random;
 
 public class Game_WordChain extends AppCompatActivity {
+    // 디버깅 메시지
+    protected static final String TAG = Game_WordChain.class.getSimpleName();
+
     // 모든 액티비티가 가지고 있어야 하는 요소.
-    private VoiceRecognizer mVoiceRecognizer; // 싱글톤
-    private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
-    private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
+    protected VoiceRecognizer mVoiceRecognizer; // 싱글톤
+    protected EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
+    protected VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
     // test stub
-    private DatabaseTestStub mDatabaseTestStub;
-
-    // 디버깅 메시지
-    private static final String TAG = Game_WordChain.class.getSimpleName();
+    protected DatabaseTestStub mDatabaseTestStub;
 
     // 액티비티들 공통 UI
-    private TextView textView_word;
-    private TextView textView_mean;
+    protected TextView textView_word;
+    protected TextView textView_mean;
 
-    private EditText editText_inputWord;
-    private Button button_inputWordAccept;
+    protected EditText editText_inputWord;
+    protected Button button_inputWordAccept;
 
-    private Button button_start;
-    private Button button_next;
-    private Button button_playSound;
+    protected Button button_start;
+    protected Button button_next;
+    protected Button button_playSound;
 
     // 퀴즈를 진행하기 위한 변수
-    private String givenWord; // 컴퓨터가 제시한 단어를 기록하는 변수.
-    private boolean isRightAnswer; // 적절한 단어를 말했는지 기록하는 변수.
-    private String RightAnswer; // 답한 단어를 기록하는 변수.
-    private Session_Admin session_admin; // 세션을 관리하는 변수
-    private int opportunity; // 발음할 수 있는 횟수를 제한하는 변수.
+    protected String givenWord; // 컴퓨터가 제시한 단어를 기록하는 변수.
+    protected boolean isRightAnswer; // 적절한 단어를 말했는지 기록하는 변수.
+    protected String RightAnswer; // 답한 단어를 기록하는 변수.
+    protected Session_Admin session_admin; // 세션을 관리하는 변수
+    protected int opportunity; // 발음할 수 있는 횟수를 제한하는 변수.
 
     //함수 시작
-    private boolean roundInit() {
+    protected boolean roundInit() {
         /*
         세션이 처음 시작될때 딱 한번 onCreate에서 호출되는 함수.
          */
@@ -55,7 +55,7 @@ public class Game_WordChain extends AppCompatActivity {
         roundInit(atoz.charAt(random.nextInt(26)));
         return true;
     }
-    private boolean roundInit(char ch) {
+    protected boolean roundInit(char ch) {
         /*
         applyResult에서만 호출되어야 하는 함수.
          */
@@ -75,7 +75,7 @@ public class Game_WordChain extends AppCompatActivity {
         return true;
     }
 
-    private void checkAnswer(String word){
+    protected void checkAnswer(String word){
         /*
         정답을 체크하고, isRightAnswer의 값을 변경하는 함수. (결과를 데이터베이스에 반영하지는 않음)
         isRightAnswer의 값에 따라 이후 처리가 달라진다.
@@ -91,7 +91,7 @@ public class Game_WordChain extends AppCompatActivity {
         }
     }
 
-    private void applyResult(Session_Admin.resultCode result){
+    protected void applyResult(Session_Admin.resultCode result){
         /*
         정답을 데이터베이스에 반영하고, 다음 문제를 출제하거나, 세션을 종료하는 함수.
          */
@@ -124,7 +124,7 @@ public class Game_WordChain extends AppCompatActivity {
 
     public void handleMessage(Message msg) {
         switch (msg.what) {
-            case R.id.clientReady: //// TODO: 2017-05-06 준비 메시지가 늦게 도착하는 경우 메인화면으로 텍스트보다 나중에 갱신되어 이 메시지가 뜨는 경우가 있음.
+            case R.id.clientReady:
                 button_start.setText("연결됨");
                 break;
             case R.id.audioRecording:
