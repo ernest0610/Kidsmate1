@@ -7,8 +7,6 @@ import java.util.ArrayList;
 public class DatabaseTestStub {
     private static final String TAG = DatabaseTestStub.class.getSimpleName();
 
-    public static boolean isDeveloping = false;
-
     private static DatabaseTestStub mDatabaseTestStub;
 
     private int currentExp;

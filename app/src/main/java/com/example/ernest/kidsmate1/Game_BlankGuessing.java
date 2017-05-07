@@ -144,8 +144,10 @@ public class Game_BlankGuessing extends AppCompatActivity {
         game_result.setGameResultText(
                 "CurrentRound: "+session_admin.getCurrentRound()+
                         "\nCorrectRound: "+session_admin.getCorrectRound()+
-                        "\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
-                        "\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
+                        //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
+                        //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
+                        "\nCurrentExp: "+mStateManager.getCurrentExp()+
+                        "\nLevelUpExp: "+mStateManager.getLevelUpExp()
         );
         game_result.show();
     }
@@ -290,7 +292,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         });
 
         // 세션 초기화, 퀴즈 생성
-        session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        //session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
         session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
         roundInit();
     }
