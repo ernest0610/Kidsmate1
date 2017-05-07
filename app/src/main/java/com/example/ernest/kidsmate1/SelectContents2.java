@@ -67,4 +67,9 @@ public class SelectContents2 extends AppCompatActivity {
         Intent intent = new Intent(SelectContents2.this, Game_WordChain_BossBattle.class);
         startActivity(intent);
     }
+
+    protected void clicked_Layout_Test(View v) {
+        Intent intent = new Intent(SelectContents2.this, Layout_Test.class);
+        startActivity(intent);
+    }
 }

@@ -61,25 +61,19 @@ public class StateManager {
     public void initCharacterExp() {
         Database.setCharacterInfo("exp", currentUname, currentUname, 0);
     }
-/////////////////////////////////////////////////////////////////////////////////////////// user info add
-    public void addUserAlphpa_kerberos(int increment) {
-        int origin = Database.getUserInfo("alpha_kerberos", currentUname);
-        origin += increment;
-        Database.setUserInfo("alpha_kerberos", currentUname, origin);
+/////////////////////////////////////////////////////////////////////////////////////////// alpha set
+    public void setUserAlphpa_kerberos(String value) {
+        Database.setUserAlpha("alpha_kerberos", currentUname, value);
     }
 
-    public void addUserAlpha_griffon(int increment) {
-        int origin = Database.getUserInfo("alpha_griffon", currentUname);
-        origin += increment;
-        Database.setUserInfo("alpha_griffon", currentUname, origin);
+    public void setUserAlpha_griffin(String value) {
+        Database.setUserAlpha("alpha_griffin", currentUname, value);
     }
 
-    public void addUserAlphpa_sphinx(int increment) {
-        int origin = Database.getUserInfo("alpha_sphinx", currentUname);
-        origin += increment;
-        Database.setUserInfo("alpha_sphinx", currentUname, origin);
+    public void setUserAlphpa_pyramid(String value) {
+        Database.setUserAlpha("alpha_pyramid", currentUname, value);
     }
-
+    /////////////////////////////////////////////////////////////////////////////////////////// user info add
     public void addUserTW_count(int increment) {
         int origin = Database.getUserInfo("TW_count", currentUname);
         origin += increment;
@@ -121,17 +115,29 @@ public class StateManager {
         origin += increment;
         Database.setUserInfo("WC_bcount", currentUname, origin);
     }
+    /////////////////////////////////////////////////////////////////////////////////// user alpha full get
+    public String getUserAlphpa_kerberos_fullString() {
+        return "KERBEROS";
+    }
+
+    public String getUserAlpha_griffin_fullString() {
+        return "GRIFFIN";
+    }
+
+    public String getUserAlphpa_pyramid_fullString() {
+        return "PYRAMID";
+    }
 ////////////////////////////////////////////////////////////////////////////////////// user info get
-    public int getUserAlphpa_kerberos() {
-        return Database.getUserInfo("alpha_kerberos", currentUname);
+    public String getUserAlphpa_kerberos() {
+        return Database.getUserAlpha("alpha_kerberos", currentUname);
     }
 
-    public int getUserAlpha_griffon() {
-        return Database.getUserInfo("alpha_griffon", currentUname);
+    public String getUserAlpha_griffin() {
+        return Database.getUserAlpha("alpha_griffin", currentUname);
     }
 
-    public int getUserAlphpa_sphinx() {
-        return Database.getUserInfo("alpha_sphinx", currentUname);
+    public String getUserAlphpa_pyramid() {
+        return Database.getUserAlpha("alpha_pyramid", currentUname);
     }
 
     public int getUserTW_count() {
