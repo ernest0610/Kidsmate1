@@ -1,7 +1,6 @@
 package com.example.ernest.kidsmate1;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Random;
 
@@ -22,14 +20,15 @@ public class Game_BlankGuessing extends AppCompatActivity {
     private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
     private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
-    //test stub
+    // test stub
     private DatabaseTestStub mDatabaseTestStub;
+
+    // 디버깅 메시지
     private static final String TAG = Game_BlankGuessing.class.getSimpleName();
 
     // 액티비티들 공통 UI
     private TextView textView_word;
     private TextView textView_mean;
-    //private TextView textView_debug;
 
     private EditText editText_inputWord;
     private Button button_inputWordAccept;
@@ -38,53 +37,58 @@ public class Game_BlankGuessing extends AppCompatActivity {
     private Button button_next;
     private Button button_playSound;
 
-    // 액티비티마다 다른 변수
-    private String correctAnswer;
-    private String correctAnsersMean;
-    private boolean isRightAnswer;
-    private int[] blankIndex = {0};
+    // 퀴즈를 진행하기 위한 변수
+    private String correctAnswer; // 정답을 기록하는 변수
+    private String correctAnsersMean; // 정답의 의미를 기록하는 변수
+    private boolean isRightAnswer; // 정답을 맞췄는지 기록하는 변수
+    private Session_Admin session_admin; // 세션을 관리하는 변수
+    private int opportunity; // 발음할 수 있는 횟수를 제한하는 변수.
 
-    private boolean hintMean;
+    private int[] blankIndex = {0}; // 빈칸을 체크하는 변수
+    private boolean hintMean; // 힌트를 주었는지 체크하는 변수
     private boolean hintSynthesizer;
 
-    private Session_Admin session_admin; // session variant
-
-    private int opportunity;
+    // 결과창 표시 변수
+    private Game_Result game_result;
 
     // 함수 시작
-    private String[] getWordAndMean() {
-        return Database.getRandomWordMean();
-    }
-
     private boolean roundInit(){
-        String[] todayWord = getWordAndMean();
+        /*
+        세션이 처음 시작될때 딱 한번 onCreate에서 호출되고, 그 이후에는 반드시 applyResult에서만 호출되어야 하는 함수.
+         */
+        // 문제를 얻어온다.
+        String[] todayWord = Database.getRandomWordMean();
         correctAnswer = todayWord[0].toLowerCase();
         correctAnsersMean = todayWord[1];
 
-        hintMean = false;
-        hintSynthesizer = false;
-        textView_mean.setText("");
-
-        //빈칸이 들어갈 위치 정하기.
+        // 빈칸이 들어갈 위치 정하기.
         Random randomIndex = new Random();
         blankIndex[0] = randomIndex.nextInt(correctAnswer.length()-1);
 
-        isRightAnswer = false;
-
-        //빈칸 만들어서 출력하기. 원본은 correctAnswer에 저장되어있고 변형되지 않음.
+        // 빈칸 만들어서 출력하기. 원본은 correctAnswer에 저장되어있고 변형되지 않음.
         StringBuffer mStringBuffer = new StringBuffer(correctAnswer);
         mStringBuffer.setCharAt(blankIndex[0], '_');
         textView_word.setText(mStringBuffer.toString());
 
-        this.opportunity = 5;
+        // 라운드 초기화.
+        isRightAnswer = false;
+        textView_mean.setText("");
+        hintMean = false;
+        hintSynthesizer = false;
+        opportunity = 5;
 
-        button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
+        // 버튼 텍스트 초기화.
+        button_start.setText("남은 기회는 " + Integer.toString(opportunity)+ "회.\n도전!");
         button_next.setText("현재 라운드: " + Integer.toString(session_admin.getCurrentRound())+ "\n패스(패배)");
         button_playSound.setText("발음 힌트");
         return true;
     }
 
     private void checkAnswer(String word){
+        /*
+        정답을 체크하고, isRightAnswer의 값을 변경하는 함수. (결과를 데이터베이스에 반영하지는 않음)
+        isRightAnswer의 값에 따라 이후 처리가 달라진다.
+         */
         if(word.length()==1 && !isRightAnswer && word.toLowerCase().charAt(0) == correctAnswer.charAt(blankIndex[0])) {
             isRightAnswer = true;
             Log.d(TAG, "정답입니다.");
@@ -92,6 +96,9 @@ public class Game_BlankGuessing extends AppCompatActivity {
     }
 
     private void applyResult(Session_Admin.resultCode result){
+        /*
+        정답을 데이터베이스에 반영하고, 다음 문제를 출제하거나, 세션을 종료하는 함수.
+         */
         session_admin.reportGameResult(result);
         if(session_admin.getCurrentRound() <= session_admin.getMaxRound()){
             roundInit();
@@ -115,6 +122,9 @@ public class Game_BlankGuessing extends AppCompatActivity {
                     onBackPressed2();
                 }
             });
+
+            //game_result.show();
+            //game_result.set
         }
     }
 
@@ -151,14 +161,13 @@ public class Game_BlankGuessing extends AppCompatActivity {
                 }
                 break;
             case R.id.recognitionError:
-                //MessageDialogFragment.newInstance("Error code : " + msg.obj.toString());
                 Log.d(TAG, "Error code : " + msg.obj.toString());
                 button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
                 button_start.setEnabled(true);
                 break;
             case R.id.endPointDetectTypeSelected:
                 break;
-            case R.id.clientInactive:
+            case R.id.clientInactive: //// TODO: 2017-05-06 준비 메시지가 늦게 도착하는 경우 메인화면으로 텍스트보다 나중에 갱신되어 이 메시지가 뜨는 경우가 있음.
                 button_start.setText("남은 기회는 " + Integer.toString(this.opportunity)+ "회.\n도전!");
                 button_start.setEnabled(true);
                 break;
@@ -191,16 +200,11 @@ public class Game_BlankGuessing extends AppCompatActivity {
         editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
         button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
 
-        //textView_debug = (TextView) findViewById(R.id.textView_debug);
-
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
         button_start.setEnabled(true);
         button_playSound.setEnabled(true);
         button_inputWordAccept.setEnabled(true);
-
-
-
 
         // UI 리스너 구현
         button_start.setOnClickListener(new View.OnClickListener(){
@@ -262,7 +266,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
             }
         });
 
-        // 세션 초기화
+        // 세션 초기화, 퀴즈 생성
         session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
         roundInit();
     }
