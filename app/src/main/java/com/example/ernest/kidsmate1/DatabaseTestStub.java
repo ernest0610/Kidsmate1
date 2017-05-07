@@ -13,6 +13,7 @@ public class DatabaseTestStub {
     private String Cname;
     private int currentPet;
     private ArrayList<Integer> petArrayList;
+    private ArrayList<Character> alphabetArrayList;
 
     private int statBlankGuessing;
     private int statImageGuessing;
@@ -26,6 +27,7 @@ public class DatabaseTestStub {
         currentExp = 0;
         Cname = "Ernest";
         petArrayList = new ArrayList(6);
+        alphabetArrayList = new ArrayList(20);
         petArrayList.add(1);
         currentPet = 1;
 
@@ -97,33 +99,32 @@ public class DatabaseTestStub {
         }
     }
 
+
     public int getCurrentPet(){
         /*
         현재 펫의 정보를 얻는다. (객체, 문자열)
          */
         return currentPet;
     }
-
     public void setCurrentPet(int code){
         /*
         펫을 교체한다.
          */
         currentPet = code;
     }
-
     public ArrayList<Integer> getPetList(){
         /*
         펫의 리스트를 얻는다.
          */
         return petArrayList;
     }
-
     public void addPet(int petcode){
         /*
         펫을 추가한다.
          */
         petArrayList.add(petcode);
     }
+
 
     public void addStatBlankGuessing(int point){
         /*
@@ -216,4 +217,23 @@ public class DatabaseTestStub {
     }
 
     //////////////////////////////////////////////// 새로 작성한 코드는 여기서부터
+    public ArrayList<Character> getAlphabetList(){
+        /*
+        알파벳의 리스트를 얻는다.
+         */
+        return alphabetArrayList;
+    }
+    public void addAlphabet(char ch){
+        alphabetArrayList.add(ch);
+    }
+
+    public boolean isBlankGuessingBossBattleAvailable(){
+        return true;
+    }
+    public boolean isImageGuessingBossBattleAvailable(){
+        return true;
+    }
+    public boolean isWordChainBossBattleAvailable(){
+        return true;
+    }
 }

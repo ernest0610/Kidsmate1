@@ -2,6 +2,7 @@ package com.example.ernest.kidsmate1;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Random;
 
@@ -21,7 +23,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
 
     // 모든 액티비티가 가지고 있어야 하는 요소.
     protected VoiceRecognizer mVoiceRecognizer; // 싱글톤
-    protected EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
+    protected InnerEventHandler mInnerEventHandler; // 각 액티비티 고유의 이벤트 핸들러
     protected VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
     // test stub
@@ -106,29 +108,31 @@ public class Game_BlankGuessing extends AppCompatActivity {
     }
 
     protected void endingSession(){
+        button_next.setEnabled(false);
+        button_start.setEnabled(true);
+        button_playSound.setEnabled(false);
+        button_inputWordAccept.setEnabled(false);
+
+        sendResultToDatabase();
+        showTotalResult();
+    }
+
+    protected void sendResultToDatabase(){
+        /*
+        데이터베이스에 결과를 전송
+         */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
             mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
         }else{
             mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
         }
         mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
+    }
 
-        button_next.setEnabled(false);
-        button_start.setEnabled(true);
-        button_playSound.setEnabled(false);
-        button_inputWordAccept.setEnabled(false);
-
+    protected void showTotalResult(){
         /*
-        button_start.setText("메인화면으로.");
-        button_start.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                onBackPressed2();
-            }
-        });
-        */
-
-        // 결과창 표시 변수
+        모든 라운드가 끝나고 세션의 결과를 표시
+         */
         Game_Result game_result = new Game_Result(this);
         game_result.setGameResultText(
                 "CurrentRound: "+session_admin.getCurrentRound()+
@@ -196,7 +200,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // 음성인식 API의 이벤트를 받을 핸들러 생성
-        mEventHandler = new EventHandler(this);
+        mInnerEventHandler = new InnerEventHandler(this);
         // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
         // 음성합성 API를 사용하기 위한 객체 생성.
@@ -292,7 +296,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // 액티비티 시작시 반드시 음성인식 기능을 초기화 하여야 함.
-        mVoiceRecognizer.initialize(mEventHandler);
+        mVoiceRecognizer.initialize(mInnerEventHandler);
     }
 
     @Override
@@ -304,5 +308,20 @@ public class Game_BlankGuessing extends AppCompatActivity {
 
     protected void onBackPressed2(){
         super.onBackPressed();
+    }
+
+    protected static class InnerEventHandler extends Handler {
+        // 이벤트 핸들러 이너 클래스
+        private final WeakReference<Game_BlankGuessing> mActivity;
+        InnerEventHandler(Game_BlankGuessing activity) {
+            mActivity = new WeakReference(activity);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            Game_BlankGuessing activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
+            }
+        }
     }
 }
