@@ -32,6 +32,12 @@ public class Game_BlankGuessing_BossBattle extends Game_BlankGuessing {
         모든 라운드가 끝나고 세션의 결과를 표시
          */
         Game_Result game_result = new Game_Result(this);
+        game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
+            @Override
+            public void onCancel(DialogInterface dialog){
+                Game_BlankGuessing_BossBattle.this.finish();
+            }
+        });
         game_result.setGameResultText(
                 "CurrentRound: "+session_admin.getCurrentRound()+
                         "\nCorrectRound: "+session_admin.getCorrectRound()+
@@ -39,12 +45,6 @@ public class Game_BlankGuessing_BossBattle extends Game_BlankGuessing {
                         "\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()+
                         "\npresentedChar: "+presentedChar
         );
-        game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
-            @Override
-            public void onCancel(DialogInterface dialog){
-                Game_BlankGuessing_BossBattle.this.finish();
-            }
-        });
         game_result.show();
     }
 }
