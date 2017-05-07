@@ -81,6 +81,13 @@
                 android:layout_height="wrap_content"
                 android:onClick="clicked_Game_WordChain_BossBattle"
                 android:text="Game_WordChain_BossBattle" />
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Layout_Test"
+                android:text="TEST_LAYOUT" />
         </LinearLayout>
     </ScrollView>
 
