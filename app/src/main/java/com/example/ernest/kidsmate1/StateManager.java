@@ -53,6 +53,14 @@ public class StateManager {
     public void setCharacterJob(String job) {
         Database.setCharacterJob(currentUname, currentCname, job);
     }
+    // 현재 character의 pet 변경
+    public void setCurrentPet(String pid) {
+        Database.setCurrentPet(currentUname, currentCname, pid);
+    }
+    // levelup 시 경험치 초기화
+    public void initCharacterExp() {
+        Database.setCharacterInfo("exp", currentUname, currentUname, 0);
+    }
 /////////////////////////////////////////////////////////////////////////////////////////// user info add
     public void addUserAlphpa_kerberos(int increment) {
         int origin = Database.getUserInfo("alpha_kerberos", currentUname);
@@ -203,6 +211,10 @@ public int getCharacterLevel() {
     public int getCharacterLuck() {
         return Database.getCharacterInfo("luck", currentUname, currentCname);
     }
+
+    public int getCurrentPet() {
+        return Database.getCurrentPet(currentUname, currentCname);
+    }
     //////////////////////////////////////////////////////////////////////////////// char, pet, trop 추가
     public void addCharacter(String cname) {
         Calendar cal = Calendar.getInstance();
@@ -220,10 +232,10 @@ public int getCharacterLevel() {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         String tid = simpleDateFormat.format(cal.getTime());
-        Database.addPet(tid, currentUname, type);
+        Database.addTrophy(tid, currentUname, type);
     }
     ////////////////////////////////////////////////////////////////////////////////// get pet, trophy list
-    public ArrayList<Integer> getPetList() {
+    public ArrayList<Pet> getPetList() {
         return Database.getPetList(currentUname);
     }
     public ArrayList<Integer> getTrophyList() {
@@ -232,5 +244,53 @@ public int getCharacterLevel() {
     //////////////////////////////////////////////////////////////////////////////// get char list
     public ArrayList<String> getCharacterList() {
         return Database.getCharacterList(currentUname);
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////// 추가
+    public int getLevelUpExp(){
+        /*
+        다음 레벨업에 필요한 경험치를 얻는다.
+         */
+        if(this.getCharacterLevel() <= 10){
+            return 10;
+        }else if(this.getCharacterLevel() <= 20){
+            return 20;
+        }else if(this.getCharacterLevel() <= 30){
+            return 30;
+        }else if(this.getCharacterLevel() <= 40){
+            return 40;
+        }else if(this.getCharacterLevel() <= 50){
+            return 60;
+        }else{
+            return -1;
+        }
+    }
+    // 한 세션(게임)의 최대 라운드를 구한다. (기본 10판이나 나중에 변경할수도 있으니)
+    public int getMaxRound(){
+        return 10;
+    }
+    // 경험치를 더 얻기 위해 이겨야 하는 라운드의 수를 구한다.
+    public int getGoalRound(){
+        if(this.getCharacterLevel() <= 10){
+            return 4;
+        }else if(this.getCharacterLevel() <= 20){
+            return 5;
+        }else if(this.getCharacterLevel() <= 30){
+            return 6;
+        }else if(this.getCharacterLevel() <= 40){
+            return 7;
+        }else if(this.getCharacterLevel() <= 50){
+            return 8;
+        }else{
+            return -1;
+        }
+    }
+    // 이겼을때 경험치를 얼마나 얻는가
+    public int getEarnedExpWhenSuccess(){
+        return 10;
+    }
+
+    // 졌을때 경험치를 얼마나 얻는가
+    public int getEarnedExpWhenFailure(){
+        return 5;
     }
 }
