@@ -1,5 +1,6 @@
 package com.example.ernest.kidsmate1;
 
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -192,26 +193,50 @@ public class Game_ImageGuessing extends AppCompatActivity {
         if(session_admin.getCurrentRound() <= session_admin.getMaxRound()){
             roundInit();
         }else{
-            if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
-            }else{
-                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
-            }
-            mDatabaseTestStub.addStatImageGuessing(session_admin.getCorrectRound());
-
-            button_next.setEnabled(false);
-            button_start.setEnabled(true);
-            button_playSound.setEnabled(false);
-            button_inputWordAccept.setEnabled(false);
-
-            button_start.setText("메인화면으로.");
-            button_start.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    onBackPressed2();
-                }
-            });
+            endingSession();
         }
+    }
+
+    protected void endingSession(){
+        button_next.setEnabled(false);
+        button_start.setEnabled(true);
+        button_playSound.setEnabled(false);
+        button_inputWordAccept.setEnabled(false);
+
+        sendResultToDatabase();
+        showTotalResult();
+    }
+
+    protected void sendResultToDatabase(){
+        /*
+        데이터베이스에 결과를 전송
+         */
+        if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
+            mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+        }else{
+            mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+        }
+        mDatabaseTestStub.addStatImageGuessing(session_admin.getCorrectRound());
+    }
+
+    protected void showTotalResult(){
+        /*
+        모든 라운드가 끝나고 세션의 결과를 표시
+         */
+        Game_Result game_result = new Game_Result(this);
+        game_result.setGameResultText(
+                "CurrentRound: "+session_admin.getCurrentRound()+
+                        "\nCorrectRound: "+session_admin.getCorrectRound()+
+                        "\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
+                        "\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
+        );
+        game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
+            @Override
+            public void onCancel(DialogInterface dialog){
+                Game_ImageGuessing.this.finish();
+            }
+        });
+        game_result.show();
     }
 
     public void handleMessage(Message msg) {

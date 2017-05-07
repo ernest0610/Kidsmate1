@@ -36,6 +36,10 @@
         <activity android:name=".Character_Pet" />
         <activity android:name=".Character_Alphabet" />
         <activity android:name=".Character_Trophy" />
+
+        <activity android:name=".Game_BlankGuessing_BossBattle" />
+        <activity android:name=".Game_ImageGuessing_BossBattle" />
+        <activity android:name=".Game_WordChain_BossBattle" />
     </application>
 
 </manifest>
