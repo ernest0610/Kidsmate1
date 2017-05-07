@@ -144,35 +144,48 @@ public class DatabaseTestStub {
         statWordChain += point;
     }
 
-    // 총 스탯을 얻어온다.
     public int getStatBlankGuessing(){
+        /*
+        빈칸맞추기로 얻는 스탯을 얻어온다.
+         */
         return statBlankGuessing;
     }
     public int getStatImageGuessing(){
+        /*
+        그림맞추기로 얻는 스탯을 얻어온다.
+         */
         return statImageGuessing;
     }
     public int getStatWordChain(){
+        /*
+        끝말잇기로 얻는 스탯을 얻어온다.
+         */
         return statWordChain;
     }
 
-    // 현재 레벨을 구한다.
     public int getLevel(){
+        // 현재 레벨을 구한다.
         return level;
     }
 
-    // 다음 레벨업에 필요한 경험치를 구한다.
     public int getLevelUpExp(){
+        /*
+        다음 레벨업에 필요한 경험치를 구한다.
+         */
         return this.levelUpExp;
     }
 
-
-    // 한 세션(게임)의 최대 라운드를 구한다. (기본 10판이나 나중에 변경할수도 있으니)
     public int getMaxRound(){
+        /*
+        한 세션(게임)의 최대 라운드를 구한다. (기본 10판이나 나중에 변경할수도 있으니)
+         */
         return 10;
     }
 
-    // 경험치를 더 얻기 위해 이겨야 하는 라운드의 수를 구한다.
     public int getGoalRound(){
+        /*
+        보너스 경험치를 얻기 위해 이겨야 하는 라운드의 수를 구한다.
+         */
         if(level <= 10){
             return 4;
         }else if(level <= 20){
@@ -188,13 +201,19 @@ public class DatabaseTestStub {
         }
     }
 
-    // 이겼을때 경험치를 얼마나 얻는가
     public int getEarnedExpWhenSuccess(){
+        /*
+        이겼을때 경험치를 얼마나 얻는가
+         */
         return 10;
     }
 
-    // 졌을때 경험치를 얼마나 얻는가
     public int getEarnedExpWhenFailure(){
+        /*
+        졌을때 경험치를 얼마나 얻는가
+         */
         return 5;
     }
+
+    //////////////////////////////////////////////// 새로 작성한 코드는 여기서부터
 }
