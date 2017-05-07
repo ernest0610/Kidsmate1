@@ -62,7 +62,7 @@ public class StateManager {
     }
     // levelup 시 경험치 초기화
     public void initCharacterExp() {
-        Database.setCharacterInfo("exp", currentUname, currentUname, 0);
+        Database.setCharacterInfo("exp", currentUname, currentCname, 0);
     }
 /////////////////////////////////////////////////////////////////////////////////////////// alpha set
     public void setUserAlphpa_kerberos(String value) {
@@ -132,7 +132,7 @@ public class StateManager {
     }
 ////////////////////////////////////////////////////////////////////////////////////// user info get
     public String getUserAlphpa_kerberos() {
-        return Database.getUserAlpha("alpha_kerberos", currentUname);
+       return Database.getUserAlpha("alpha_kerberos", currentUname);
     }
 
     public String getUserAlpha_griffin() {
@@ -174,8 +174,7 @@ public class StateManager {
     public void addCharacterLevel(int increment) {
         int origin = Database.getCharacterInfo("level", currentUname, currentCname);
         origin += increment;
-        Database.setCharacterInfo("level", currentUname, currentUname, origin);
-        Log.d(TAG, "addCharacterLevel Origin: "+Integer.toString(origin));
+        Database.setCharacterInfo("level", currentUname, currentCname, origin);
     }
 
     public boolean addCharacterExp(int increment) {
@@ -187,30 +186,27 @@ public class StateManager {
             addCharacterLevel(1);
             LevelUpChck = true;
         }
-        Log.d(TAG, "addCharacterExp Origin: "+Integer.toString(origin));
-        Database.setCharacterInfo("exp", currentUname, currentUname, origin);
+
+        Database.setCharacterInfo("exp", currentUname, currentCname, origin);
         return LevelUpChck;
     }
 
     public void addCharacterPower(int increment) {
         int origin = Database.getCharacterInfo("power", currentUname, currentCname);
         origin += increment;
-        Log.d(TAG, "addCharacterPower Origin: "+Integer.toString(origin));
-        Database.setCharacterInfo("power", currentUname, currentUname, origin);
+        Database.setCharacterInfo("power", currentUname, currentCname, origin);
     }
 
     public void addCharacterSmart(int increment) {
         int origin = Database.getCharacterInfo("smart", currentUname, currentCname);
         origin += increment;
-        Log.d(TAG, "addCharacterSmart Origin: "+Integer.toString(origin));
-        Database.setCharacterInfo("smart", currentUname, currentUname, origin);
+        Database.setCharacterInfo("smart", currentUname, currentCname, origin);
     }
 
     public void addCharacterLuck(int increment) {
         int origin = Database.getCharacterInfo("luck", currentUname, currentCname);
         origin += increment;
-        Log.d(TAG, "addCharacterLuck Origin: "+Integer.toString(origin));
-        Database.setCharacterInfo("luck", currentUname, currentUname, origin);
+        Database.setCharacterInfo("luck", currentUname, currentCname, origin);
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////// char info get
 public int getCharacterLevel() {
