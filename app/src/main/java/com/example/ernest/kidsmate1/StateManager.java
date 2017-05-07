@@ -2,6 +2,7 @@ package com.example.ernest.kidsmate1;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.naver.speech.clientapi.SpeechRecognitionException;
 import com.naver.speech.clientapi.SpeechRecognizer;
@@ -15,6 +16,8 @@ import java.util.Calendar;
  */
 
 public class StateManager {
+    protected static final String TAG = StateManager.class.getSimpleName();
+
     private static StateManager mStateManager = null;
     private String currentUname = "";
     private String currentCname = "";
@@ -172,6 +175,7 @@ public class StateManager {
         int origin = Database.getCharacterInfo("level", currentUname, currentCname);
         origin += increment;
         Database.setCharacterInfo("level", currentUname, currentUname, origin);
+        Log.d(TAG, "addCharacterLevel Origin: "+Integer.toString(origin));
     }
 
     public boolean addCharacterExp(int increment) {
@@ -183,6 +187,7 @@ public class StateManager {
             addCharacterLevel(1);
             LevelUpChck = true;
         }
+        Log.d(TAG, "addCharacterExp Origin: "+Integer.toString(origin));
         Database.setCharacterInfo("exp", currentUname, currentUname, origin);
         return LevelUpChck;
     }
@@ -190,18 +195,21 @@ public class StateManager {
     public void addCharacterPower(int increment) {
         int origin = Database.getCharacterInfo("power", currentUname, currentCname);
         origin += increment;
+        Log.d(TAG, "addCharacterPower Origin: "+Integer.toString(origin));
         Database.setCharacterInfo("power", currentUname, currentUname, origin);
     }
 
     public void addCharacterSmart(int increment) {
         int origin = Database.getCharacterInfo("smart", currentUname, currentCname);
         origin += increment;
+        Log.d(TAG, "addCharacterSmart Origin: "+Integer.toString(origin));
         Database.setCharacterInfo("smart", currentUname, currentUname, origin);
     }
 
     public void addCharacterLuck(int increment) {
         int origin = Database.getCharacterInfo("luck", currentUname, currentCname);
         origin += increment;
+        Log.d(TAG, "addCharacterLuck Origin: "+Integer.toString(origin));
         Database.setCharacterInfo("luck", currentUname, currentUname, origin);
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////// char info get

@@ -147,7 +147,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
             }
         });
         game_result.setGameResultText(
-                "CurrentRound: "+session_admin.getCurrentRound()+
+                "CurrentRound: "+(session_admin.getCurrentRound()-1)+
                         "\nCorrectRound: "+session_admin.getCorrectRound()+
                         //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
                         //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()

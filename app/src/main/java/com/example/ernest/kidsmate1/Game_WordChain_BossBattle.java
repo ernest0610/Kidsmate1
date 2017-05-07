@@ -42,7 +42,7 @@ public class Game_WordChain_BossBattle extends Game_WordChain {
             }
         });
         game_result.setGameResultText(
-                "CurrentRound: "+session_admin.getCurrentRound()+
+                "CurrentRound: "+(session_admin.getCurrentRound()-1)+
                         "\nCorrectRound: "+session_admin.getCorrectRound()+
                         //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
                         //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
@@ -82,7 +82,7 @@ public class Game_WordChain_BossBattle extends Game_WordChain {
             }
         }
         int selectedIndex = random.nextInt(indexOfString.size());
-        char selectedChar = target.charAt(selectedIndex);
+        selectedChar = target.charAt(selectedIndex);
         finalState.setCharAt(selectedIndex, selectedChar);
 
         mDatabaseTestStub.setUserAlpha_pyramid(finalState.toString());
