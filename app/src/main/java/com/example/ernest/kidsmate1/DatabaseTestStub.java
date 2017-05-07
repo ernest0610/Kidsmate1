@@ -23,6 +23,10 @@ public class DatabaseTestStub {
 
     private int levelUpExp;
 
+    private String pyramid;
+    private String kerberos;
+    private String griffin;
+
     private DatabaseTestStub(){
         currentExp = 0;
         Cname = "Ernest";
@@ -38,6 +42,10 @@ public class DatabaseTestStub {
         level = 1;
 
         levelUpExp = getLevelUpExp(level);
+
+        pyramid = "_______";
+        kerberos = "________";
+        griffin = "_______";
     }
 
     public static DatabaseTestStub getInstance(){
@@ -236,4 +244,35 @@ public class DatabaseTestStub {
     public boolean isWordChainBossBattleAvailable(){
         return true;
     }
+
+    public void setUserAlpha_pyramid(String str){
+        pyramid = str;
+    }
+    public void setUserAlpha_kerberos(String str){
+        kerberos = str;
+    }
+    public void setUserAlpha_griffin(String str){
+        griffin = str;
+    }
+
+    public String getUserAlpha_pyramid(){
+        return pyramid;
+    }
+    public String getUserAlpha_kerberos(){
+        return kerberos;
+    }
+    public String getUserAlpha_griffin(){
+        return griffin;
+    }
+
+    public String getUserAlpha_pyramid_fullString(){
+        return "PYRAMID";
+    }
+    public String getUserAlpha_kerberos_fullString(){
+        return "KERBEROS";
+    }
+    public String getUserAlpha_griffin_fullString(){
+        return "GRIFFIN";
+    }
+
 }

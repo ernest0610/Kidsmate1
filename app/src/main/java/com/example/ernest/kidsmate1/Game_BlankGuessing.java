@@ -26,8 +26,10 @@ public class Game_BlankGuessing extends AppCompatActivity {
     protected InnerEventHandler mInnerEventHandler; // 각 액티비티 고유의 이벤트 핸들러
     protected VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
-    // test stub
-    //protected DatabaseTestStub mDatabaseTestStub;
+    // 데이터베이스 테스트 stub
+    protected DatabaseTestStub mDatabaseTestStub = DatabaseTestStub.getInstance();
+
+    // 데이터베이스 상태 매니저
     protected StateManager mStateManager;
 
     // 액티비티들 공통 UI
@@ -123,11 +125,14 @@ public class Game_BlankGuessing extends AppCompatActivity {
         데이터베이스에 결과를 전송
          */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-            mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenSuccess());
         }else{
-            mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenFailure());
         }
-        mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
+        //mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
+        mStateManager.addCharacterLuck(session_admin.getCorrectRound());
     }
 
     protected void showTotalResult(){
@@ -146,7 +151,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
                         "\nCorrectRound: "+session_admin.getCorrectRound()+
                         //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
                         //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
-                        "\nCurrentExp: "+mStateManager.getCurrentExp()+
+                        "\nCurrentExp: "+mStateManager.getCharacterExp()+
                         "\nLevelUpExp: "+mStateManager.getLevelUpExp()
         );
         game_result.show();
@@ -208,8 +213,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
-
-        //mDatabaseTestStub = DatabaseTestStub.getInstance();
+        // 데이터베이스를 다루기 위한 객체
         mStateManager = StateManager.getInstance();
 
         // UI 생성 (액티비티 공통)

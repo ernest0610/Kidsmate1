@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Game_Basic extends AppCompatActivity {
+
     // 디버깅 메시지
     protected static final String TAG = Game_Basic.class.getSimpleName();
 
@@ -312,7 +313,7 @@ public class Game_Basic extends AppCompatActivity {
 
     protected static class InnerEventHandler extends Handler {
         // 이벤트 핸들러 이너 클래스
-        private final WeakReference<Game_Basic> mActivity;
+        private final WeakReference<? extends Game_Basic> mActivity;
         InnerEventHandler(Game_Basic activity) {
             mActivity = new WeakReference(activity);
         }

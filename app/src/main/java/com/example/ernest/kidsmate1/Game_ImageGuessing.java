@@ -26,6 +26,7 @@ import org.jsoup.select.Elements;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.List;
 
@@ -38,11 +39,14 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
     // 모든 액티비티가 가지고 있어야 하는 요소.
     protected VoiceRecognizer mVoiceRecognizer; // 싱글톤
-    protected EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
+    protected InnerEventHandler mInnerEventHandler; // 각 액티비티 고유의 이벤트 핸들러
     protected VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
-    // test stub
-    protected DatabaseTestStub mDatabaseTestStub;
+    // 데이터베이스 테스트 stub
+    protected DatabaseTestStub mDatabaseTestStub = DatabaseTestStub.getInstance();
+
+    // 데이터베이스 상태 매니저
+    protected StateManager mStateManager;
 
     // 액티비티들 공통 UI
     protected TextView textView_word;
@@ -212,11 +216,14 @@ public class Game_ImageGuessing extends AppCompatActivity {
         데이터베이스에 결과를 전송
          */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-            mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenSuccess());
         }else{
-            mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenFailure());
         }
-        mDatabaseTestStub.addStatImageGuessing(session_admin.getCorrectRound());
+        //mDatabaseTestStub.addStatImageGuessing(session_admin.getCorrectRound());
+        mStateManager.addCharacterPower(session_admin.getCorrectRound());
     }
 
     protected void showTotalResult(){
@@ -233,8 +240,10 @@ public class Game_ImageGuessing extends AppCompatActivity {
         game_result.setGameResultText(
                 "CurrentRound: "+session_admin.getCurrentRound()+
                         "\nCorrectRound: "+session_admin.getCorrectRound()+
-                        "\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
-                        "\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
+                        //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
+                        //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
+                        "\nCurrentExp: "+mStateManager.getCharacterExp()+
+                        "\nLevelUpExp: "+mStateManager.getLevelUpExp()
         );
         game_result.show();
     }
@@ -290,13 +299,13 @@ public class Game_ImageGuessing extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // 음성인식 API의 이벤트를 받을 핸들러 생성
-        mEventHandler = new EventHandler(this);
+        mInnerEventHandler = new InnerEventHandler(this);
         // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
-
-        mDatabaseTestStub = DatabaseTestStub.getInstance();
+        // 데이터베이스를 다루기 위한 객체
+        mStateManager = StateManager.getInstance();
 
         // UI 생성 (액티비티 공통)
         setContentView(R.layout.game_basic2);
@@ -373,7 +382,8 @@ public class Game_ImageGuessing extends AppCompatActivity {
         });
 
         // 세션 초기화, 퀴즈 생성
-        session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        //session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
         roundInit();
     }
 
@@ -381,7 +391,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // 액티비티 시작시 반드시 음성인식 기능을 초기화 하여야 함.
-        mVoiceRecognizer.initialize(mEventHandler);
+        mVoiceRecognizer.initialize(mInnerEventHandler);
     }
 
     @Override
@@ -393,5 +403,20 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
     protected void onBackPressed2(){
         super.onBackPressed();
+    }
+
+    protected static class InnerEventHandler extends Handler {
+        // 이벤트 핸들러 이너 클래스
+        private final WeakReference<Game_ImageGuessing> mActivity;
+        InnerEventHandler(Game_ImageGuessing activity) {
+            mActivity = new WeakReference(activity);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            Game_ImageGuessing activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
+            }
+        }
     }
 }
