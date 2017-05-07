@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".Database">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="sensorLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,20 +23,31 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SelectContents2" />
-        <activity android:name=".Feature_Dictionary" />
-        <activity android:name=".Feature_TodaysWord" />
-        <activity android:name=".Game_BlankGuessing" />
-        <activity android:name=".Game_ImageGuessing" />
-        <activity android:name=".Game_WordChain" />
+        <activity android:name=".SelectContents2"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Feature_Dictionary"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Feature_TodaysWord"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Game_BlankGuessing"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Game_ImageGuessing"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Game_WordChain"
+            android:screenOrientation="sensorLandscape"/>
         <activity android:name=".Test_WordChain"
             android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".Login_test" />
+        <activity android:name=".Login_test"
+            android:screenOrientation="sensorLandscape"/>
 
-        <activity android:name=".Character_Info" />
-        <activity android:name=".Character_Pet" />
-        <activity android:name=".Character_Alphabet" />
-        <activity android:name=".Character_Trophy" />
+        <activity android:name=".Character_Info"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Character_Pet"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Character_Alphabet"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Character_Trophy"
+            android:screenOrientation="sensorLandscape"/>
     </application>
 
 </manifest>
