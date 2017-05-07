@@ -141,8 +141,22 @@ public class Database extends Application {
         return result;
     }
 
+    public static String getUserAlpha(String attr, String uname) {
+        Cursor cursor = DB.rawQuery("SELECT " + attr + " FROM user WHERE uname = '" + uname + "'", null);
+        cursor.moveToFirst();
+        String result = "";
+        if(!cursor.isAfterLast())
+            result = cursor.getString(0);
+        cursor.close();
+        return result;
+    }
+
     public static void setUserInfo(String attr, String uname, int value) {
         DB.execSQL("UPDATE user SET " + attr + " = " + value + " WHERE uname = '" + uname + "'");
+    }
+
+    public static void setUserAlpha(String attr, String uname, String value) {
+        DB.execSQL("UPDATE user SET " + attr + " = '" + value + "' WHERE uname = '" + uname + "'");
     }
 
     public static int getCharacterInfo(String attr, String uname, String cname) {
