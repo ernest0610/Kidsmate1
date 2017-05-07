@@ -1,6 +1,7 @@
 package com.example.ernest.kidsmate1;
 
 import android.content.DialogInterface;
+import android.os.Bundle;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -53,13 +54,18 @@ public class Game_ImageGuessing_BossBattle extends Game_ImageGuessing {
         game_result.show();
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        finalState = new StringBuilder();
+    }
+
     protected void setStringPuzzle(){
         // string 처리
         Random random = new Random();
         String target = mDatabaseTestStub.getUserAlpha_kerberos_fullString();
         String state = mDatabaseTestStub.getUserAlpha_kerberos();
-        finalState = new StringBuilder();
-        ArrayList<Integer> indexOfString = new ArrayList();
+        ArrayList<Integer> indexOfString = new ArrayList<Integer>();
         int index = 0;
         for(;index < target.length() && index < state.length(); index++){
             if(target.charAt(index) != state.charAt(index)){
