@@ -52,4 +52,19 @@ public class SelectContents2 extends AppCompatActivity {
         Intent intent = new Intent(SelectContents2.this, Character_Info.class);
         startActivity(intent);
     }
+
+    protected void clicked_Game_BlankGuessing_BossBattle(View v) {
+        Intent intent = new Intent(SelectContents2.this, Game_BlankGuessing_BossBattle.class);
+        startActivity(intent);
+    }
+
+    protected void clicked_Game_ImageGuessing_BossBattle(View v) {
+        Intent intent = new Intent(SelectContents2.this, Game_ImageGuessing_BossBattle.class);
+        startActivity(intent);
+    }
+
+    protected void clicked_Game_WordChain_BossBattle(View v) {
+        Intent intent = new Intent(SelectContents2.this, Game_WordChain_BossBattle.class);
+        startActivity(intent);
+    }
 }
