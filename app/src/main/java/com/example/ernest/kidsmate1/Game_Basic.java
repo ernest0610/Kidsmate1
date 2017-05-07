@@ -17,13 +17,9 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Random;
 
-/*
-아직 작업중인 클래스
- */
-
-class Game_Basic extends AppCompatActivity {
+public class Game_Basic extends AppCompatActivity {
     // 디버깅 메시지
-    protected static final String TAG = Game_BlankGuessing.class.getSimpleName();
+    protected static final String TAG = Game_Basic.class.getSimpleName();
 
     // 모든 액티비티가 가지고 있어야 하는 요소.
     protected VoiceRecognizer mVoiceRecognizer; // 싱글톤
@@ -112,19 +108,31 @@ class Game_Basic extends AppCompatActivity {
     }
 
     protected void endingSession(){
+        button_next.setEnabled(false);
+        button_start.setEnabled(true);
+        button_playSound.setEnabled(false);
+        button_inputWordAccept.setEnabled(false);
+
+        sendResultToDatabase();
+        showTotalResult();
+    }
+
+    protected void sendResultToDatabase(){
+        /*
+        데이터베이스에 결과를 전송
+         */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
             mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
         }else{
             mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
         }
         mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
+    }
 
-        button_next.setEnabled(false);
-        button_start.setEnabled(true);
-        button_playSound.setEnabled(false);
-        button_inputWordAccept.setEnabled(false);
-
-        // 결과창 표시 변수
+    protected void showTotalResult(){
+        /*
+        모든 라운드가 끝나고 세션의 결과를 표시
+         */
         Game_Result game_result = new Game_Result(this);
         game_result.setGameResultText(
                 "CurrentRound: "+session_admin.getCurrentRound()+
