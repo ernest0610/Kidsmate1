@@ -27,11 +27,13 @@ public class DatabaseTestStub {
     private String kerberos;
     private String griffin;
 
+    private ArrayList<String> trophyList;
+
     private DatabaseTestStub(){
         currentExp = 0;
         Cname = "Ernest";
-        petArrayList = new ArrayList(6);
-        alphabetArrayList = new ArrayList(20);
+        petArrayList = new ArrayList(0);
+        alphabetArrayList = new ArrayList(0);
         petArrayList.add(1);
         currentPet = 1;
 
@@ -46,6 +48,8 @@ public class DatabaseTestStub {
         pyramid = "_______";
         kerberos = "________";
         griffin = "_______";
+
+        trophyList = new ArrayList(0);
     }
 
     public static DatabaseTestStub getInstance(){
@@ -134,22 +138,14 @@ public class DatabaseTestStub {
     }
 
 
+
     public void addStatBlankGuessing(int point){
-        /*
-        빈칸맞추기로 얻은 스탯을 더한다.
-         */
         statBlankGuessing += point;
     }
     public void addStatImageGuessing(int point){
-        /*
-        그림맞추기로 얻은 스탯을 더한다.
-         */
         statImageGuessing += point;
     }
     public void addStatWordChain(int point){
-        /*
-        끝말잇기로 얻은 스탯을 더한다.
-         */
         statWordChain += point;
     }
 
@@ -275,4 +271,10 @@ public class DatabaseTestStub {
         return "GRIFFIN";
     }
 
+    public ArrayList<String> getTrophyList(){
+        return trophyList;
+    }
+    public void addTrophy(String str){
+        trophyList.add(str);
+    }
 }

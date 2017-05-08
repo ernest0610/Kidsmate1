@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
@@ -27,7 +28,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
     protected VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
     // 데이터베이스 테스트 stub
-    protected DatabaseTestStub mDatabaseTestStub = DatabaseTestStub.getInstance();
+    // protected DatabaseTestStub mDatabaseTestStub = DatabaseTestStub.getInstance();
 
     // 데이터베이스 상태 매니저
     protected StateManager mStateManager;
@@ -54,6 +55,10 @@ public class Game_BlankGuessing extends AppCompatActivity {
     protected boolean hintMean; // 힌트를 주었는지 체크하는 변수
     protected boolean hintSynthesizer;
 
+    // 결과물 출력을 위해 임시로 기록해두는 변수
+    protected boolean isLevelUp = false;
+    protected int increasedExp = 0;
+
     // 함수 시작
     protected boolean roundInit(){
         /*
@@ -69,7 +74,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         blankIndex[0] = randomIndex.nextInt(correctAnswer.length()-1);
 
         // 빈칸 만들어서 출력하기. 원본은 correctAnswer에 저장되어있고 변형되지 않음.
-        StringBuffer mStringBuffer = new StringBuffer(correctAnswer);
+        StringBuilder mStringBuffer = new StringBuilder(correctAnswer);
         mStringBuffer.setCharAt(blankIndex[0], '_');
         textView_word.setText(mStringBuffer.toString());
 
@@ -95,6 +100,8 @@ public class Game_BlankGuessing extends AppCompatActivity {
         if(word.length()==1 && !isRightAnswer && word.toLowerCase().charAt(0) == correctAnswer.charAt(blankIndex[0])) {
             isRightAnswer = true;
             Log.d(TAG, "정답입니다.");
+        }else {
+            Log.d(TAG, "오답입니다.");
         }
     }
 
@@ -112,11 +119,12 @@ public class Game_BlankGuessing extends AppCompatActivity {
 
     protected void endingSession(){
         button_next.setEnabled(false);
-        button_start.setEnabled(true);
+        button_start.setEnabled(false);
         button_playSound.setEnabled(false);
         button_inputWordAccept.setEnabled(false);
 
         sendResultToDatabase();
+        mStateManager.addUserBG_count(1);
         showTotalResult();
     }
 
@@ -125,13 +133,13 @@ public class Game_BlankGuessing extends AppCompatActivity {
         데이터베이스에 결과를 전송
          */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
-            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenSuccess());
+            increasedExp = mStateManager.getEarnedExpWhenSuccess();
+        }else if(session_admin.getCorrectRound() > 0){
+            increasedExp = mStateManager.getEarnedExpWhenFailure();
         }else{
-            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
-            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenFailure());
+            increasedExp = 0; // // TODO: 2017-05-09  0문제를 맞춰도 경험치가 5 상승하는건 불합리하므로, 최소 한문제를 맞춰야 경험치가 올라가도록 조정.
         }
-        //mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
+        isLevelUp = mStateManager.addCharacterExp(increasedExp);
         mStateManager.addCharacterLuck(session_admin.getCorrectRound());
     }
 
@@ -139,6 +147,7 @@ public class Game_BlankGuessing extends AppCompatActivity {
         /*
         모든 라운드가 끝나고 세션의 결과를 표시
          */
+        String temp = "";
         Game_Result game_result = new Game_Result(this);
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
@@ -146,14 +155,13 @@ public class Game_BlankGuessing extends AppCompatActivity {
                 Game_BlankGuessing.this.finish();
             }
         });
-        game_result.setGameResultText(
-                "CurrentRound: "+(session_admin.getCurrentRound()-1)+
-                        "\nCorrectRound: "+session_admin.getCorrectRound()+
-                        //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
-                        //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
-                        "\nCurrentExp: "+mStateManager.getCharacterExp()+
-                        "\nLevelUpExp: "+mStateManager.getLevelUpExp()
-        );
+        if(isLevelUp) {temp = temp + "레벨업 하였습니다!\n";}
+        temp = temp + "정답률: " + session_admin.getCorrectRound()  + "/" + (session_admin.getCurrentRound()-1) + "\n";
+        temp = temp + "행운 스탯 상승: " + session_admin.getCorrectRound() + "\n";
+        temp = temp + "오른 경험치: " + increasedExp + "\n"; // // TODO: 2017-05-09  목표 도달시에 경험치가 두배 상승했음을 보여줄 필요가 있음.
+        temp = temp + "현재 경험치: " + mStateManager.getCharacterExp() + "\n";
+        temp = temp + "다음 레벨 까지 경험치: " + mStateManager.getLevelUpExp() + "\n";
+        game_result.setGameResultText(temp);
         game_result.show();
     }
 
@@ -179,12 +187,15 @@ public class Game_BlankGuessing extends AppCompatActivity {
                     if (isRightAnswer) break;
                 }
                 if (isRightAnswer) {
+                    Toast.makeText(getApplicationContext(), "정답입니다.", Toast.LENGTH_SHORT).show();
                     applyResult(Session_Admin.resultCode.CORRECT);
                 }else{
                     if(opportunity>0){
                         opportunity--;
+                        Toast.makeText(getApplicationContext(), "오답입니다.", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "다시 발음 해 보세요.");
                     }else {
+                        Toast.makeText(getApplicationContext(), "라운드 패배.", Toast.LENGTH_SHORT).show();
                         applyResult(Session_Admin.resultCode.WRONG);
                     }
                 }
@@ -261,8 +272,8 @@ public class Game_BlankGuessing extends AppCompatActivity {
             public void onClick(View v){
                 mVoiceSynthesizer.setString(correctAnswer);
                 mVoiceSynthesizer.doSynthsize();
-                if(hintMean == false) {
-                    if (hintSynthesizer == false) {
+                if(!hintMean) {
+                    if (!hintSynthesizer) {
                         hintSynthesizer = true;
                         button_playSound.setText("의미 힌트");
                     } else {
@@ -296,7 +307,6 @@ public class Game_BlankGuessing extends AppCompatActivity {
         });
 
         // 세션 초기화, 퀴즈 생성
-        //session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
         session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
         roundInit();
     }

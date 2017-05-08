@@ -18,6 +18,7 @@ class Game_Result extends Dialog {
         super(context);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // 제목
         setContentView(R.layout.game_result);
+
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); //배경을 투명하게
 
         textView_gameResult = (TextView) findViewById(R.id.textView_gameResult);

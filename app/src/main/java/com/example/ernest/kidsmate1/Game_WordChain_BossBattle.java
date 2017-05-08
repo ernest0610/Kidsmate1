@@ -7,8 +7,24 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Game_WordChain_BossBattle extends Game_WordChain {
+    // 데이터베이스 테스트 stub
+    protected DatabaseTestStub mDatabaseTestStub = DatabaseTestStub.getInstance(); // // TODO: 2017-05-09 test 유닛 제거
+
     protected char selectedChar;
     protected StringBuilder finalState;
+
+    @Override
+    protected void endingSession(){
+        button_next.setEnabled(false);
+        button_start.setEnabled(true);
+        button_playSound.setEnabled(false);
+        button_inputWordAccept.setEnabled(false);
+
+        sendResultToDatabase();
+        int tempInt = mStateManager.getUserWC_count();
+        mStateManager.addUserWC_count(-tempInt); // // TODO: 2017-05-09  게임 플레이 카운트를 초기화하는 방식으로 대응하고 있지만, 게임 플레이 카운트가 누적되도록 변경해야 함.
+        showTotalResult();
+    }
 
     @Override
     protected void sendResultToDatabase(){
@@ -16,16 +32,14 @@ public class Game_WordChain_BossBattle extends Game_WordChain {
         데이터베이스에 결과를 전송
          */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
-            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenSuccess());
-
+            increasedExp = mStateManager.getEarnedExpWhenSuccess();
             setStringPuzzle();
-
+        }else if(session_admin.getCorrectRound() > 0){
+            increasedExp = mStateManager.getEarnedExpWhenFailure();
         }else{
-            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
-            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenFailure());
+            increasedExp = 0; // // TODO: 2017-05-09  0문제를 맞춰도 경험치가 5 상승하는건 불합리하므로, 최소 한문제를 맞춰야 경험치가 올라가도록 조정.
         }
-        //mDatabaseTestStub.addStatWordChain(session_admin.getCorrectRound());
+        isLevelUp = mStateManager.addCharacterExp(increasedExp);
         mStateManager.addCharacterSmart(session_admin.getCorrectRound());
     }
 
@@ -34,6 +48,7 @@ public class Game_WordChain_BossBattle extends Game_WordChain {
         /*
         모든 라운드가 끝나고 세션의 결과를 표시
          */
+        String temp = "";
         Game_Result game_result = new Game_Result(this);
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
@@ -41,16 +56,16 @@ public class Game_WordChain_BossBattle extends Game_WordChain {
                 Game_WordChain_BossBattle.this.finish();
             }
         });
-        game_result.setGameResultText(
-                "CurrentRound: "+(session_admin.getCurrentRound()-1)+
-                        "\nCorrectRound: "+session_admin.getCorrectRound()+
-                        //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
-                        //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
-                        "\nCurrentExp: "+mStateManager.getCharacterExp()+
-                        "\nLevelUpExp: "+mStateManager.getLevelUpExp()+
-                        "\nselectedChar: "+selectedChar+
-                        "\nfinalState: "+finalState.toString()
-        );
+        if(isLevelUp) {temp = temp + "레벨업 하였습니다!\n";}
+        temp = temp + "정답률: " + session_admin.getCorrectRound()  + "/" + (session_admin.getCurrentRound()-1) + "\n";
+        temp = temp + "지능 스탯 상승: " + session_admin.getCorrectRound() + "\n";
+        temp = temp + "오른 경험치: " + increasedExp + "\n"; // // TODO: 2017-05-09  목표 도달시에 경험치가 두배 상승했음을 보여줄 필요가 있음.
+        temp = temp + "현재 경험치: " + mStateManager.getCharacterExp() + "\n";
+        temp = temp + "다음 레벨 까지 경험치: " + mStateManager.getLevelUpExp() + "\n";
+        if(selectedChar == '0'){temp = temp + "모은 문자: 없음\n";}
+        else{temp = temp + "모은 문자: " + selectedChar + "\n";}
+        temp = temp + "지금까지 모은 문자들: " + finalState.toString() + "\n";
+        game_result.setGameResultText(temp);
         game_result.show();
     }
 
@@ -63,8 +78,8 @@ public class Game_WordChain_BossBattle extends Game_WordChain {
     protected void setStringPuzzle(){
         // string 처리
         Random random = new Random();
-        String target = mDatabaseTestStub.getUserAlpha_griffin_fullString();
-        String state = mDatabaseTestStub.getUserAlpha_griffin();
+        String target = mDatabaseTestStub.getUserAlpha_griffin_fullString(); // // TODO: 2017-05-09 test 유닛 제거
+        String state = mDatabaseTestStub.getUserAlpha_griffin(); // // TODO: 2017-05-09 test 유닛 제거
         ArrayList<Integer> indexOfString = new ArrayList<Integer>();
         int index = 0;
         for(;index < target.length() && index < state.length(); index++){
@@ -85,6 +100,6 @@ public class Game_WordChain_BossBattle extends Game_WordChain {
         selectedChar = target.charAt(selectedIndex);
         finalState.setCharAt(selectedIndex, selectedChar);
 
-        mDatabaseTestStub.setUserAlpha_pyramid(finalState.toString());
+        mDatabaseTestStub.setUserAlpha_griffin(finalState.toString()); // // TODO: 2017-05-09 test 유닛 제거
     }
 }

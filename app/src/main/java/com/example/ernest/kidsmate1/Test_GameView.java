@@ -12,9 +12,6 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
-/**
- * TODO: document your custom view class.
- */
 public class Test_GameView extends View {
     Bitmap slime;
 

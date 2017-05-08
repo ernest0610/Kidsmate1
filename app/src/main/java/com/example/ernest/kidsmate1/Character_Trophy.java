@@ -17,12 +17,12 @@ public class Character_Trophy extends AppCompatActivity {
 
     LinearLayout linearLayout_buttonScroll;
 
-    int petButtonListSize;
+    //int petButtonListSize;
 
-    int selectedButtonIndex;
+    //int selectedButtonIndex;
 
-    ArrayList<Button> petButtonList;
-    ArrayList<Integer> petList;
+    ArrayList<Button> trophyButtonList;
+    ArrayList<String> trophyList;
 
     Button buttonAdd;
     Button buttonConfirm;
@@ -38,66 +38,20 @@ public class Character_Trophy extends AppCompatActivity {
 
         linearLayout_buttonScroll = (LinearLayout) findViewById(R.id.linearLayout_buttonScroll);
 
-        petButtonListSize = 0;
-
-        selectedButtonIndex = mDatabaseTestStub.getCurrentPet();
-
-        petButtonList = new ArrayList(6);
-
+        trophyButtonList = new ArrayList(7);
 
         buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonConfirm = (Button) findViewById(R.id.buttonConfirm);
 
-        buttonAdd.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                petButtonListSize++;
-                final Button button = new Button(context);
-                button.setText(Integer.toString(petButtonListSize));
-                petButtonList.add(button);
-                button.setOnClickListener(new View.OnClickListener() {
-                    Button mButton = button;
-                    int index = petButtonListSize-1;
-                    @Override
-                    public void onClick(View v) {
-                        petButtonList.get(selectedButtonIndex).setEnabled(true);
-                        mButton.setEnabled(false);
-                        selectedButtonIndex = index;
-                    }
-                });
-                linearLayout_buttonScroll.addView(button);
-                mDatabaseTestStub.addPet(petButtonListSize);
-            }
-        });
+        buttonAdd.setEnabled(false);
+        buttonConfirm.setEnabled(false);
 
-        buttonConfirm.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                mDatabaseTestStub.setCurrentPet(selectedButtonIndex+1);
-                onBackPressed(v);
-            }
-        });
-
-        buttonAdd.setEnabled(true);
-        buttonConfirm.setEnabled(true);
-
-        petList = mDatabaseTestStub.getPetList();
-        if(petList.size() != 0) {
-            for (int petcode : petList) {
-                petButtonListSize++;
+        trophyList = mDatabaseTestStub.getTrophyList();
+        if(trophyList.size() != 0) {
+            for (String str : trophyList) {
                 final Button button = new Button(this);
-                button.setText(Integer.toString(petcode));
-                petButtonList.add(button);
-                button.setOnClickListener(new View.OnClickListener() {
-                    Button mButton = button;
-                    int index = petButtonListSize-1;
-                    @Override
-                    public void onClick(View v) {
-                        petButtonList.get(selectedButtonIndex).setEnabled(true);
-                        mButton.setEnabled(false);
-                        selectedButtonIndex = index;
-                    }
-                });
+                button.setText(str);
+                trophyButtonList.add(button);
                 linearLayout_buttonScroll.addView(button);
             }
         }

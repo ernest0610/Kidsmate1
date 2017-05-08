@@ -8,6 +8,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/linearLayout_buttonLayer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
@@ -62,7 +63,7 @@
                 android:text="Character_Info" />
 
             <Button
-                android:id="@+id/button_game_wordChain_bossBattle"
+                android:id="@+id/button_game_blankGuessing_bossBattle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="clicked_Game_BlankGuessing_BossBattle"
@@ -76,7 +77,7 @@
                 android:text="Game_ImageGuessing_BossBattle" />
 
             <Button
-                android:id="@+id/button_Game_wordChain_bossBattle"
+                android:id="@+id/button_game_wordChain_bossBattle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="clicked_Game_WordChain_BossBattle"

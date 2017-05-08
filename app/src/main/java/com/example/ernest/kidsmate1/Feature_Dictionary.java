@@ -26,6 +26,9 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class Feature_Dictionary extends AppCompatActivity {
+    // 디버깅 메시지
+    protected static final String TAG = Feature_Dictionary.class.getSimpleName();
+
     // 모든 액티비티가 가지고 있어야 하는 요소.
     private VoiceRecognizer mVoiceRecognizer; // 싱글톤
     private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러

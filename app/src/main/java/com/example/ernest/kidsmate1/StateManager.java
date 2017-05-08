@@ -11,10 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-/**
- * Created by User on 2017-05-06.
- */
-
 public class StateManager {
     protected static final String TAG = StateManager.class.getSimpleName();
 
