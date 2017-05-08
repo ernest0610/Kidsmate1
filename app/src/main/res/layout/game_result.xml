@@ -6,16 +6,24 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView_gameResult"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/testView_pleaseTouch"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Touch to continue"
-        android:textColor="@color/colorAccent" />
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/textView_gameResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/testView_pleaseTouch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Touch to continue"
+            android:textColor="@color/colorAccent" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -23,7 +23,6 @@ public class Character_Info extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //mDatabaseTestStub = DatabaseTestStub.getInstance();
         mStateManager = StateManager.getInstance();
 
         setContentView(R.layout.character_info);
@@ -44,26 +43,14 @@ public class Character_Info extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        /*
-        button_pet.setText("pet : " + Integer.toString(mDatabaseTestStub.getCurrentPet()));
-        textView_characterName.setText(mDatabaseTestStub.getCharacterCname());
-        textView_status.setText("level:" + mDatabaseTestStub.getLevel() +
-                "\nCurrentExp: " + mDatabaseTestStub.getCurrentExp() +
-                "\nLevelUpExp: " + mDatabaseTestStub.getLevelUpExp() +
-                "\nGame_BlankGuessing Stat: " + mDatabaseTestStub.getStatBlankGuessing() +
-                "\nGame_ImageGuessing Stat: " + mDatabaseTestStub.getStatImageGuessing() +
-                "\nGame_WordChain Stat: " + mDatabaseTestStub.getStatWordChain() +
-                "\n");
-        */
-
         button_pet.setText("pet : " + Integer.toString(mStateManager.getCurrentPet()));
         textView_characterName.setText(mStateManager.getCurrentCname());
         textView_status.setText("level:" + mStateManager.getCharacterLevel() +
                 "\nCurrentExp: " + mStateManager.getCharacterExp() +
                 "\nLevelUpExp: " + mStateManager.getLevelUpExp() +
-                "\nGame_BlankGuessing Stat: " + mStateManager.getCharacterLuck() +
-                "\nGame_ImageGuessing Stat: " + mStateManager.getCharacterPower() +
-                "\nGame_WordChain Stat: " + mStateManager.getCharacterSmart() +
+                "\nGame_BlankGuessing Stat(Luck): " + mStateManager.getCharacterLuck() +
+                "\nGame_ImageGuessing Stat(Power): " + mStateManager.getCharacterPower() +
+                "\nGame_WordChain Stat(Smart): " + mStateManager.getCharacterSmart() +
                 "\n");
     }
 

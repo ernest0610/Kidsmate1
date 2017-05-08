@@ -1,6 +1,8 @@
 package com.example.ernest.kidsmate1;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -8,23 +10,28 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Random;
 
 public class Feature_TodaysWord extends AppCompatActivity {
-    // 모든 액티비티가 가지고 있어야 하는 요소.
-    private VoiceRecognizer mVoiceRecognizer; // 싱글톤
-    private EventHandler mEventHandler; // 각 액티비티 고유의 이벤트 핸들러
-    private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
-
-    // test stub
-    private DatabaseTestStub mDatabaseTestStub;
-
     // 디버깅 메시지
     private static final String TAG = Feature_TodaysWord.class.getSimpleName();
+
+    // 모든 액티비티가 가지고 있어야 하는 요소.
+    private VoiceRecognizer mVoiceRecognizer; // 싱글톤
+    private InnerEventHandler mInnerEventHandler; // 각 액티비티 고유의 이벤트 핸들러
+    private VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
+
+    // 데이터베이스 테스트 stub
+    //private DatabaseTestStub mDatabaseTestStub;
+
+    // 데이터베이스 상태 매니저
+    protected StateManager mStateManager;
 
     // 액티비티들 공통 UI
     private TextView textView_word;
@@ -42,6 +49,12 @@ public class Feature_TodaysWord extends AppCompatActivity {
     private String correctAnsersMean;
     private boolean isRightAnswer;
     private Session_Admin session_admin; // 세션을 관리하는 변수
+
+    // 결과물 출력을 위해 임시로 기록해두는 변수
+    protected boolean isLevelUp = false;
+    protected int increasedExp = 0;
+    protected int whatStat = -1;
+    protected int dice = -1;
 
     // 함수 시작
     private boolean roundInit(){
@@ -73,6 +86,8 @@ public class Feature_TodaysWord extends AppCompatActivity {
         if(word.toLowerCase().equals(correctAnswer.toLowerCase())){
             isRightAnswer = true;
             Log.d(TAG, "정답입니다.");
+        }else {
+            Log.d(TAG, "오답입니다.");
         }
     }
 
@@ -84,48 +99,91 @@ public class Feature_TodaysWord extends AppCompatActivity {
         if(session_admin.getCurrentRound() <= session_admin.getMaxRound()){
             roundInit();
         }else{
-            if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
-            }else{
-                mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
-            }
-
-            Random random = new Random();
-            int whatStat = random.nextInt(3);
-            int dice = random.nextInt(6)+1;
-
-            switch(whatStat) {
-                case(0):
-                    mDatabaseTestStub.addStatBlankGuessing(dice);
-                    break;
-                case(1):
-                    mDatabaseTestStub.addStatImageGuessing(dice);
-                    break;
-                case(2):
-                    mDatabaseTestStub.addStatWordChain(dice);
-                    break;
-                default:
-                    break;
-                }
-
-            button_next.setEnabled(false);
-            button_start.setEnabled(true);
-            button_playSound.setEnabled(false);
-            button_inputWordAccept.setEnabled(false);
-
-            button_start.setText("메인화면으로.");
-            button_start.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    onBackPressed2();
-                }
-            });
+            endingSession();
         }
+    }
+
+    protected void endingSession(){
+        button_next.setEnabled(false);
+        button_start.setEnabled(false);
+        button_playSound.setEnabled(false);
+        button_inputWordAccept.setEnabled(false);
+
+        sendResultToDatabase();
+        mStateManager.addUserTW_count(1);
+        showTotalResult();
+    }
+
+    protected void sendResultToDatabase(){
+        /*
+        데이터베이스에 결과를 전송
+         */
+        if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
+            increasedExp = mStateManager.getEarnedExpWhenSuccess();
+        }else if(session_admin.getCorrectRound() > 0){
+            increasedExp = mStateManager.getEarnedExpWhenFailure();
+        }else{
+            increasedExp = 0; // // TODO: 2017-05-09  0문제를 맞춰도 경험치가 5 상승하는건 불합리하므로, 최소 한문제를 맞춰야 경험치가 올라가도록 조정.
+        }
+        isLevelUp = mStateManager.addCharacterExp(increasedExp);
+
+        Random random = new Random();
+        whatStat = random.nextInt(3);
+        dice = random.nextInt(6)+1;
+
+        switch(whatStat) {
+            case(0):
+                mStateManager.addCharacterLuck(dice);
+                break;
+            case(1):
+                mStateManager.addCharacterPower(dice);
+                break;
+            case(2):
+                mStateManager.addCharacterSmart(dice);
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected void showTotalResult(){
+        /*
+        모든 라운드가 끝나고 세션의 결과를 표시
+         */
+        String temp = "";
+        Game_Result game_result = new Game_Result(this);
+        game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
+            @Override
+            public void onCancel(DialogInterface dialog){
+                Feature_TodaysWord.this.finish();
+            }
+        });
+        if(isLevelUp) {temp = temp + "레벨업 하였습니다!\n";}
+        temp = temp + "정답률: " + session_admin.getCorrectRound()  + "/" + (session_admin.getCurrentRound()-1) + "\n";
+        switch(whatStat) {
+            case(0):
+                temp = temp + "행운 스탯 상승: ";
+                break;
+            case(1):
+                temp = temp + "힘 스탯 상승: ";
+                break;
+            case(2):
+                temp = temp + "지능 스탯 상승: ";
+                break;
+            default:
+                break;
+        }
+        temp = temp + dice + "\n";
+        temp = temp + "오른 경험치: " + increasedExp + "\n"; // // TODO: 2017-05-09  목표 도달시에 경험치가 두배 상승했음을 보여줄 필요가 있음.
+        temp = temp + "현재 경험치: " + mStateManager.getCharacterExp() + "\n";
+        temp = temp + "다음 레벨 까지 경험치: " + mStateManager.getLevelUpExp() + "\n";
+        game_result.setGameResultText(temp);
+        game_result.show();
     }
 
     public void handleMessage(Message msg) {
         switch (msg.what) {
-            case R.id.clientReady: //// TODO: 2017-05-06 준비 메시지가 늦게 도착하는 경우 메인화면으로 텍스트보다 나중에 갱신되어 이 메시지가 뜨는 경우가 있음.
+            case R.id.clientReady:
                 button_start.setText("발음하세요.");
                 break;
             case R.id.audioRecording:
@@ -145,8 +203,10 @@ public class Feature_TodaysWord extends AppCompatActivity {
                     if (isRightAnswer) break;
                 }
                 if (isRightAnswer) {
+                    Toast.makeText(getApplicationContext(), "정답입니다.", Toast.LENGTH_SHORT).show();
                     applyResult(Session_Admin.resultCode.CORRECT);
                 }else{
+                    Toast.makeText(getApplicationContext(), "오답입니다.", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "다시 발음 해 보세요.");
                 }
                 break;
@@ -169,7 +229,7 @@ public class Feature_TodaysWord extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // 음성인식 API의 이벤트를 받을 핸들러 생성
-        mEventHandler = new EventHandler(this);
+        mInnerEventHandler = new InnerEventHandler(this);
         // 음성인식 API의 인스턴스를 받아옴.
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
         // 음성합성 API를 사용하기 위한 객체 생성.
@@ -240,7 +300,8 @@ public class Feature_TodaysWord extends AppCompatActivity {
         });
 
         // 세션 초기화, 퀴즈 생성
-        session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
+        //session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
         roundInit();
     }
 
@@ -248,7 +309,7 @@ public class Feature_TodaysWord extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // 액티비티 시작시 반드시 음성인식 기능을 초기화 하여야 함.
-        mVoiceRecognizer.initialize(mEventHandler);
+        mVoiceRecognizer.initialize(mInnerEventHandler);
     }
 
     @Override
@@ -260,5 +321,20 @@ public class Feature_TodaysWord extends AppCompatActivity {
 
     protected void onBackPressed2(){
         super.onBackPressed();
+    }
+
+    protected static class InnerEventHandler extends Handler {
+        // 이벤트 핸들러 이너 클래스
+        private final WeakReference<Feature_TodaysWord> mActivity;
+        InnerEventHandler(Feature_TodaysWord activity) {
+            mActivity = new WeakReference(activity);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            Feature_TodaysWord activity = mActivity.get();
+            if (activity != null) {
+                activity.handleMessage(msg);
+            }
+        }
     }
 }

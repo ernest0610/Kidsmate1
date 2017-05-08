@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
@@ -65,6 +66,10 @@ public class Game_ImageGuessing extends AppCompatActivity {
     protected boolean isRightAnswer; // 정답을 맞췄는지 기록하는 변수
     protected Session_Admin session_admin; // 세션을 관리하는 변수
     protected int opportunity; // 발음할 수 있는 횟수를 제한하는 변수.
+
+    // 결과물 출력을 위해 임시로 기록해두는 변수
+    protected boolean isLevelUp = false;
+    protected int increasedExp = 0;
 
     // 그림 맞추기 전용 변수
     protected ScrollView scrollView_game;
@@ -186,6 +191,8 @@ public class Game_ImageGuessing extends AppCompatActivity {
         if(word.toLowerCase().equals(correctAnswer.toLowerCase())){
             isRightAnswer = true;
             Log.d(TAG, "정답입니다.");
+        }else {
+            Log.d(TAG, "오답입니다.");
         }
     }
 
@@ -208,6 +215,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
         button_inputWordAccept.setEnabled(false);
 
         sendResultToDatabase();
+        mStateManager.addUserIG_count(1);
         showTotalResult();
     }
 
@@ -216,13 +224,13 @@ public class Game_ImageGuessing extends AppCompatActivity {
         데이터베이스에 결과를 전송
          */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
-            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenSuccess());
+            increasedExp = mStateManager.getEarnedExpWhenSuccess();
+        }else if(session_admin.getCorrectRound() > 0){
+            increasedExp = mStateManager.getEarnedExpWhenFailure();
         }else{
-            //mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
-            mStateManager.addCharacterExp(mStateManager.getEarnedExpWhenFailure());
+            increasedExp = 0; // // TODO: 2017-05-09  0문제를 맞춰도 경험치가 5 상승하는건 불합리하므로, 최소 한문제를 맞춰야 경험치가 올라가도록 조정.
         }
-        //mDatabaseTestStub.addStatImageGuessing(session_admin.getCorrectRound());
+        isLevelUp = mStateManager.addCharacterExp(increasedExp);
         mStateManager.addCharacterPower(session_admin.getCorrectRound());
     }
 
@@ -230,6 +238,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
         /*
         모든 라운드가 끝나고 세션의 결과를 표시
          */
+        String temp = "";
         Game_Result game_result = new Game_Result(this);
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
@@ -237,14 +246,13 @@ public class Game_ImageGuessing extends AppCompatActivity {
                 Game_ImageGuessing.this.finish();
             }
         });
-        game_result.setGameResultText(
-                "CurrentRound: "+(session_admin.getCurrentRound()-1)+
-                        "\nCorrectRound: "+session_admin.getCorrectRound()+
-                        //"\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
-                        //"\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
-                        "\nCurrentExp: "+mStateManager.getCharacterExp()+
-                        "\nLevelUpExp: "+mStateManager.getLevelUpExp()
-        );
+        if(isLevelUp) {temp = temp + "레벨업 하였습니다!\n";}
+        temp = temp + "정답률: " + session_admin.getCorrectRound()  + "/" + (session_admin.getCurrentRound()-1) + "\n";
+        temp = temp + "체력 스탯 상승: " + session_admin.getCorrectRound() + "\n";
+        temp = temp + "오른 경험치: " + increasedExp + "\n"; // // TODO: 2017-05-09  목표 도달시에 경험치가 두배 상승했음을 보여줄 필요가 있음.
+        temp = temp + "현재 경험치: " + mStateManager.getCharacterExp() + "\n";
+        temp = temp + "다음 레벨 까지 경험치: " + mStateManager.getLevelUpExp() + "\n";
+        game_result.setGameResultText(temp);
         game_result.show();
     }
 
@@ -274,8 +282,10 @@ public class Game_ImageGuessing extends AppCompatActivity {
                 }else{
                     if(opportunity>0){
                         opportunity--;
+                        Toast.makeText(getApplicationContext(), "오답입니다.", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "다시 발음 해 보세요.");
                     }else {
+                        Toast.makeText(getApplicationContext(), "라운드 패배.", Toast.LENGTH_SHORT).show();
                         applyResult(Session_Admin.resultCode.WRONG);
                     }
                 }
@@ -329,7 +339,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
         // imageGuessing 이미지 로딩 구현
         scrollView_game = (ScrollView) findViewById(R.id.scrollView_game);
         myProgress = new MyProgress(this);
-        myProgress.setCancelable(false);
+        myProgress.setCancelable(false); // // TODO: 2017-05-09 인터넷 상태가 좋지 않은 경우 뒤로가기로도 취소를 할 수 없어 영원히 로딩상태가 되는 경우가 있음.
 
         // UI 리스너 구현
         button_start.setOnClickListener(new View.OnClickListener(){
@@ -382,7 +392,6 @@ public class Game_ImageGuessing extends AppCompatActivity {
         });
 
         // 세션 초기화, 퀴즈 생성
-        //session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
         session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
         roundInit();
     }

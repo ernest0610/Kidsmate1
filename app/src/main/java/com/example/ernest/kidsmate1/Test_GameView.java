@@ -15,9 +15,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-/**
- * TODO: document your custom view class.
- */
 public class Test_GameView extends View {
     /////////////////////////////////////// 객체 목록
     private MyImageView myCharacter;
