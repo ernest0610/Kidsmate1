@@ -67,6 +67,8 @@ public class SelectContents2 extends AppCompatActivity {
 
         // // TODO: 2017-05-09 트로피 지급의 예시를 보여주기 위해 간단하게 작성했지만, 추후에 조건을 변경해야 함.
 
+        // // TODO: 2017-05-09 트로피 중복 지급 문제가 있음. 
+        
         if(mStateManager.getUserBG_count() >= 3){
             // 빈칸맞추기 3회 플레이 트로피!
             mDatabaseTestStub.addTrophy("빈칸맞추기 3회 플레이 트로피!");
