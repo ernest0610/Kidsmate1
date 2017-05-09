@@ -32,15 +32,17 @@ public class MyButton {
     }
 
     public void action(int id, boolean isDown, float x, float y) {
-        if(isDown && rectF.contains(x, y)) {
-            isTouch = true;
-            ptrId = id;
-            if(onClickListener != null)
-                onClickListener.onClick(parentView);
-        }
+        if(enabled) {
+            if (isDown && rectF.contains(x, y)) {
+                isTouch = true;
+                ptrId = id;
+                if (onClickListener != null)
+                    onClickListener.onClick(parentView);
+            }
 
-        if (!isDown && id == ptrId) {
-            isTouch = false;
+            if (!isDown && id == ptrId) {
+                isTouch = false;
+            }
         }
     }
 

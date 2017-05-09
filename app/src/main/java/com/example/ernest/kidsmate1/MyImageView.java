@@ -3,6 +3,9 @@ package com.example.ernest.kidsmate1;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 /**
@@ -22,6 +25,11 @@ public class MyImageView {
 
     public void setImage(int id) {
         image = BitmapFactory.decodeResource(context.getResources(), id);
+        parentView.invalidate();
+    }
+
+    public void setBackground(Drawable drawable) {
+        image = ((BitmapDrawable) drawable).getBitmap();
         parentView.invalidate();
     }
 

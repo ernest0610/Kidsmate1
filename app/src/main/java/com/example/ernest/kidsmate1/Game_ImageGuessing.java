@@ -50,7 +50,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
     protected StateManager mStateManager;
 
     // 액티비티들 공통 UI
-    protected TextView textView_word;
+    /*protected TextView textView_word;   // 17.05.09 테스트중
     protected TextView textView_mean;
 
     protected EditText editText_inputWord;
@@ -58,7 +58,23 @@ public class Game_ImageGuessing extends AppCompatActivity {
 
     protected Button button_start;
     protected Button button_next;
-    protected Button button_playSound;
+    protected Button button_playSound;*/
+
+    protected Test_GameView gameView; // custom view 17.05.09 테스트중입니다.
+
+    protected MyTextView textView_word;
+    protected MyTextView textView_mean;
+
+    protected MyButton editText_inputWord;
+    protected MyButton button_inputWordAccept;
+
+    protected MyButton button_start;
+    protected MyButton button_next;
+    protected MyButton button_playSound;
+
+    protected MyImageView scrollView_game;
+    protected MyImageView myCharacter;
+    protected MyImageView enemy;
 
     // 퀴즈를 진행하기 위한 변수
     protected String correctAnswer; // 정답을 기록하는 변수
@@ -72,7 +88,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
     protected int increasedExp = 0;
 
     // 그림 맞추기 전용 변수
-    protected ScrollView scrollView_game;
+    //protected ScrollView scrollView_game; //테스트중 17.05.09
 
     // 이미지 추출용 변수
     protected Handler handler;
@@ -318,9 +334,11 @@ public class Game_ImageGuessing extends AppCompatActivity {
         mStateManager = StateManager.getInstance();
 
         // UI 생성 (액티비티 공통)
-        setContentView(R.layout.game_basic2);
+        //setContentView(R.layout.game_basic2);  //테스트중 17.05.09
+        gameView = new Test_GameView(this);
+        setContentView(gameView);
 
-        textView_word = (TextView) findViewById(R.id.textView_word);
+        /*textView_word = (TextView) findViewById(R.id.textView_word);       // custom view 테스트중 17.05.09
         textView_mean = (TextView) findViewById(R.id.textView_mean);
 
         button_start = (Button) findViewById(R.id.button_start);
@@ -328,7 +346,30 @@ public class Game_ImageGuessing extends AppCompatActivity {
         button_playSound = (Button) findViewById(R.id.button_playSound);
 
         editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
-        button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
+        button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);*/
+
+        textView_word = gameView.getQuizBlankGuessing();       // custom view 테스트중 17.05.09
+        textView_mean = gameView.getHint();
+
+        button_start = gameView.getMic();
+        button_next = gameView.getPass();
+        button_playSound = gameView.getPlay();
+
+        editText_inputWord = gameView.getInput();
+        button_inputWordAccept = gameView.getSubmit();
+        scrollView_game = gameView.getQuizImageGuessing();
+        myCharacter = gameView.getMyCharacter();
+        enemy = gameView.getEnemy();
+
+        myCharacter.setImage(R.drawable.magumsa);
+        enemy.setImage(R.drawable.bosssphinx);
+        button_start.setImage(R.drawable.buttonmic);
+        button_next.setImage(R.drawable.pass);
+        button_playSound.setImage(R.drawable.play);
+        editText_inputWord.setImage(R.drawable.input);
+        button_inputWordAccept.setImage(R.drawable.submit);
+        button_inputWordAccept.setText("제출");
+        gameView.setBackgroundResource(R.drawable.imagegamebackground);
 
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
@@ -337,7 +378,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
         button_inputWordAccept.setEnabled(true);
 
         // imageGuessing 이미지 로딩 구현
-        scrollView_game = (ScrollView) findViewById(R.id.scrollView_game);
+        //scrollView_game = (ScrollView) findViewById(R.id.scrollView_game);   // 테스트중 17.05.09
         myProgress = new MyProgress(this);
         myProgress.setCancelable(false); // // TODO: 2017-05-09 인터넷 상태가 좋지 않은 경우 뒤로가기로도 취소를 할 수 없어 영원히 로딩상태가 되는 경우가 있음.
 
@@ -373,7 +414,7 @@ public class Game_ImageGuessing extends AppCompatActivity {
         button_inputWordAccept.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                String inputWord = editText_inputWord.toString();
+                String inputWord = editText_inputWord.getText().toString();
                 editText_inputWord.setText("");
                 checkAnswer(inputWord);
                 Log.d(TAG, "input: " + inputWord);

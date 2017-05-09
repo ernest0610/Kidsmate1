@@ -32,7 +32,7 @@
         <activity android:name=".Game_BlankGuessing"
             android:screenOrientation="sensorLandscape"/>
         <activity android:name=".Game_ImageGuessing"
-            android:screenOrientation="sensorLandscape"/>
+            android:configChanges="screenSize|orientation"/>
         <activity android:name=".Game_WordChain"
             android:screenOrientation="sensorLandscape"/>
         <activity android:name=".Test_WordChain"
