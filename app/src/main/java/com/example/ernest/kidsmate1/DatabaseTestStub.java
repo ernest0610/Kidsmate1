@@ -27,7 +27,19 @@ public class DatabaseTestStub {
     private String kerberos;
     private String griffin;
 
-    private ArrayList<String> trophyList;
+    private class structure{
+        public String name;
+        public boolean isIssued;
+        public boolean isAchieved;
+    }
+
+    private ArrayList<String> trophyStringList;
+    private ArrayList<structure> trophies;
+
+    private ArrayList<String> petStringList;
+    private ArrayList<structure> pets;
+
+    private int selectedPetIndex;
 
     private DatabaseTestStub(){
         currentExp = 0;
@@ -45,11 +57,48 @@ public class DatabaseTestStub {
 
         levelUpExp = getLevelUpExp(level);
 
+        /////////////////////////////////////////////////
+
         pyramid = "_______";
         kerberos = "________";
         griffin = "_______";
 
-        trophyList = new ArrayList(0);
+        ///
+
+        trophyStringList = new ArrayList(0);
+        trophyStringList.add("빈칸맞추기 3회 플레이 트로피");
+        trophyStringList.add("그림맞추기 3회 플레이 트로피");
+        trophyStringList.add("끝말잇기 3회 플레이 트로피");
+        trophyStringList.add("행운 스탯 10 달성 트로피");
+        trophyStringList.add("힘 스탯 10 달성 트로피");
+        trophyStringList.add("지능 스탯 10 달성 트로피");
+        trophyStringList.add("오늘의 단어 3회 플레이 트로피");
+
+        trophies = new ArrayList();
+        structure mTrophy;
+        for(int index=0; index < trophyStringList.size(); index++){
+            mTrophy = new structure();
+            mTrophy.name = trophyStringList.get(index);
+            mTrophy.isAchieved = false;
+            mTrophy.isIssued = false;
+            trophies.add(mTrophy);
+        }
+
+        petStringList = new ArrayList(0);
+        petStringList.add("코리안 숏헤어 고양이");
+        petStringList.add("페르시안 고양이");
+        petStringList.add("샴 고양이");
+        selectedPetIndex = -1;
+
+        pets = new ArrayList();
+        structure mPet;
+        for(int index=0; index < petStringList.size(); index++){
+            mPet = new structure();
+            mPet.name = petStringList.get(index);
+            mPet.isAchieved = false;
+            mPet.isIssued = false;
+            pets.add(mPet);
+        }
     }
 
     public static DatabaseTestStub getInstance(){
@@ -271,10 +320,98 @@ public class DatabaseTestStub {
         return "GRIFFIN";
     }
 
-    public ArrayList<String> getTrophyList(){
-        return trophyList;
+
+    ////////////////////
+
+    public int getTrophyListSize(){
+        return trophies.size();
     }
-    public void addTrophy(String str){
-        trophyList.add(str);
+
+    public boolean isTrophyIssued(int index){
+        if(index>=0 && index < trophies.size()) {
+            return trophies.get(index).isIssued;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isTrophyAchieved(int index){
+        if(index>=0 && index < trophies.size()) {
+            return trophies.get(index).isAchieved;
+        }else{
+            return false;
+        }
+    }
+
+    public void setTrophyAchieved(int index){
+        if(index>=0 && index < trophies.size()) {
+            trophies.get(index).isAchieved = true;
+        }
+    }
+
+    public void setTrophyIssued(int index){
+        if(index>=0 && index < trophies.size()) {
+            trophies.get(index).isIssued = true;
+        }
+    }
+
+    public String getTrophyString(int index){
+        if(index>=0 && index < trophies.size()) {
+            return trophies.get(index).name;
+        }else{
+            return "";
+        }
+    }
+
+    ////////////////////
+
+    public int getPetListSize(){
+        return pets.size();
+    }
+
+    public boolean isPetIssued(int index){
+        if(index>=0 && index < pets.size()) {
+            return pets.get(index).isIssued;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isPetAchieved(int index){
+        if(index>=0 && index < pets.size()) {
+            return pets.get(index).isAchieved;
+        }else{
+            return false;
+        }
+    }
+
+    public void setPetAchieved(int index){
+        if(index>=0 && index < pets.size()) {
+            pets.get(index).isAchieved = true;
+        }
+    }
+
+    public void setPetIssued(int index){
+        if(index>=0 && index < pets.size()) {
+            pets.get(index).isIssued = true;
+        }
+    }
+
+    public String getPetString(int index){
+        if(index>=0 && index < pets.size()) {
+            return pets.get(index).name;
+        }else{
+            return "";
+        }
+    }
+
+    public int getCurrentPetIndex(){
+        return selectedPetIndex;
+    }
+
+    public void setCurrentPetIndex(int index){
+        if(index>=0 && index < pets.size() && pets.get(index).isAchieved == true) {
+            selectedPetIndex = index;
+        }
     }
 }

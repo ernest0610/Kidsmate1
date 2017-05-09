@@ -8,7 +8,7 @@ import android.widget.*;
 
 public class Character_Info extends AppCompatActivity {
 
-    //DatabaseTestStub mDatabaseTestStub;
+    DatabaseTestStub mDatabaseTestStub;
     StateManager mStateManager;
 
     ImageView imageView_characterPic;
@@ -38,12 +38,19 @@ public class Character_Info extends AppCompatActivity {
         button_pet.setEnabled(true);
         button_alphabet.setEnabled(true);
         button_trophy.setEnabled(true);
+
+        mDatabaseTestStub = DatabaseTestStub.getInstance();
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        button_pet.setText("pet : " + Integer.toString(mStateManager.getCurrentPet()));
+        int petIndex = mDatabaseTestStub.getCurrentPetIndex();
+        if(petIndex < 0){
+            button_pet.setText("pet: 선택안함");
+        }else {
+            button_pet.setText("pet: " + mDatabaseTestStub.getPetString(petIndex));
+        }
         textView_characterName.setText(mStateManager.getCurrentCname());
         textView_status.setText("level:" + mStateManager.getCharacterLevel() +
                 "\nCurrentExp: " + mStateManager.getCharacterExp() +

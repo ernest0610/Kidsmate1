@@ -14,19 +14,14 @@ public class Character_Alphabet extends AppCompatActivity {
 
     DatabaseTestStub mDatabaseTestStub;
 
-    Context context;
-
     LinearLayout linearLayout_buttonScroll;
-
-    int mListSize; // 수정!
-
-    int selectedButtonIndex;
-
-    ArrayList<Button> buttonList; // 수정!
-    ArrayList<Character> mList; // 수정!
 
     Button buttonAdd;
     Button buttonConfirm;
+
+    Button mButton1;
+    Button mButton2;
+    Button mButton3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,83 +30,33 @@ public class Character_Alphabet extends AppCompatActivity {
 
         mDatabaseTestStub = DatabaseTestStub.getInstance();
 
-        context = this;
-
         linearLayout_buttonScroll = (LinearLayout) findViewById(R.id.linearLayout_buttonScroll);
-
-        mListSize = 0;
-
-        //selectedButtonIndex = mDatabaseTestStub.getCurrentPet(); // 수정!
-
-        buttonList = new ArrayList(6);
-
 
         buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonConfirm = (Button) findViewById(R.id.buttonConfirm);
 
-        buttonAdd.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
+        buttonAdd.setEnabled(false);
+        buttonConfirm.setEnabled(false);
 
-                Random random = new Random();
-                String atoz = "abcdefghijklmnopqrstuvwxyz";
-                Character randomCh = atoz.charAt(random.nextInt(atoz.length()));
+        mButton1 = new Button(this);
+        mButton1.setText(mDatabaseTestStub.getUserAlpha_griffin());
+        linearLayout_buttonScroll.addView(mButton1);
 
-                mDatabaseTestStub.addAlphabet(randomCh); // 수정!
+        mButton2 = new Button(this);
+        mButton2.setText(mDatabaseTestStub.getUserAlpha_kerberos());
+        linearLayout_buttonScroll.addView(mButton2);
 
-                mListSize++;
-                final Button button = new Button(context);
-                button.setText(randomCh);
-                buttonList.add(button);
-                button.setOnClickListener(new View.OnClickListener() {
-                    Button mButton = button;
-                    int index = mListSize-1;
-                    @Override
-                    public void onClick(View v) {
-                        buttonList.get(selectedButtonIndex).setEnabled(true);
-                        mButton.setEnabled(false);
-                        selectedButtonIndex = index;
-                    }
-                });
-                linearLayout_buttonScroll.addView(button);
-            }
-        });
-
-        buttonConfirm.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                //mDatabaseTestStub.setCurrentPet(selectedButtonIndex+1); // 수정!
-                onBackPressed(v);
-            }
-        });
-
-        buttonAdd.setEnabled(true);
-        buttonConfirm.setEnabled(true);
-
-        mList = mDatabaseTestStub.getAlphabetList(); // 수정!
-        if(mList.size() != 0) {
-            for (char ch : mList) {
-                mListSize++;
-                final Button button = new Button(this);
-                button.setText(ch);
-                buttonList.add(button);
-                button.setOnClickListener(new View.OnClickListener() {
-                    Button mButton = button;
-                    int index = mListSize-1;
-                    @Override
-                    public void onClick(View v) {
-                        buttonList.get(selectedButtonIndex).setEnabled(true);
-                        mButton.setEnabled(false);
-                        selectedButtonIndex = index;
-                    }
-                });
-                linearLayout_buttonScroll.addView(button);
-            }
-        }
+        mButton3 = new Button(this);
+        mButton3.setText(mDatabaseTestStub.getUserAlpha_pyramid());
+        linearLayout_buttonScroll.addView(mButton3);
     }
+
     @Override
-    protected void onStart(){
-        super.onStart();
+    protected void onResume(){
+        super.onResume();
+        mButton1.setText(mDatabaseTestStub.getUserAlpha_griffin());
+        mButton2.setText(mDatabaseTestStub.getUserAlpha_kerberos());
+        mButton3.setText(mDatabaseTestStub.getUserAlpha_pyramid());
     }
 
     protected void onBackPressed(View v){
