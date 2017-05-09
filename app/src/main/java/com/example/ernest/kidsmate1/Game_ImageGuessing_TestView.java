@@ -1,6 +1,10 @@
 package com.example.ernest.kidsmate1;
 
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -9,29 +13,44 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.naver.speech.clientapi.SpeechRecognitionResult;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.List;
-import java.util.Random;
 
-public class Game_Basic extends AppCompatActivity {
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 
+public class Game_ImageGuessing_TestView extends AppCompatActivity {
     // 디버깅 메시지
-    protected static final String TAG = Game_Basic.class.getSimpleName();
+    protected static final String TAG = Game_ImageGuessing.class.getSimpleName();
 
     // 모든 액티비티가 가지고 있어야 하는 요소.
     protected VoiceRecognizer mVoiceRecognizer; // 싱글톤
     protected InnerEventHandler mInnerEventHandler; // 각 액티비티 고유의 이벤트 핸들러
     protected VoiceSynthesizer mVoiceSynthesizer; // 음성 합성 API
 
-    // test stub
-    protected DatabaseTestStub mDatabaseTestStub;
+    // 데이터베이스 테스트 stub
+    protected DatabaseTestStub mDatabaseTestStub = DatabaseTestStub.getInstance();
+
+    // 데이터베이스 상태 매니저
+    protected StateManager mStateManager;
 
     // 액티비티들 공통 UI
-    protected TextView textView_word;
+    /*protected TextView textView_word;   // 17.05.09 테스트중
     protected TextView textView_mean;
 
     protected EditText editText_inputWord;
@@ -39,7 +58,23 @@ public class Game_Basic extends AppCompatActivity {
 
     protected Button button_start;
     protected Button button_next;
-    protected Button button_playSound;
+    protected Button button_playSound;*/
+
+    protected Test_GameView gameView; // custom view 17.05.09 테스트중입니다.
+
+    protected MyTextView textView_word;
+    protected MyTextView textView_mean;
+
+    protected MyButton editText_inputWord;
+    protected MyButton button_inputWordAccept;
+
+    protected MyButton button_start;
+    protected MyButton button_next;
+    protected MyButton button_playSound;
+
+    protected MyImageView scrollView_game;
+    protected MyImageView myCharacter;
+    protected MyImageView enemy;
 
     // 퀴즈를 진행하기 위한 변수
     protected String correctAnswer; // 정답을 기록하는 변수
@@ -48,40 +83,119 @@ public class Game_Basic extends AppCompatActivity {
     protected Session_Admin session_admin; // 세션을 관리하는 변수
     protected int opportunity; // 발음할 수 있는 횟수를 제한하는 변수.
 
-    protected int[] blankIndex = {0}; // 빈칸을 체크하는 변수
-    protected boolean hintMean; // 힌트를 주었는지 체크하는 변수
-    protected boolean hintSynthesizer;
+    // 결과물 출력을 위해 임시로 기록해두는 변수
+    protected boolean isLevelUp = false;
+    protected int increasedExp = 0;
+
+    // 그림 맞추기 전용 변수
+    //protected ScrollView scrollView_game; //테스트중 17.05.09
+
+    // 이미지 추출용 변수
+    protected Handler handler;
+    protected String imageURL;
+    protected URL url;
+    protected Bitmap bitmap;
+    protected static final String addr = "https://www.google.com/search?newwindow=1&prmd=ivmn&source=lnms&tbm=isch&sa=X&biw=360&bih=517&dpr=2&q=";
+    protected HttpsURLConnection conn = null;
+    protected BufferedInputStream bis = null;
+    protected BufferedReader reader = null;
+    protected StringBuffer st = null;
+    protected Document doc;
+    protected Elements elements;
+    protected Drawable drawable = null;
+
+    // progress bar 변수
+    protected MyProgress myProgress;
 
     // 함수 시작
     protected boolean roundInit(){
         /*
         세션이 처음 시작될때 딱 한번 onCreate에서 호출되고, 그 이후에는 반드시 applyResult에서만 호출되어야 하는 함수.
          */
+        // 로딩 메시지를 띄움
+        imageURL = "";
+        myProgress.show();
+
         // 문제를 얻어온다.
         String[] todayWord = Database.getRandomWordMean();
-        correctAnswer = todayWord[0].toLowerCase();
+        correctAnswer = todayWord[0];
         correctAnsersMean = todayWord[1];
 
-        // 빈칸이 들어갈 위치 정하기.
-        Random randomIndex = new Random();
-        blankIndex[0] = randomIndex.nextInt(correctAnswer.length()-1);
-
-        // 빈칸 만들어서 출력하기. 원본은 correctAnswer에 저장되어있고 변형되지 않음.
-        StringBuffer mStringBuffer = new StringBuffer(correctAnswer);
-        mStringBuffer.setCharAt(blankIndex[0], '_');
-        textView_word.setText(mStringBuffer.toString());
-
-        // 라운드 초기화.
+        //라운드 초기화.
         isRightAnswer = false;
-        textView_mean.setText("");
-        hintMean = false;
-        hintSynthesizer = false;
+        //textView_mean.setText("");
+        //hintMean = false;
+        //hintSynthesizer = false;
         opportunity = 5;
 
         // 버튼 텍스트 초기화.
         button_start.setText("남은 기회는 " + Integer.toString(opportunity)+ "회.\n도전!");
         button_next.setText("현재 라운드: " + Integer.toString(session_admin.getCurrentRound())+ "\n패스(패배)");
         button_playSound.setText("발음 힌트");
+
+        handler = new Handler() {
+            public void handleMessage(Message msg) {
+                Bundle bun = msg.getData();
+                imageURL = bun.getString("IMAGE_URL");
+                //if (imageURL.equals(""));
+                scrollView_game.setBackground(drawable);
+                myProgress.dismiss(); // 로딩 메시지를 닫음.
+            }
+        };
+        new Thread() {
+            public void run() {
+                String imageURL = "";
+                try{
+                    url = new URL(addr + correctAnswer.replaceAll(" ", "%20") + "#imgrc=6C2Fpt3z7jtfQM:");
+                    conn = (HttpsURLConnection) url.openConnection();
+                    conn.setRequestProperty("user-agent",
+                            "Mozilla/5.0 (Linux; Android 4.3; Nexus 10 Build/JSS15Q) "
+                                    + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2307.2 Mobile Safari/537.36"
+                    );
+                    conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                    SSLContext context = SSLContext.getInstance("TLS");
+                    context.init(null, null, null);
+                    conn.setSSLSocketFactory(context.getSocketFactory());
+                    conn.connect();
+                    conn.setInstanceFollowRedirects(true);
+
+
+                    bis = new BufferedInputStream(conn.getInputStream());
+                    reader = new BufferedReader(new InputStreamReader(bis));
+                    st = new StringBuffer();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        st.append(line + "\n");
+                    }
+                }catch (Exception e) { e.printStackTrace();}
+                //doc = Jsoup.parse(ResponseText);
+                doc = Jsoup.parse(st.toString());
+
+                elements = doc.select("div.rg_meta");
+                for(Element element : elements) {
+                    imageURL = element.text();
+                    imageURL = imageURL.substring(imageURL.indexOf("\"ou\"") + 6, imageURL.indexOf("\"ow\"") - 2);
+                    try {
+                        url = new URL(imageURL);
+                    } catch (Exception e) { e.printStackTrace();}
+                    try {
+                        bitmap = BitmapFactory.decodeStream(url.openStream());
+                    } catch (Exception e) {e.printStackTrace();}
+                    try {
+                        drawable = new BitmapDrawable(bitmap);
+                    } catch (Exception e) { e.printStackTrace();}
+                    if(bitmap != null)
+                        break;
+                }
+
+                Bundle bun = new Bundle();
+                bun.putString("IMAGE_URL", imageURL);
+                Message msg = handler.obtainMessage();
+                msg.setData(bun);
+                handler.sendMessage(msg);
+            }
+        }.start();
+        textView_word.setText(correctAnswer);
         return true;
     }
 
@@ -90,9 +204,11 @@ public class Game_Basic extends AppCompatActivity {
         정답을 체크하고, isRightAnswer의 값을 변경하는 함수. (결과를 데이터베이스에 반영하지는 않음)
         isRightAnswer의 값에 따라 이후 처리가 달라진다.
          */
-        if(word.length()==1 && !isRightAnswer && word.toLowerCase().charAt(0) == correctAnswer.charAt(blankIndex[0])) {
+        if(word.toLowerCase().equals(correctAnswer.toLowerCase())){
             isRightAnswer = true;
             Log.d(TAG, "정답입니다.");
+        }else {
+            Log.d(TAG, "오답입니다.");
         }
     }
 
@@ -115,6 +231,7 @@ public class Game_Basic extends AppCompatActivity {
         button_inputWordAccept.setEnabled(false);
 
         sendResultToDatabase();
+        mStateManager.addUserIG_count(1);
         showTotalResult();
     }
 
@@ -123,30 +240,35 @@ public class Game_Basic extends AppCompatActivity {
         데이터베이스에 결과를 전송
          */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-            mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenSuccess());
+            increasedExp = mStateManager.getEarnedExpWhenSuccess();
+        }else if(session_admin.getCorrectRound() > 0){
+            increasedExp = mStateManager.getEarnedExpWhenFailure();
         }else{
-            mDatabaseTestStub.addCharacterExp(mDatabaseTestStub.getEarnedExpWhenFailure());
+            increasedExp = 0; // // TODO: 2017-05-09  0문제를 맞춰도 경험치가 5 상승하는건 불합리하므로, 최소 한문제를 맞춰야 경험치가 올라가도록 조정.
         }
-        mDatabaseTestStub.addStatBlankGuessing(session_admin.getCorrectRound());
+        isLevelUp = mStateManager.addCharacterExp(increasedExp);
+        mStateManager.addCharacterPower(session_admin.getCorrectRound());
     }
 
     protected void showTotalResult(){
         /*
         모든 라운드가 끝나고 세션의 결과를 표시
          */
+        String temp = "";
         Game_Result game_result = new Game_Result(this);
-        game_result.setGameResultText(
-                "CurrentRound: "+session_admin.getCurrentRound()+
-                        "\nCorrectRound: "+session_admin.getCorrectRound()+
-                        "\nCurrentExp: "+mDatabaseTestStub.getCurrentExp()+
-                        "\nLevelUpExp: "+mDatabaseTestStub.getLevelUpExp()
-        );
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
-                Game_Basic.this.finish();
+                Game_ImageGuessing_TestView.this.finish();
             }
         });
+        if(isLevelUp) {temp = temp + "레벨업 하였습니다!\n";}
+        temp = temp + "정답률: " + session_admin.getCorrectRound()  + "/" + (session_admin.getCurrentRound()-1) + "\n";
+        temp = temp + "체력 스탯 상승: " + session_admin.getCorrectRound() + "\n";
+        temp = temp + "오른 경험치: " + increasedExp + "\n"; // // TODO: 2017-05-09  목표 도달시에 경험치가 두배 상승했음을 보여줄 필요가 있음.
+        temp = temp + "현재 경험치: " + mStateManager.getCharacterExp() + "\n";
+        temp = temp + "다음 레벨 까지 경험치: " + mStateManager.getLevelUpExp() + "\n";
+        game_result.setGameResultText(temp);
         game_result.show();
     }
 
@@ -176,8 +298,10 @@ public class Game_Basic extends AppCompatActivity {
                 }else{
                     if(opportunity>0){
                         opportunity--;
+                        Toast.makeText(getApplicationContext(), "오답입니다.", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "다시 발음 해 보세요.");
                     }else {
+                        Toast.makeText(getApplicationContext(), "라운드 패배.", Toast.LENGTH_SHORT).show();
                         applyResult(Session_Admin.resultCode.WRONG);
                     }
                 }
@@ -206,13 +330,15 @@ public class Game_Basic extends AppCompatActivity {
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
-
-        mDatabaseTestStub = DatabaseTestStub.getInstance();
+        // 데이터베이스를 다루기 위한 객체
+        mStateManager = StateManager.getInstance();
 
         // UI 생성 (액티비티 공통)
-        setContentView(R.layout.game_basic2);
+        //setContentView(R.layout.game_basic2);  //테스트중 17.05.09
+        gameView = new Test_GameView(this);
+        setContentView(gameView);
 
-        textView_word = (TextView) findViewById(R.id.textView_word);
+        /*textView_word = (TextView) findViewById(R.id.textView_word);       // custom view 테스트중 17.05.09
         textView_mean = (TextView) findViewById(R.id.textView_mean);
 
         button_start = (Button) findViewById(R.id.button_start);
@@ -220,13 +346,41 @@ public class Game_Basic extends AppCompatActivity {
         button_playSound = (Button) findViewById(R.id.button_playSound);
 
         editText_inputWord = (EditText) findViewById(R.id.editText_inputWord);
-        button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);
+        button_inputWordAccept = (Button) findViewById(R.id.button_inputWordAccept);*/
+
+        textView_word = gameView.getQuizBlankGuessing();       // custom view 테스트중 17.05.09
+        textView_mean = gameView.getHint();
+
+        button_start = gameView.getMic();
+        button_next = gameView.getPass();
+        button_playSound = gameView.getPlay();
+
+        editText_inputWord = gameView.getInput();
+        button_inputWordAccept = gameView.getSubmit();
+        scrollView_game = gameView.getQuizImageGuessing();
+        myCharacter = gameView.getMyCharacter();
+        enemy = gameView.getEnemy();
+
+        myCharacter.setImage(R.drawable.magumsa);
+        enemy.setImage(R.drawable.bosssphinx);
+        button_start.setImage(R.drawable.buttonmic);
+        button_next.setImage(R.drawable.pass);
+        button_playSound.setImage(R.drawable.play);
+        editText_inputWord.setImage(R.drawable.input);
+        button_inputWordAccept.setImage(R.drawable.submit);
+        button_inputWordAccept.setText("제출");
+        gameView.setBackgroundResource(R.drawable.imagegamebackground);
 
         // UI 환경 설정 (액티비티마다 다름)
         button_next.setEnabled(true);
         button_start.setEnabled(true);
         button_playSound.setEnabled(true);
         button_inputWordAccept.setEnabled(true);
+
+        // imageGuessing 이미지 로딩 구현
+        //scrollView_game = (ScrollView) findViewById(R.id.scrollView_game);   // 테스트중 17.05.09
+        myProgress = new MyProgress(this);
+        myProgress.setCancelable(false); // // TODO: 2017-05-09 인터넷 상태가 좋지 않은 경우 뒤로가기로도 취소를 할 수 없어 영원히 로딩상태가 되는 경우가 있음.
 
         // UI 리스너 구현
         button_start.setOnClickListener(new View.OnClickListener(){
@@ -254,23 +408,13 @@ public class Game_Basic extends AppCompatActivity {
             public void onClick(View v){
                 mVoiceSynthesizer.setString(correctAnswer);
                 mVoiceSynthesizer.doSynthsize();
-                if(hintMean == false) {
-                    if (hintSynthesizer == false) {
-                        hintSynthesizer = true;
-                        button_playSound.setText("의미 힌트");
-                    } else {
-                        textView_mean.setText(correctAnsersMean);
-                        hintMean = true;
-                        button_playSound.setText("발음 힌트");
-                    }
-                }
             }
         });
 
         button_inputWordAccept.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                String inputWord = editText_inputWord.toString();
+                String inputWord = editText_inputWord.getText().toString();
                 editText_inputWord.setText("");
                 checkAnswer(inputWord);
                 Log.d(TAG, "input: " + inputWord);
@@ -289,7 +433,7 @@ public class Game_Basic extends AppCompatActivity {
         });
 
         // 세션 초기화, 퀴즈 생성
-        session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
+        session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
         roundInit();
     }
 
@@ -313,13 +457,13 @@ public class Game_Basic extends AppCompatActivity {
 
     protected static class InnerEventHandler extends Handler {
         // 이벤트 핸들러 이너 클래스
-        private final WeakReference<? extends Game_Basic> mActivity;
-        InnerEventHandler(Game_Basic activity) {
+        private final WeakReference<Game_ImageGuessing_TestView> mActivity;
+        InnerEventHandler(Game_ImageGuessing_TestView activity) {
             mActivity = new WeakReference(activity);
         }
         @Override
         public void handleMessage(Message msg) {
-            Game_Basic activity = mActivity.get();
+            Game_ImageGuessing_TestView activity = mActivity.get();
             if (activity != null) {
                 activity.handleMessage(msg);
             }

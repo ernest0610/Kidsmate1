@@ -54,6 +54,9 @@
         <activity android:name=".Game_BlankGuessing_BossBattle" />
         <activity android:name=".Game_ImageGuessing_BossBattle" />
         <activity android:name=".Game_WordChain_BossBattle" />
+
+        <activity android:name=".Game_ImageGuessing_TestView"
+            android:configChanges="screenSize|orientation"/>
     </application>
 
 </manifest>
