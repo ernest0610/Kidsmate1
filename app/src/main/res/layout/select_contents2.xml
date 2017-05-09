@@ -84,20 +84,18 @@
                 android:text="Game_WordChain_BossBattle" />
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/button_Layout_Test"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="clicked_Layout_Test"
                 android:text="TEST_LAYOUT" />
+
+            <Button
+                android:id="@+id/button_game_imageGuessing_testView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Game_ImageGuessing_TestView"
+                android:text="game_imageGuessing_testView" />
         </LinearLayout>
     </ScrollView>
-
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicked_Layout_Test"
-        android:text="LAYOUT_TEST" />
-
 </LinearLayout>
