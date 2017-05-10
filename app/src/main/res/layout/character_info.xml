@@ -90,6 +90,7 @@
             android:layout_height="match_parent"
             android:layout_margin="5dp"
             android:layout_weight="1"
+            android:onClick="clicked_button_character_promote"
             android:text="캐릭터 전직" />
 
         <Button
