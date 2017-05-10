@@ -54,18 +54,18 @@
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/button_game_blankGuessing"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="clicked_Game_BlankGuessing"
-                    android:text="빈칸 맞추기" />
-
-                <Button
                     android:id="@+id/button_game_imageGuessing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="clicked_Game_ImageGuessing"
                     android:text="그림 맞추기" />
+
+                <Button
+                    android:id="@+id/button_game_blankGuessing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="clicked_Game_BlankGuessing"
+                    android:text="빈칸 맞추기" />
 
                 <Button
                     android:id="@+id/button_game_wordChain"

@@ -45,6 +45,9 @@ public class DatabaseStateManager {
     public void setCharacterJob(String job) {
         Database.setCharacterJob(currentUname, currentCname, job);
     }
+    public String getChracterJob(){
+        return Database.getCurrentJob(currentUname, currentCname);
+    }
     // 현재 character의 pet 변경
     public void setCurrentPet(String pid) {
         Database.setCurrentPet(currentUname, currentCname, pid);

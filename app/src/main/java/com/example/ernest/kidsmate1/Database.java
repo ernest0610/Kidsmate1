@@ -225,6 +225,17 @@ public class Database extends Application {
         return result;
     }
 
+    public static String getCurrentJob(String uname, String cname) {
+        Cursor cursor = DB.rawQuery("SELECT job FROM character WHERE uname = '" + uname + "'AND cname = '" + cname + "'", null);
+        cursor.moveToFirst();
+        String result = "";
+        if(!cursor.isAfterLast()) {
+            result = cursor.getString(0);
+        }
+        cursor.close();
+        return result;
+    }
+
     public static int getCurrentPet(String uname, String cname) {
         Cursor cursor = DB.rawQuery("SELECT type FROM pet WHERE uname = '" + uname + "'AND cname = '" + cname + "'", null);
         cursor.moveToFirst();

@@ -52,12 +52,12 @@ public class Character_Info extends AppCompatActivity {
             button_pet.setText("pet: " + mDatabaseTestStub.getPetString(petIndex));
         }
         textView_characterName.setText(mDatabaseStateManager.getCurrentCname());
-        textView_status.setText("level:" + mDatabaseStateManager.getCharacterLevel() +
-                "\nCurrentExp: " + mDatabaseStateManager.getCharacterExp() +
-                "\nLevelUpExp: " + mDatabaseStateManager.getLevelUpExp() +
-                "\nGame_BlankGuessing Stat(Luck): " + mDatabaseStateManager.getCharacterLuck() +
-                "\nGame_ImageGuessing Stat(Power): " + mDatabaseStateManager.getCharacterPower() +
-                "\nGame_WordChain Stat(Smart): " + mDatabaseStateManager.getCharacterSmart() +
+        textView_status.setText("레벨:" + mDatabaseStateManager.getCharacterLevel() +
+                "\n현재 경험치: " + mDatabaseStateManager.getCharacterExp() +
+                "\n레벨업 경험치: " + mDatabaseStateManager.getLevelUpExp() +
+                "\n빈칸 맞추기 맞춘 총 문제 수(Luck): " + mDatabaseStateManager.getCharacterLuck() +
+                "\n그림 맞추기 맞춘 총 문제 수(Power): " + mDatabaseStateManager.getCharacterPower() +
+                "\n끝말잇기 맞춘 총 문제 수(Smart): " + mDatabaseStateManager.getCharacterSmart() +
                 "\n");
     }
 
@@ -76,4 +76,13 @@ public class Character_Info extends AppCompatActivity {
         startActivity(intent);
     }
 
+    protected void clicked_button_character_change(View v) {
+        Intent intent = new Intent(Character_Info.this, Character_Change.class);
+        startActivity(intent);
+    }
+
+    protected void clicked_button_character_promote(View v) {
+        Intent intent = new Intent(Character_Info.this, Character_Promote.class);
+        startActivity(intent);
+    }
 }

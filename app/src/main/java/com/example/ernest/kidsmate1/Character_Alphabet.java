@@ -48,7 +48,6 @@ public class Character_Alphabet extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addCharacter(1);
-                // // TODO: 2017-05-10 캐릭터 추가 루틴
             }
         });
 
@@ -60,7 +59,6 @@ public class Character_Alphabet extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addCharacter(2);
-                // // TODO: 2017-05-10 캐릭터 추가 루틴
             }
         });
 
@@ -72,7 +70,6 @@ public class Character_Alphabet extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addCharacter(3);
-                // // TODO: 2017-05-10 캐릭터 추가 루틴
             }
         });
     }

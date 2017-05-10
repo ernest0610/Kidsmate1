@@ -24,7 +24,7 @@ public class Character_Change extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dynamic_button_scroll_view);
+        setContentView(R.layout.activity_button_scrollview);
         mDatabaseStateManager = DatabaseStateManager.getInstance();
         linearLayout_buttonScroll = (LinearLayout) findViewById(R.id.linearLayout_buttonScroll);
     }
