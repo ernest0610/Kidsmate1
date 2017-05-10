@@ -96,6 +96,20 @@
                 android:layout_height="wrap_content"
                 android:onClick="clicked_Game_ImageGuessing_TestView"
                 android:text="game_imageGuessing_testView" />
+
+            <Button
+                android:id="@+id/button_game_blankGuessing_testView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Game_BlankGuessing_TestView"
+                android:text="game_blankGuessing_testView" />
+
+            <Button
+                android:id="@+id/button_game_wordChain_testView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_Game_WordChain_TestView"
+                android:text="game_wordChain_testView" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

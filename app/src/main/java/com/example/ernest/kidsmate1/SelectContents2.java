@@ -222,4 +222,14 @@ public class SelectContents2 extends AppCompatActivity {
         Intent intent = new Intent(SelectContents2.this, Game_ImageGuessing_TestView.class);
         startActivity(intent);
     }
+
+    protected void clicked_Game_BlankGuessing_TestView(View v) {
+        Intent intent = new Intent(SelectContents2.this, Game_BlankGuessing_TestView.class);
+        startActivity(intent);
+    }
+
+    protected void clicked_Game_WordChain_TestView(View v) {
+        Intent intent = new Intent(SelectContents2.this, Game_WordChain_TestView.class);
+        startActivity(intent);
+    }
 }
