@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,7 +26,7 @@ public class Login_test extends AppCompatActivity implements AdapterView.OnItemC
     private ArrayList<String> unames = null;
     private EditText editText;
     private boolean isExist;
-    private StateManager stateManager;
+    private DatabaseStateManager databaseStateManager;
     private ArrayList<String> cnames = null;
     private static final String TAG = Login_test.class.getSimpleName();
 
@@ -35,25 +34,24 @@ public class Login_test extends AppCompatActivity implements AdapterView.OnItemC
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String uname = unames.get(position);
         Toast.makeText(getApplicationContext(), uname + "님 환영합니다", Toast.LENGTH_SHORT).show();
-        stateManager = StateManager.getInstance();
-        stateManager.switchUser(uname);
-        cnames = stateManager.getCharacterList();
+        databaseStateManager = DatabaseStateManager.getInstance();
+        databaseStateManager.switchUser(uname);
+        cnames = databaseStateManager.getCharacterList();
         if(cnames.size() == 0) {
             ShowDialog_addCharacter();
         }
         else {
             Toast.makeText(getApplicationContext(), cnames.get(0) + "님 환영합니다", Toast.LENGTH_SHORT).show();
-            stateManager.switchCharacter(cnames.get(0));
+            databaseStateManager.switchCharacter(cnames.get(0));
             Intent intent = new Intent(Login_test.this, SelectContents2.class);
             startActivity(intent);
             finish();
         }
     }
 
-    private void ShowDialog_addCharacter()
-    {
+    private void ShowDialog_addCharacter() {
         LayoutInflater dialog = LayoutInflater.from(this);
-        final View dialogLayout = dialog.inflate(R.layout.my_dialog_addchar_test, null);
+        final View dialogLayout = dialog.inflate(R.layout.dialog_get_string, null);
         final Dialog myDialog = new Dialog(this);
 
         myDialog.setTitle("캐릭터를 생성합니다");
@@ -75,8 +73,8 @@ public class Login_test extends AppCompatActivity implements AdapterView.OnItemC
                 }
                 else {
                     Toast.makeText(getApplicationContext(), cname + "님 환영합니다", Toast.LENGTH_SHORT).show();
-                    stateManager.addCharacter(cname);
-                    stateManager.switchCharacter(cname);
+                    databaseStateManager.addCharacter(cname);
+                    databaseStateManager.switchCharacter(cname);
                     Intent intent = new Intent(Login_test.this, SelectContents2.class);
                     startActivity(intent);
                     finish();
@@ -102,7 +100,7 @@ public class Login_test extends AppCompatActivity implements AdapterView.OnItemC
     private void ShowDialog_delUser(final int position)
     {
         LayoutInflater dialog = LayoutInflater.from(this);
-        final View dialogLayout = dialog.inflate(R.layout.my_dialog_deluser_test, null);
+        final View dialogLayout = dialog.inflate(R.layout.dialog_del_user, null);
         final Dialog myDialog = new Dialog(this);
 
         myDialog.setTitle("사용자 '" + unames.get(position) + "' 를 삭제합니다");

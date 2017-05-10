@@ -31,7 +31,7 @@ public class Game_WordChain extends AppCompatActivity {
     //protected DatabaseTestStub mDatabaseTestStub = DatabaseTestStub.getInstance();
 
     // 데이터베이스 상태 매니저
-    protected StateManager mStateManager;
+    protected DatabaseStateManager mDatabaseStateManager;
 
     // 액티비티들 공통 UI
     protected TextView textView_word;
@@ -126,7 +126,7 @@ public class Game_WordChain extends AppCompatActivity {
         button_inputWordAccept.setEnabled(false);
 
         sendResultToDatabase();
-        mStateManager.addUserWC_count(1);
+        mDatabaseStateManager.addUserWC_count(1);
         showTotalResult();
     }
 
@@ -135,14 +135,14 @@ public class Game_WordChain extends AppCompatActivity {
         데이터베이스에 결과를 전송
          */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-            increasedExp = mStateManager.getEarnedExpWhenSuccess();
+            increasedExp = mDatabaseStateManager.getEarnedExpWhenSuccess();
         }else if(session_admin.getCorrectRound() > 0){
-            increasedExp = mStateManager.getEarnedExpWhenFailure();
+            increasedExp = mDatabaseStateManager.getEarnedExpWhenFailure();
         }else{
             increasedExp = 0; // // TODO: 2017-05-09  0문제를 맞춰도 경험치가 5 상승하는건 불합리하므로, 최소 한문제를 맞춰야 경험치가 올라가도록 조정.
         }
-        isLevelUp = mStateManager.addCharacterExp(increasedExp);
-        mStateManager.addCharacterSmart(session_admin.getCorrectRound());
+        isLevelUp = mDatabaseStateManager.addCharacterExp(increasedExp);
+        mDatabaseStateManager.addCharacterSmart(session_admin.getCorrectRound());
     }
 
     protected void showTotalResult(){
@@ -150,7 +150,7 @@ public class Game_WordChain extends AppCompatActivity {
         모든 라운드가 끝나고 세션의 결과를 표시
          */
         String temp = "";
-        Game_Result game_result = new Game_Result(this);
+        Dialog_Game_Result game_result = new Dialog_Game_Result(this);
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
@@ -161,8 +161,8 @@ public class Game_WordChain extends AppCompatActivity {
         temp = temp + "정답률: " + session_admin.getCorrectRound()  + "/" + (session_admin.getCurrentRound()-1) + "\n";
         temp = temp + "지능 스탯 상승: " + session_admin.getCorrectRound() + "\n";
         temp = temp + "오른 경험치: " + increasedExp + "\n"; // // TODO: 2017-05-09  목표 도달시에 경험치가 두배 상승했음을 보여줄 필요가 있음.
-        temp = temp + "현재 경험치: " + mStateManager.getCharacterExp() + "\n";
-        temp = temp + "다음 레벨 까지 경험치: " + mStateManager.getLevelUpExp() + "\n";
+        temp = temp + "현재 경험치: " + mDatabaseStateManager.getCharacterExp() + "\n";
+        temp = temp + "다음 레벨 까지 경험치: " + mDatabaseStateManager.getLevelUpExp() + "\n";
         game_result.setGameResultText(temp);
         game_result.show();
 
@@ -234,7 +234,7 @@ public class Game_WordChain extends AppCompatActivity {
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
         // 데이터베이스를 다루기 위한 객체
-        mStateManager = StateManager.getInstance();
+        mDatabaseStateManager = DatabaseStateManager.getInstance();
 
         // UI 생성 (액티비티 공통)
         setContentView(R.layout.game_basic2);
@@ -309,7 +309,7 @@ public class Game_WordChain extends AppCompatActivity {
 
         // 세션 초기화, 퀴즈 생성
         //session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
-        session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
+        session_admin = new Session_Admin(mDatabaseStateManager.getMaxRound(), mDatabaseStateManager.getGoalRound());
         roundInit();
     }
 

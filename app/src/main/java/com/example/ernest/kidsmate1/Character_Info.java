@@ -9,7 +9,7 @@ import android.widget.*;
 public class Character_Info extends AppCompatActivity {
 
     DatabaseTestStub mDatabaseTestStub;
-    StateManager mStateManager;
+    DatabaseStateManager mDatabaseStateManager;
 
     ImageView imageView_characterPic;
     TextView textView_characterName;
@@ -23,7 +23,7 @@ public class Character_Info extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mStateManager = StateManager.getInstance();
+        mDatabaseStateManager = DatabaseStateManager.getInstance();
 
         setContentView(R.layout.character_info);
 
@@ -51,13 +51,13 @@ public class Character_Info extends AppCompatActivity {
         }else {
             button_pet.setText("pet: " + mDatabaseTestStub.getPetString(petIndex));
         }
-        textView_characterName.setText(mStateManager.getCurrentCname());
-        textView_status.setText("level:" + mStateManager.getCharacterLevel() +
-                "\nCurrentExp: " + mStateManager.getCharacterExp() +
-                "\nLevelUpExp: " + mStateManager.getLevelUpExp() +
-                "\nGame_BlankGuessing Stat(Luck): " + mStateManager.getCharacterLuck() +
-                "\nGame_ImageGuessing Stat(Power): " + mStateManager.getCharacterPower() +
-                "\nGame_WordChain Stat(Smart): " + mStateManager.getCharacterSmart() +
+        textView_characterName.setText(mDatabaseStateManager.getCurrentCname());
+        textView_status.setText("level:" + mDatabaseStateManager.getCharacterLevel() +
+                "\nCurrentExp: " + mDatabaseStateManager.getCharacterExp() +
+                "\nLevelUpExp: " + mDatabaseStateManager.getLevelUpExp() +
+                "\nGame_BlankGuessing Stat(Luck): " + mDatabaseStateManager.getCharacterLuck() +
+                "\nGame_ImageGuessing Stat(Power): " + mDatabaseStateManager.getCharacterPower() +
+                "\nGame_WordChain Stat(Smart): " + mDatabaseStateManager.getCharacterSmart() +
                 "\n");
     }
 

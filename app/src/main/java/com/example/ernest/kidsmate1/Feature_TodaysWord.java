@@ -31,7 +31,7 @@ public class Feature_TodaysWord extends AppCompatActivity {
     //private DatabaseTestStub mDatabaseTestStub;
 
     // 데이터베이스 상태 매니저
-    protected StateManager mStateManager;
+    protected DatabaseStateManager mDatabaseStateManager;
 
     // 액티비티들 공통 UI
     private TextView textView_word;
@@ -110,7 +110,7 @@ public class Feature_TodaysWord extends AppCompatActivity {
         button_inputWordAccept.setEnabled(false);
 
         sendResultToDatabase();
-        mStateManager.addUserTW_count(1);
+        mDatabaseStateManager.addUserTW_count(1);
         showTotalResult();
     }
 
@@ -119,13 +119,13 @@ public class Feature_TodaysWord extends AppCompatActivity {
         데이터베이스에 결과를 전송
          */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-            increasedExp = mStateManager.getEarnedExpWhenSuccess();
+            increasedExp = mDatabaseStateManager.getEarnedExpWhenSuccess();
         }else if(session_admin.getCorrectRound() > 0){
-            increasedExp = mStateManager.getEarnedExpWhenFailure();
+            increasedExp = mDatabaseStateManager.getEarnedExpWhenFailure();
         }else{
             increasedExp = 0; // // TODO: 2017-05-09  0문제를 맞춰도 경험치가 5 상승하는건 불합리하므로, 최소 한문제를 맞춰야 경험치가 올라가도록 조정.
         }
-        isLevelUp = mStateManager.addCharacterExp(increasedExp);
+        isLevelUp = mDatabaseStateManager.addCharacterExp(increasedExp);
 
         Random random = new Random();
         whatStat = random.nextInt(3);
@@ -133,13 +133,13 @@ public class Feature_TodaysWord extends AppCompatActivity {
 
         switch(whatStat) {
             case(0):
-                mStateManager.addCharacterLuck(dice);
+                mDatabaseStateManager.addCharacterLuck(dice);
                 break;
             case(1):
-                mStateManager.addCharacterPower(dice);
+                mDatabaseStateManager.addCharacterPower(dice);
                 break;
             case(2):
-                mStateManager.addCharacterSmart(dice);
+                mDatabaseStateManager.addCharacterSmart(dice);
                 break;
             default:
                 break;
@@ -151,7 +151,7 @@ public class Feature_TodaysWord extends AppCompatActivity {
         모든 라운드가 끝나고 세션의 결과를 표시
          */
         String temp = "";
-        Game_Result game_result = new Game_Result(this);
+        Dialog_Game_Result game_result = new Dialog_Game_Result(this);
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
@@ -175,8 +175,8 @@ public class Feature_TodaysWord extends AppCompatActivity {
         }
         temp = temp + dice + "\n";
         temp = temp + "오른 경험치: " + increasedExp + "\n"; // // TODO: 2017-05-09  목표 도달시에 경험치가 두배 상승했음을 보여줄 필요가 있음.
-        temp = temp + "현재 경험치: " + mStateManager.getCharacterExp() + "\n";
-        temp = temp + "다음 레벨 까지 경험치: " + mStateManager.getLevelUpExp() + "\n";
+        temp = temp + "현재 경험치: " + mDatabaseStateManager.getCharacterExp() + "\n";
+        temp = temp + "다음 레벨 까지 경험치: " + mDatabaseStateManager.getLevelUpExp() + "\n";
         game_result.setGameResultText(temp);
         game_result.show();
     }
@@ -300,7 +300,7 @@ public class Feature_TodaysWord extends AppCompatActivity {
         });
 
         // 세션 초기화, 퀴즈 생성
-        session_admin = new Session_Admin(mStateManager.getMaxRound(), mStateManager.getGoalRound());
+        session_admin = new Session_Admin(mDatabaseStateManager.getMaxRound(), mDatabaseStateManager.getGoalRound());
         //session_admin = new Session_Admin(mDatabaseTestStub.getMaxRound(), mDatabaseTestStub.getGoalRound());
         roundInit();
     }

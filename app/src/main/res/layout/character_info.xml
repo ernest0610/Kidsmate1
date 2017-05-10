@@ -5,56 +5,40 @@
     android:id="@+id/LinearLayout_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="10dp">
 
     <LinearLayout
-        android:id="@+id/LinearLayout_left"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/LinearLayout_upLeft"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="9"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/imageView_characterPic"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/progress" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/LinearLayout_downLeft"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textView_characterName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/imageView_characterPic"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="8"
+                app:srcCompat="@drawable/progress" />
         </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/LinearLayout_right"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/LinearLayout_upRight"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -65,52 +49,65 @@
                 android:layout_weight="1"
                 android:textColor="@color/text"
                 android:textStyle="bold" />
-        </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/LinearLayout_downRight"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <LinearLayout
+            <ImageView
+                android:id="@+id/imageView_petPic"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/button_pet"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:onClick="clicked_button_pet"
-                    android:text="pet" />
-
-                <Button
-                    android:id="@+id/button_alphabet"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:onClick="clicked_button_alphabet"
-                    android:text="alphabet" />
-
-                <Button
-                    android:id="@+id/button_trophy"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:onClick="clicked_button_trophy"
-                    android:text="trophy" />
-
-            </LinearLayout>
-
+                app:srcCompat="@drawable/progress" />
         </LinearLayout>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_alphabet"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:onClick="clicked_button_alphabet"
+            android:text="알파벳 수집\n(캐릭터 생성)" />
+
+        <Button
+            android:id="@+id/button_character_change"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:text="캐릭터 변경" />
+
+        <Button
+            android:id="@+id/button_character_promote"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:text="캐릭터 전직" />
+
+        <Button
+            android:id="@+id/button_pet"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:onClick="clicked_button_pet"
+            android:text="펫 변경" />
+
+        <Button
+            android:id="@+id/button_trophy"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:onClick="clicked_button_trophy"
+            android:text="트로피" />
     </LinearLayout>
 
 </LinearLayout>

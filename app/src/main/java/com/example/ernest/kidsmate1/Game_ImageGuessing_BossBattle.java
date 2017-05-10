@@ -21,8 +21,8 @@ public class Game_ImageGuessing_BossBattle extends Game_ImageGuessing {
         button_inputWordAccept.setEnabled(false);
 
         sendResultToDatabase();
-        int tempInt = mStateManager.getUserIG_count();
-        mStateManager.addUserIG_count(-tempInt); // // TODO: 2017-05-09  게임 플레이 카운트를 초기화하는 방식으로 대응하고 있지만, 게임 플레이 카운트가 누적되도록 변경해야 함.
+        int tempInt = mDatabaseStateManager.getUserIG_count();
+        mDatabaseStateManager.addUserIG_count(-tempInt); // // TODO: 2017-05-09  게임 플레이 카운트를 초기화하는 방식으로 대응하고 있지만, 게임 플레이 카운트가 누적되도록 변경해야 함.
         showTotalResult();
     }
 
@@ -32,15 +32,15 @@ public class Game_ImageGuessing_BossBattle extends Game_ImageGuessing {
         데이터베이스에 결과를 전송
          */
         if(session_admin.getCorrectRound() >= session_admin.getGoalRound()){
-            increasedExp = mStateManager.getEarnedExpWhenSuccess();
+            increasedExp = mDatabaseStateManager.getEarnedExpWhenSuccess();
             setStringPuzzle();
         }else if(session_admin.getCorrectRound() > 0){
-            increasedExp = mStateManager.getEarnedExpWhenFailure();
+            increasedExp = mDatabaseStateManager.getEarnedExpWhenFailure();
         }else{
             increasedExp = 0; // // TODO: 2017-05-09  0문제를 맞춰도 경험치가 5 상승하는건 불합리하므로, 최소 한문제를 맞춰야 경험치가 올라가도록 조정.
         }
-        isLevelUp = mStateManager.addCharacterExp(increasedExp);
-        mStateManager.addCharacterPower(session_admin.getCorrectRound());
+        isLevelUp = mDatabaseStateManager.addCharacterExp(increasedExp);
+        mDatabaseStateManager.addCharacterPower(session_admin.getCorrectRound());
     }
 
     @Override
@@ -49,7 +49,7 @@ public class Game_ImageGuessing_BossBattle extends Game_ImageGuessing {
         모든 라운드가 끝나고 세션의 결과를 표시
          */
         String temp = "";
-        Game_Result game_result = new Game_Result(this);
+        Dialog_Game_Result game_result = new Dialog_Game_Result(this);
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
@@ -60,8 +60,8 @@ public class Game_ImageGuessing_BossBattle extends Game_ImageGuessing {
         temp = temp + "정답률: " + session_admin.getCorrectRound()  + "/" + (session_admin.getCurrentRound()-1) + "\n";
         temp = temp + "행운 스탯 상승: " + session_admin.getCorrectRound() + "\n";
         temp = temp + "오른 경험치: " + increasedExp + "\n"; // // TODO: 2017-05-09  목표 도달시에 경험치가 두배 상승했음을 보여줄 필요가 있음.
-        temp = temp + "현재 경험치: " + mStateManager.getCharacterExp() + "\n";
-        temp = temp + "다음 레벨 까지 경험치: " + mStateManager.getLevelUpExp() + "\n";
+        temp = temp + "현재 경험치: " + mDatabaseStateManager.getCharacterExp() + "\n";
+        temp = temp + "다음 레벨 까지 경험치: " + mDatabaseStateManager.getLevelUpExp() + "\n";
         if(selectedChar == '0'){temp = temp + "모은 문자: 없음\n";}
         else{temp = temp + "모은 문자: " + selectedChar + "\n";}
         temp = temp + "지금까지 모은 문자들: " + finalState.toString() + "\n";
