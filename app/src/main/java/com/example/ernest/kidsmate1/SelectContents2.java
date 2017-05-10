@@ -69,57 +69,84 @@ public class SelectContents2 extends AppCompatActivity {
 
         // // TODO: 2017-05-09 트로피 중복 지급 문제가 있음. 
 
-        if(mStateManager.getUserBG_count() >= 3){
+        if(mDatabaseTestStub.isTrophyIssued(0)==false && mStateManager.getUserBG_count() >= 3){
             // 빈칸맞추기 3회 플레이 트로피!
-            mDatabaseTestStub.addTrophy("빈칸맞추기 3회 플레이 트로피!");
-            msg = msg + ("빈칸맞추기 3회 플레이 트로피 획득!\n");
+            msg = msg + mDatabaseTestStub.getTrophyString(0) + " 획득!\n";
+            mDatabaseTestStub.setTrophyAchieved(0);
+            mDatabaseTestStub.setTrophyIssued(0);
         }
 
-        if(mStateManager.getUserIG_count() >= 3){
+        if(mDatabaseTestStub.isTrophyIssued(1)==false && mStateManager.getUserIG_count() >= 3){
             // 그림맞추기 3회 플레이 트로피!
-            mDatabaseTestStub.addTrophy("그림맞추기 3회 플레이 트로피!");
-            msg = msg + ("그림맞추기 3회 플레이 트로피 획득!\n");
+            msg = msg + mDatabaseTestStub.getTrophyString(1) + " 획득!\n";
+            mDatabaseTestStub.setTrophyAchieved(1);
+            mDatabaseTestStub.setTrophyIssued(1);
         }
 
-        if(mStateManager.getUserWC_count() >= 3){
+        if(mDatabaseTestStub.isTrophyIssued(2)==false && mStateManager.getUserWC_count() >= 3){
             // 끝말잇기 3회 플레이 트로피!
-            mDatabaseTestStub.addTrophy("끝말잇기 3회 플레이 트로피!");
-            msg = msg + ("끝말잇기 3회 플레이 트로피 획득!\n");
+            msg = msg + mDatabaseTestStub.getTrophyString(2) + " 획득!\n";
+            mDatabaseTestStub.setTrophyAchieved(2);
+            mDatabaseTestStub.setTrophyIssued(2);
         }
 
-        if(mStateManager.getCharacterLuck() >= 10){
+        if(mDatabaseTestStub.isTrophyIssued(3)==false && mStateManager.getCharacterLuck() >= 10){
             // 행운 스탯 10 달성 트로피!
-            mDatabaseTestStub.addTrophy("행운 스탯 10 달성 트로피!");
-            msg = msg + ("행운 스탯 10 달성 트로피 획득!\n");
+            msg = msg + mDatabaseTestStub.getTrophyString(3) + " 획득!\n";
+            mDatabaseTestStub.setTrophyAchieved(3);
+            mDatabaseTestStub.setTrophyIssued(3);
         }
 
-        if(mStateManager.getCharacterPower() >= 10){
+        if(mDatabaseTestStub.isTrophyIssued(4)==false && mStateManager.getCharacterPower() >= 10){
             // 힘 스탯 10 달성 트로피!
-            mDatabaseTestStub.addTrophy("힘 스탯 10 달성 트로피!");
-            msg = msg + ("힘 스탯 10 달성 트로피 획득!\n");
+            msg = msg + mDatabaseTestStub.getTrophyString(4) + " 획득!\n";
+            mDatabaseTestStub.setTrophyAchieved(4);
+            mDatabaseTestStub.setTrophyIssued(4);
         }
 
-        if(mStateManager.getCharacterSmart() >= 10){
+        if(mDatabaseTestStub.isTrophyIssued(5)==false && mStateManager.getCharacterSmart() >= 10){
             // 지능 스탯 10 달성 트로피!
-            mDatabaseTestStub.addTrophy("지능 스탯 10 달성 트로피!");
-            msg = msg + ("지능 스탯 10 달성 트로피 획득!\n");
+            msg = msg + mDatabaseTestStub.getTrophyString(5) + " 획득!\n";
+            mDatabaseTestStub.setTrophyAchieved(5);
+            mDatabaseTestStub.setTrophyIssued(5);
         }
 
-        if(mStateManager.getUserTW_count() >= 3){
+        if(mDatabaseTestStub.isTrophyIssued(6)==false && mStateManager.getUserTW_count() >= 3){
             // 오늘의 단어 3회 플레이 트로피!
-            mDatabaseTestStub.addTrophy("오늘의 단어 3회 플레이 트로피!");
-            msg = msg + ("오늘의 단어 3회 플레이 트로피 획득!\n");
+            msg = msg + mDatabaseTestStub.getTrophyString(6) + " 획득!\n";
+            mDatabaseTestStub.setTrophyAchieved(6);
+            mDatabaseTestStub.setTrophyIssued(6);
         }
 
         // // TODO: 2017-05-09 펫 구현
 
-        int tempSize = mDatabaseTestStub.getTrophyList().size();
-        if(tempSize>=7){
-            // 펫 추가
-        }else if(tempSize>=3){
-            // 펫 추가
-        }else if(tempSize>=1){
-            // 펫 추가
+        int trophyCount = 0;
+        int trophyListSize = mDatabaseTestStub.getTrophyListSize();
+        for(int index=0; index < trophyListSize; index++){
+            if(mDatabaseTestStub.isTrophyAchieved(index)==true){
+                trophyCount++;
+            }
+        }
+
+        if(mDatabaseTestStub.isPetAchieved(0)==false && trophyCount>=1){
+            // 코리안 숏헤어 고양이
+            msg = msg + mDatabaseTestStub.getPetString(0) + " 획득!\n";
+            mDatabaseTestStub.setPetAchieved(0);
+            mDatabaseTestStub.setPetIssued(0);
+        }
+
+        if(mDatabaseTestStub.isPetAchieved(1)==false && trophyCount>=3){
+            // 페르시안 고양이
+            msg = msg + mDatabaseTestStub.getPetString(1) + " 획득!\n";
+            mDatabaseTestStub.setPetAchieved(1);
+            mDatabaseTestStub.setPetIssued(1);
+        }
+
+        if(mDatabaseTestStub.isPetAchieved(2)==false && trophyCount>=7){
+            // 샴 고양이
+            msg = msg + mDatabaseTestStub.getPetString(2) + " 획득!\n";
+            mDatabaseTestStub.setPetAchieved(2);
+            mDatabaseTestStub.setPetIssued(3);
         }
 
         // // TODO: 2017-05-09 전직 구현 (레벨, 스탯 연관)

@@ -1,6 +1,5 @@
 package com.example.ernest.kidsmate1;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -10,22 +9,16 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 
 public class Character_Pet extends AppCompatActivity {
-
     DatabaseTestStub mDatabaseTestStub;
-
-    Context context;
 
     LinearLayout linearLayout_buttonScroll;
 
-    int petButtonListSize;
-
-    int selectedButtonIndex;
-
-    ArrayList<Button> petButtonList;
-    ArrayList<Integer> petList;
-
     Button buttonAdd;
     Button buttonConfirm;
+
+    int selectedIndex;
+
+    ArrayList<Button> buttonList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,77 +27,68 @@ public class Character_Pet extends AppCompatActivity {
 
         mDatabaseTestStub = DatabaseTestStub.getInstance();
 
-        context = this;
-
         linearLayout_buttonScroll = (LinearLayout) findViewById(R.id.linearLayout_buttonScroll);
-
-        petButtonListSize = 0;
-
-        selectedButtonIndex = mDatabaseTestStub.getCurrentPet();
-
-        petButtonList = new ArrayList(6);
-
 
         buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonConfirm = (Button) findViewById(R.id.buttonConfirm);
 
-        buttonAdd.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                petButtonListSize++;
-                final Button button = new Button(context);
-                button.setText(Integer.toString(petButtonListSize));
-                petButtonList.add(button);
-                button.setOnClickListener(new View.OnClickListener() {
-                    Button mButton = button;
-                    int index = petButtonListSize-1;
-                    @Override
-                    public void onClick(View v) {
-                        petButtonList.get(selectedButtonIndex).setEnabled(true);
-                        mButton.setEnabled(false);
-                        selectedButtonIndex = index;
-                    }
-                });
-                linearLayout_buttonScroll.addView(button);
-                mDatabaseTestStub.addPet(petButtonListSize);
-            }
-        });
-
         buttonConfirm.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                mDatabaseTestStub.setCurrentPet(selectedButtonIndex+1);
+                mDatabaseTestStub.setCurrentPetIndex(selectedIndex);
                 onBackPressed(v);
             }
         });
 
-        buttonAdd.setEnabled(true);
+        buttonAdd.setEnabled(false);
         buttonConfirm.setEnabled(true);
 
-        petList = mDatabaseTestStub.getPetList();
-        if(petList.size() != 0) {
-            for (int petcode : petList) {
-                petButtonListSize++;
-                final Button button = new Button(this);
-                button.setText(Integer.toString(petcode));
-                petButtonList.add(button);
-                button.setOnClickListener(new View.OnClickListener() {
-                    Button mButton = button;
-                    int index = petButtonListSize-1;
+        selectedIndex = -1;
+
+        buttonList = new ArrayList();
+
+        final int listSize = mDatabaseTestStub.getPetListSize();
+        if(listSize != 0) {
+            for (int index = 0; index < listSize; index++) {
+                final Button mButton = new Button(this);
+                final int mint = index;
+                mButton.setOnClickListener(new View.OnClickListener() {
+                    Button mmButton = mButton;
+                    int mindex = mint;
                     @Override
                     public void onClick(View v) {
-                        petButtonList.get(selectedButtonIndex).setEnabled(true);
-                        mButton.setEnabled(false);
-                        selectedButtonIndex = index;
+                        if(selectedIndex >= 0 && selectedIndex < listSize) {
+                            buttonList.get(selectedIndex).setEnabled(true);
+                        }
+                        mmButton.setEnabled(false);
+                        selectedIndex = mindex;
                     }
                 });
-                linearLayout_buttonScroll.addView(button);
+                mButton.setEnabled(false);
+                buttonList.add(mButton);
             }
         }
     }
+
     @Override
-    protected void onStart(){
-        super.onStart();
+    protected void onResume(){
+        super.onResume();
+
+        linearLayout_buttonScroll.removeAllViews();
+
+        Button mButton;
+
+        int listSize = mDatabaseTestStub.getPetListSize();
+        if(listSize != 0) {
+            for (int index = 0; index < listSize; index++) {
+                if(mDatabaseTestStub.isPetAchieved(index)) {
+                    mButton = buttonList.get(index);
+                    mButton.setText(mDatabaseTestStub.getPetString(index));
+                    mButton.setEnabled(true);
+                    linearLayout_buttonScroll.addView(mButton);
+                }
+            }
+        }
     }
 
     protected void onBackPressed(View v){
