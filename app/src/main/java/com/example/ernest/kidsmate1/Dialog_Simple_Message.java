@@ -9,15 +9,14 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-// 커스텀 progress bar
-class Game_Result extends Dialog {
+class Dialog_Simple_Message extends Dialog {
     private LinearLayout linearLayout_root;
     private TextView textView_gameResult;
 
-    public Game_Result(Context context) {
+    public Dialog_Simple_Message(Context context) {
         super(context);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // 제목
-        setContentView(R.layout.game_result);
+        setContentView(R.layout.dialog_game_result);
 
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); //배경을 투명하게
 
@@ -27,7 +26,7 @@ class Game_Result extends Dialog {
         linearLayout_root.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Game_Result.this.onBackPressed();
+                Dialog_Simple_Message.this.onBackPressed();
             }
         });
     }

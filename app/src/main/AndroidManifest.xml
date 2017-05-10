@@ -61,6 +61,11 @@
             android:configChanges="screenSize|orientation"/>
         <activity android:name=".Game_WordChain_TestView"
             android:configChanges="screenSize|orientation"/>
+
+        <activity android:name=".Activity_Menu" />
+        <activity android:name=".Character_Change" />
+        <activity android:name=".Character_Promote" />
+
     </application>
 
 </manifest>

@@ -1,35 +1,28 @@
 package com.example.ernest.kidsmate1;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.util.Log;
-
-import com.naver.speech.clientapi.SpeechRecognitionException;
-import com.naver.speech.clientapi.SpeechRecognizer;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class StateManager {
-    protected static final String TAG = StateManager.class.getSimpleName();
+public class DatabaseStateManager {
+    protected static final String TAG = DatabaseStateManager.class.getSimpleName();
 
-    private static StateManager mStateManager = null;
+    private static DatabaseStateManager mDatabaseStateManager = null;
     private String currentUname = "";
     private String currentCname = "";
 
-    private StateManager() {
+    private DatabaseStateManager() {
     }
 
-    public static StateManager getInstance() { /// constructor
-        if(mStateManager == null) {
-            synchronized (StateManager.class) {
-                if(mStateManager == null) {
-                    mStateManager = new StateManager();
+    public static DatabaseStateManager getInstance() { /// constructor
+        if(mDatabaseStateManager == null) {
+            synchronized (DatabaseStateManager.class) {
+                if(mDatabaseStateManager == null) {
+                    mDatabaseStateManager = new DatabaseStateManager();
                 }
             }
         }
-        return mStateManager;
+        return mDatabaseStateManager;
     }
 
     // 현재 user 확인
@@ -51,6 +44,9 @@ public class StateManager {
     // 전직
     public void setCharacterJob(String job) {
         Database.setCharacterJob(currentUname, currentCname, job);
+    }
+    public String getChracterJob(){
+        return Database.getCurrentJob(currentUname, currentCname);
     }
     // 현재 character의 pet 변경
     public void setCurrentPet(String pid) {
