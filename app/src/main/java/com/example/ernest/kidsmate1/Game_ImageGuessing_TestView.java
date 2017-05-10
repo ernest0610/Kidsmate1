@@ -251,7 +251,7 @@ public class Game_ImageGuessing_TestView extends AppCompatActivity {
         모든 라운드가 끝나고 세션의 결과를 표시
          */
         String temp = "";
-        Dialog_Game_Result game_result = new Dialog_Game_Result(this);
+        Dialog_Simple_Message game_result = new Dialog_Simple_Message(this);
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){

@@ -5,13 +5,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
-public class SelectContents2 extends AppCompatActivity {
+public class Activity_Menu extends AppCompatActivity {
     Button button_game_blankGuessing_bossBattle;
     Button button_game_imageGuessing_bossBattle;
     Button button_game_wordChain_bossBattle;
-    LinearLayout linearLayout_buttonLayer;
     DatabaseStateManager mDatabaseStateManager;
 
     DatabaseTestStub mDatabaseTestStub;
@@ -19,15 +17,10 @@ public class SelectContents2 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.select_contents2);
+        setContentView(R.layout.activity_menu);
         button_game_blankGuessing_bossBattle = (Button) findViewById(R.id.button_game_blankGuessing_bossBattle);
         button_game_imageGuessing_bossBattle = (Button) findViewById(R.id.button_game_imageGuessing_bossBattle);
         button_game_wordChain_bossBattle = (Button) findViewById(R.id.button_game_wordChain_bossBattle);
-        //linearLayout_buttonLayer = (LinearLayout) findViewById(R.id.linearLayout_buttonLayer);
-
-        //linearLayout_buttonLayer.removeView(button_game_blankGuessing_bossBattle);
-        //linearLayout_buttonLayer.removeView(button_game_imageGuessing_bossBattle);
-        //linearLayout_buttonLayer.removeView(button_game_wordChain_bossBattle);
 
         button_game_blankGuessing_bossBattle.setEnabled(false);
         button_game_imageGuessing_bossBattle.setEnabled(false);
@@ -164,72 +157,52 @@ public class SelectContents2 extends AppCompatActivity {
     }
 
     protected void clicked_Feature_Dictionary(View v) {
-        Intent intent = new Intent(SelectContents2.this, Feature_Dictionary.class);
+        Intent intent = new Intent(Activity_Menu.this, Feature_Dictionary.class);
         startActivity(intent);
     }
 
     protected void clicked_Feature_TodaysWord(View v) {
-        Intent intent = new Intent(SelectContents2.this, Feature_TodaysWord.class);
+        Intent intent = new Intent(Activity_Menu.this, Feature_TodaysWord.class);
         startActivity(intent);
     }
 
     protected void clicked_Game_BlankGuessing(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_BlankGuessing.class);
+        Intent intent = new Intent(Activity_Menu.this, Game_BlankGuessing.class);
         startActivity(intent);
     }
 
     protected void clicked_Game_ImageGuessing(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_ImageGuessing.class);
+        Intent intent = new Intent(Activity_Menu.this, Game_ImageGuessing.class);
         startActivity(intent);
     }
 
     protected void clicked_Game_WordChain(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_WordChain.class);
-        startActivity(intent);
-    }
-
-    protected void clicked_Test_WordChain(View v) {
-        Intent intent = new Intent(SelectContents2.this, Test_WordChain.class);
+        Intent intent = new Intent(Activity_Menu.this, Game_WordChain.class);
         startActivity(intent);
     }
 
     protected void clicked_Character_Info(View v) {
-        Intent intent = new Intent(SelectContents2.this, Character_Info.class);
+        Intent intent = new Intent(Activity_Menu.this, Character_Info.class);
         startActivity(intent);
     }
 
     protected void clicked_Game_BlankGuessing_BossBattle(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_BlankGuessing_BossBattle.class);
+        Intent intent = new Intent(Activity_Menu.this, Game_BlankGuessing_BossBattle.class);
         startActivity(intent);
     }
 
     protected void clicked_Game_ImageGuessing_BossBattle(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_ImageGuessing_BossBattle.class);
+        Intent intent = new Intent(Activity_Menu.this, Game_ImageGuessing_BossBattle.class);
         startActivity(intent);
     }
 
     protected void clicked_Game_WordChain_BossBattle(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_WordChain_BossBattle.class);
+        Intent intent = new Intent(Activity_Menu.this, Game_WordChain_BossBattle.class);
         startActivity(intent);
     }
 
-    protected void clicked_Layout_Test(View v) {
-        Intent intent = new Intent(SelectContents2.this, Layout_Test.class);
-        startActivity(intent);
-    }
-
-    protected void clicked_Game_ImageGuessing_TestView(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_ImageGuessing_TestView.class);
-        startActivity(intent);
-    }
-
-    protected void clicked_Game_BlankGuessing_TestView(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_BlankGuessing_TestView.class);
-        startActivity(intent);
-    }
-
-    protected void clicked_Game_WordChain_TestView(View v) {
-        Intent intent = new Intent(SelectContents2.this, Game_WordChain_TestView.class);
+    protected void clicked_Test_Menu(View v) {
+        Intent intent = new Intent(Activity_Menu.this, SelectContents2.class);
         startActivity(intent);
     }
 }

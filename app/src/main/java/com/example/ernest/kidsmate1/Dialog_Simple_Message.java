@@ -9,11 +9,11 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-class Dialog_Game_Result extends Dialog {
+class Dialog_Simple_Message extends Dialog {
     private LinearLayout linearLayout_root;
     private TextView textView_gameResult;
 
-    public Dialog_Game_Result(Context context) {
+    public Dialog_Simple_Message(Context context) {
         super(context);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // 제목
         setContentView(R.layout.dialog_game_result);
@@ -26,7 +26,7 @@ class Dialog_Game_Result extends Dialog {
         linearLayout_root.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Dialog_Game_Result.this.onBackPressed();
+                Dialog_Simple_Message.this.onBackPressed();
             }
         });
     }

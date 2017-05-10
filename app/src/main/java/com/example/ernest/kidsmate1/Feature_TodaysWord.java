@@ -151,7 +151,7 @@ public class Feature_TodaysWord extends AppCompatActivity {
         모든 라운드가 끝나고 세션의 결과를 표시
          */
         String temp = "";
-        Dialog_Game_Result game_result = new Dialog_Game_Result(this);
+        Dialog_Simple_Message game_result = new Dialog_Simple_Message(this);
         game_result.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
@@ -234,6 +234,8 @@ public class Feature_TodaysWord extends AppCompatActivity {
         mVoiceRecognizer = VoiceRecognizer.getInstance(this);
         // 음성합성 API를 사용하기 위한 객체 생성.
         mVoiceSynthesizer = new VoiceSynthesizer(this);
+
+        mDatabaseStateManager = DatabaseStateManager.getInstance();
 
         // UI 생성 (액티비티 공통)
         setContentView(R.layout.game_basic);

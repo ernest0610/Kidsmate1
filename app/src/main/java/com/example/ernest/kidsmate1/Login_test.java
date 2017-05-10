@@ -43,7 +43,7 @@ public class Login_test extends AppCompatActivity implements AdapterView.OnItemC
         else {
             Toast.makeText(getApplicationContext(), cnames.get(0) + "님 환영합니다", Toast.LENGTH_SHORT).show();
             databaseStateManager.switchCharacter(cnames.get(0));
-            Intent intent = new Intent(Login_test.this, SelectContents2.class);
+            Intent intent = new Intent(Login_test.this, Activity_Menu.class);
             startActivity(intent);
             finish();
         }
@@ -75,7 +75,7 @@ public class Login_test extends AppCompatActivity implements AdapterView.OnItemC
                     Toast.makeText(getApplicationContext(), cname + "님 환영합니다", Toast.LENGTH_SHORT).show();
                     databaseStateManager.addCharacter(cname);
                     databaseStateManager.switchCharacter(cname);
-                    Intent intent = new Intent(Login_test.this, SelectContents2.class);
+                    Intent intent = new Intent(Login_test.this, Activity_Menu.class);
                     startActivity(intent);
                     finish();
                 }
