@@ -29,6 +29,7 @@ public class MyButton {
         this.context = context;
         this.parentView = parentView;
         enabled = true;
+        text = "";
     }
 
     public void action(int id, boolean isDown, float x, float y) {

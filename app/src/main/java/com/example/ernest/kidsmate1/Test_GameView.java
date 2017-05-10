@@ -36,6 +36,7 @@ public class Test_GameView extends View {
     private MyTextView hint;
     private MyImageView enemy;
     private MyImageView quizImageGuessing;
+    private MyTextView quizWordChain;
     //////////////////////////////////////
 
     /////////////////////////////////////////////// myCharacter 정보
@@ -116,12 +117,18 @@ public class Test_GameView extends View {
     ////////////////////////////////////////////////
 
     /////////////////////////////////////////////// quizImageGuessing 정보
-    private final int quizImageGuessingRatioInView = 30;
+    private final int quizImageGuessingRatioInView = 35;
     private int quizImageGuessingRatioChange;
     private int quizImageGuessingX = 0, quizImageGuessingY = 0;
     private int quizImageGuessingWidth = 0, quizImageGuessingHeight = 0;
     private Bitmap quizImageGuessingResizedImage;
     ////////////////////////////////////////////////
+
+    /////////////////////////////////////////////// quizWordChain 정보
+    private TextPaint quizWordChainTextPaint;
+    private int quizWordChainTextX = 0, quizWordChainTextY = 0;
+    StaticLayout quizWordChainStaticLayout;
+    ///////////////////////////////////////////////
 
     //////////////////////////////////////////// view 정보
     private int view_width, view_height;
@@ -149,6 +156,8 @@ public class Test_GameView extends View {
         hintInit();
         enemy = new MyImageView(context, this);
         quizImageGuessing = new MyImageView(context, this);
+        quizWordChain = new MyTextView(context, this);
+        quizWordChainInit();
     }
     /////////////////////////////////////////////////
 
@@ -201,7 +210,7 @@ public class Test_GameView extends View {
         }
         hintStaticLayout = new StaticLayout(hint.getText(), hintTextPaint, 500, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
         canvas.save();
-        canvas.translate(10, 10);
+        canvas.translate(hintTextX, hintTextY);
         hintStaticLayout.draw(canvas);
         canvas.restore();
         if(enemy.getImage() != null && view_width != 0 && view_height != 0) {
@@ -220,6 +229,14 @@ public class Test_GameView extends View {
             quizBlankGuessingResize();
         }
         canvas.drawText(quizBlankGuessing.getText(), quizBlankGuessingTextX, quizBlankGuessingTextY, quizBlankGuessingTextPaint);
+        if(quizWordChain.getText() != "" && view_width != 0 && view_height != 0) {
+            quizWordChainResize();
+        }
+        quizWordChainStaticLayout = new StaticLayout(quizWordChain.getText(), quizWordChainTextPaint, 400, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+        canvas.save();
+        canvas.translate(quizWordChainTextX, quizWordChainTextY);
+        quizWordChainStaticLayout.draw(canvas);
+        canvas.restore();
     }
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -256,7 +273,7 @@ public class Test_GameView extends View {
         if(quizImageGuessing.getImage() != null && view_width != 0 && view_height != 0) {
             quizImageGuessingResize();
         }
-
+        quizWordChainResize();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -416,7 +433,7 @@ public class Test_GameView extends View {
             enemyRatioChange = enemyWidth * 100 / enemy.getImage().getWidth();
             enemyHeight = enemy.getImage().getHeight() * enemyRatioChange / 100;
         }
-        enemyX = view_width - enemyWidth - 10;
+        enemyX = (view_width + myCharacterX + myCharacterWidth) / 2 - enemyWidth / 2;
         enemyY = view_height / 3;
         enemyResizedImage = Bitmap.createScaledBitmap(enemy.getImage(), enemyWidth, enemyHeight, true);
     }
@@ -432,8 +449,12 @@ public class Test_GameView extends View {
             quizImageGuessingHeight = quizImageGuessing.getImage().getHeight() * quizImageGuessingRatioChange / 100;
         }
         quizImageGuessingX = view_width / 2 - quizImageGuessingWidth / 2;
-        quizImageGuessingY = 0;
+        quizImageGuessingY = myCharacterY / 2 - quizImageGuessingHeight / 2;
         quizImageGuessingResizedImage = Bitmap.createScaledBitmap(quizImageGuessing.getImage(), quizImageGuessingWidth, quizImageGuessingHeight, true);
+    }
+    private void quizWordChainResize() {
+        quizWordChainTextX = view_width / 2 - 200;
+        quizWordChainTextY = view_height / 10;
     }
     ////////////////////////////////////////////////////////////////
 
@@ -467,6 +488,9 @@ public class Test_GameView extends View {
     }
     public MyImageView getQuizImageGuessing() {
         return quizImageGuessing;
+    }
+    public MyTextView getQuizWordChain() {
+        return quizWordChain;
     }
     ////////////////////////////////////////////////////////////////
 
@@ -519,6 +543,13 @@ public class Test_GameView extends View {
         hintTextPaint.setColor(Color.BLACK);
         hintTextPaint.setTextSize(30);
         hintTextPaint.setStrokeJoin(Paint.Join.ROUND);
+    }
+    private void quizWordChainInit() {
+        quizWordChainTextPaint = new TextPaint();
+        quizWordChainTextPaint.setColor(Color.GREEN);
+        quizWordChainTextPaint.setTextSize(50);
+        quizWordChainTextPaint.setFakeBoldText(true);
+        quizWordChainTextPaint.setStrokeJoin(Paint.Join.ROUND);
     }
     ////////////////////////////////////////////////////////////////
 

@@ -57,6 +57,10 @@
 
         <activity android:name=".Game_ImageGuessing_TestView"
             android:configChanges="screenSize|orientation"/>
+        <activity android:name=".Game_BlankGuessing_TestView"
+            android:configChanges="screenSize|orientation"/>
+        <activity android:name=".Game_WordChain_TestView"
+            android:configChanges="screenSize|orientation"/>
     </application>
 
 </manifest>
