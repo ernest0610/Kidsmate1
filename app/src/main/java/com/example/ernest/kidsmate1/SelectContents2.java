@@ -232,4 +232,9 @@ public class SelectContents2 extends AppCompatActivity {
         Intent intent = new Intent(SelectContents2.this, Game_WordChain_TestView.class);
         startActivity(intent);
     }
+
+    protected void clicked_APITEST_MAIN(View v) {
+        Intent intent = new Intent(SelectContents2.this, APITEST_MAIN.class);
+        startActivity(intent);
+    }
 }

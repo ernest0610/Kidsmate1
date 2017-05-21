@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/APITEST_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:id="@+id/APITEST_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Listening…"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="@color/APITEST_status_not_hearing"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/APITEST_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:text="It is fine today."/>
+
+    </LinearLayout>
+
+</LinearLayout>

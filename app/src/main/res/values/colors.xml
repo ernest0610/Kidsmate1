@@ -7,4 +7,6 @@
     <color name="text">#f86cf8</color>
     <color name="text2">#51f803</color>
     <color name="white">#ffffff</color>
+    <color name="APITEST_status_hearing">#7B1FA2</color>
+    <color name="APITEST_status_not_hearing">#757575</color>
 </resources>
