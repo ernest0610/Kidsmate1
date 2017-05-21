@@ -39,6 +39,8 @@
             android:screenOrientation="sensorLandscape"/>
         <activity android:name=".Login_test"
             android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".Login_Test_2"
+            android:screenOrientation="sensorLandscape"/>
 
         <activity android:name=".Character_Info"
             android:screenOrientation="sensorLandscape"/>
@@ -65,7 +67,10 @@
         <activity android:name=".Activity_Menu" />
         <activity android:name=".Character_Change" />
         <activity android:name=".Character_Promote" />
-
+        <!--APITEST-->
+        <activity android:name=".APITEST_MAIN"/>
+        <service android:name=".APITEST_SpeechService"/>
+        <!--======-->
     </application>
 
 </manifest>

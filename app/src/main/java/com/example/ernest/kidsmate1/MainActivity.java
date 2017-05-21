@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements MessageDialogFrag
     }
 
     protected void mainStartClicked(View v) {               //메뉴 선택화면으로 이동
-        Intent intent = new Intent(MainActivity.this, Login_test.class);
+        Intent intent = new Intent(MainActivity.this, Login_Test_2.class);
         startActivity(intent);
         finish();
     }

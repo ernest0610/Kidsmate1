@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+
 public class DatabaseStateManager_2 {
     protected static final String TAG = DatabaseStateManager_2.class.getSimpleName();
     private static final int DB_MAX_SIZE = 3017;
@@ -15,6 +17,9 @@ public class DatabaseStateManager_2 {
     private SQLiteDatabase database;
     private Cursor cursor;
     private Object result;
+    private ArrayList<String> arrayResult;
+    private ArrayList<Pet_2> arrayResult_Pet;
+    private ArrayList<Trophy_2> arrayResult_Trophy;
     private Context context;
 
     private DatabaseStateManager_2(Context context) {
@@ -67,6 +72,20 @@ public class DatabaseStateManager_2 {
         return result;
     }
 
+    public ArrayList<String> getUserList() {
+        database = databaseHelper.openDatabase();
+        cursor = database.rawQuery("SELECT uname FROM user", null);
+        cursor.moveToFirst();
+        arrayResult = new ArrayList<String>();
+        while(!cursor.isAfterLast()) {
+            arrayResult.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        database.close();
+        return arrayResult;
+    }
+
     public void setUser(String column, Object value) {
         database = databaseHelper.openDatabase();
         if(isText(column))
@@ -105,6 +124,20 @@ public class DatabaseStateManager_2 {
         return result;
     }
 
+    public ArrayList<String> getCharacterList(String uname) {
+        database = databaseHelper.openDatabase();
+        cursor = database.rawQuery("SELECT cname FROM character WHERE uname = '" + uname + "' ORDER BY date", null);
+        cursor.moveToFirst();
+        arrayResult = new ArrayList<>();
+        while(!cursor.isAfterLast()) {
+            arrayResult.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        database.close();
+        return arrayResult;
+    }
+
     public void setCharacter(String column, Object value) {
         database = databaseHelper.openDatabase();
         if(isText(column))
@@ -123,6 +156,12 @@ public class DatabaseStateManager_2 {
     public void delCharacter(String cname) {
         database = databaseHelper.openDatabase();
         database.execSQL("DELETE FROM character WHERE uname = '" + currentUname + "' AND cname = '" + cname + "';");
+        database.close();
+    }
+
+    public void delCharacterAll(String uname) {
+        database = databaseHelper.openDatabase();
+        database.execSQL("DELETE FROM character WHERE uname = '" + uname + "'");
         database.close();
     }
     //////////////////////////////////////////////////////////////////////
@@ -290,6 +329,20 @@ public class DatabaseStateManager_2 {
         return result;
     }
 
+    public ArrayList<Pet_2> getPetList() {
+        database = databaseHelper.openDatabase();
+        cursor = database.rawQuery("SELECT uname, pid, pettype FROM pet WHERE uname = '" + currentUname + "' ORDER BY pid", null);
+        cursor.moveToFirst();
+        arrayResult_Pet = new ArrayList<Pet_2>();
+        while(!cursor.isAfterLast()) {
+            arrayResult_Pet.add(new Pet_2(cursor.getString(0), cursor.getString(1), cursor.getString(2)));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        database.close();
+        return arrayResult_Pet;
+    }
+
     public void setPet(String column, String pid, Object value) {
         database = databaseHelper.openDatabase();
         if(isText(column))
@@ -308,6 +361,12 @@ public class DatabaseStateManager_2 {
     public void delPet(String pid) {
         database = databaseHelper.openDatabase();
         database.execSQL("DELETE FROM pet WHERE uname = '" + currentUname + "' AND pid = '" + pid + "';");
+        database.close();
+    }
+
+    public void delPetAll(String uname) {
+        database = databaseHelper.openDatabase();
+        database.execSQL("DELETE FROM pet WHERE uname = '" + uname + "'");
         database.close();
     }
     /////////////////////////////////////////////////////////////////////
@@ -345,6 +404,20 @@ public class DatabaseStateManager_2 {
         return result;
     }
 
+    public ArrayList<Trophy_2> getTrophyList() {
+        database = databaseHelper.openDatabase();
+        cursor = database.rawQuery("SELECT uname, tid, trophytype FROM trophy WHERE uname = '" + currentUname + "' ORDER BY pid", null);
+        cursor.moveToFirst();
+        arrayResult_Trophy = new ArrayList<Trophy_2>();
+        while(!cursor.isAfterLast()) {
+            arrayResult_Trophy.add(new Trophy_2(cursor.getString(0), cursor.getString(1), cursor.getString(2)));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        database.close();
+        return arrayResult_Trophy;
+    }
+
     public void setTrophy(String column, String tid, Object value) {
         database = databaseHelper.openDatabase();
         if(isText(column))
@@ -363,6 +436,12 @@ public class DatabaseStateManager_2 {
     public void delTrophy(String tid) {
         database = databaseHelper.openDatabase();
         database.execSQL("DELETE FROM trophy WHERE uname = '" + currentUname + "' AND tid = '" + tid + "';");
+        database.close();
+    }
+
+    public void delTrophyAll(String uname) {
+        database = databaseHelper.openDatabase();
+        database.execSQL("DELETE FROM trophy WHERE uname = '" + uname + "'");
         database.close();
     }
     ///////////////////////////////////////////////////////////////////////

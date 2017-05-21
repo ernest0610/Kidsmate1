@@ -12,4 +12,5 @@
     <string name="permission_message">This app needs to record audio and recognize your speech.</string>
     <string name="str_start">Start</string>
     <string name="str_stop">Stop</string>
+    <string name="APITEST_appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
 </resources>

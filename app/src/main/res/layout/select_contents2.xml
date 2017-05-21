@@ -110,6 +110,13 @@
                 android:layout_height="wrap_content"
                 android:onClick="clicked_Game_WordChain_TestView"
                 android:text="game_wordChain_testView" />
+
+            <Button
+                android:id="@+id/button_APITEST_MAIN"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="clicked_APITEST_MAIN"
+                android:text="APITEST_MAIN" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
